@@ -1,4 +1,4 @@
-# 🚗 Uber Carpool Clone - Full-Stack Web Application
+# 🚗 Carpool - Full-Stack Web Application
 
 A full-stack desktop-optimized web application mimicking Uber's core carpooling functionality. This project features user and driver authentication, live interactive maps, routing, automatic seat management, booking workflows, and simulated payments.
 
