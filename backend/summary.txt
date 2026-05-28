@@ -1,0 +1,34 @@
+Carpool App Backend - Progress Summary
+
+1. Initial Setup
+- Initialized Node.js project (package.json).
+- Installed necessary dependencies: express, mongoose, dotenv, cors, bcryptjs, jsonwebtoken.
+- Installed dev dependency: nodemon.
+- Created standard MVC folder structure: config/, controllers/, middleware/, models/, routes/, utils/.
+- Configured .env file with PORT, MONGO_URI, NODE_ENV, and JWT_SECRET.
+- Created server.js as the main entry point to start the Express server.
+- Configured MongoDB connection logic in config/db.js.
+
+2. Database Models Created (MongoDB / Mongoose)
+- User Model: Stores name, email, password (hashed via bcrypt pre-save hook), role (rider/driver), and rating. Contains a matchPassword method for authenticating users.
+- Ride Model: Stores driver (ObjectId linking to User), source, destination, time, seats, and price.
+- Booking Model: Stores user (ObjectId linking to User), ride (ObjectId linking to Ride), and status (pending, confirmed, cancelled, completed).
+
+3. Authentication & Security (JWT)
+- Implemented generateToken utility to securely sign JSON Web Tokens valid for 30 days.
+- Implemented authMiddleware (the `protect` function) to intercept requests, verify the Bearer token, and attach the authenticated user to the request.
+- Added Controllers:
+  - registerUser: Creates a new user, automatically hashes their password, and returns a token.
+  - authUser: Verifies email and password, and returns a token upon successful login.
+  - getMe: Returns the profile data of the currently logged-in user.
+
+4. API Routes Hooked Up
+- POST /api/users -> Register a user.
+- POST /api/users/login -> Login a user.
+- GET /api/users -> Fetch all users (Protected route).
+- GET /api/auth/me -> Fetch current logged-in user's profile (Protected route).
+
+5. Current Operational Status
+- Local MongoDB database is fully connected and visible in MongoDB Compass.
+- Express development server is actively running on localhost:5000 and listening for changes.
+- Ready to begin implementing the core Ride and Booking logic (controllers and routes) pending your approval of the implementation plan!
