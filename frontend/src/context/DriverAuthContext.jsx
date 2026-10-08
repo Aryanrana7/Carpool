@@ -57,6 +57,7 @@ export const DriverAuthProvider = ({ children }) => {
 
   const logoutDriver = () => {
     localStorage.removeItem('driverToken');
+    localStorage.removeItem('driver');
     setDriver(null);
     toast.success('Logged out');
   };

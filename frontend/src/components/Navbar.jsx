@@ -64,6 +64,13 @@ const Navbar = () => {
 
       {/* Right side */}
       <div className="ml-auto flex items-center gap-3">
+        <Link 
+          to="/driver/dashboard" 
+          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition-colors"
+        >
+          <Car size={16} />
+          Driver Portal
+        </Link>
         {/* Theme toggle */}
         <ThemeToggle />
 

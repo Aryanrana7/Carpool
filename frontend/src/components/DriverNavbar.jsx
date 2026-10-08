@@ -73,6 +73,13 @@ const DriverNavbar = () => {
 
       {/* Right */}
       <div className="ml-auto flex items-center gap-3">
+        <Link 
+          to="/" 
+          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 transition-colors"
+        >
+          <Car size={16} />
+          User Portal
+        </Link>
         <ThemeToggle />
 
         {driver && (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import { MapPin, Navigation, Calendar, CheckCircle, XCircle, Clock, DollarSign, Car } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SocketContext } from '../context/SocketContext';
@@ -73,6 +74,18 @@ const MyRides = () => {
   const handleRateOpen = (booking) => {
     setRatingBooking(booking);
     setShowRatingModal(true);
+  };
+
+  const handleCancel = async (booking) => {
+    try {
+      await api.put(`/bookings/${booking._id}/status`, { status: 'cancelled' });
+      setBookings((prev) =>
+        prev.map((b) => (b._id === booking._id ? { ...b, status: 'cancelled' } : b))
+      );
+      toast.success('Booking cancelled');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not cancel booking');
+    }
   };
 
   useEffect(() => {
@@ -196,6 +209,14 @@ const MyRides = () => {
                         <span>{booking.ride?.carType || 'Standard'}</span>
                       </div>
                       <div className="flex items-center gap-3">
+                        {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                          <button
+                            onClick={() => handleCancel(booking)}
+                            className="text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        )}
                         {(booking.status === 'confirmed' || booking.status === 'in_progress') && (
                           <button
                             onClick={() => handleChatOpen(booking)}

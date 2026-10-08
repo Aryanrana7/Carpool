@@ -23,6 +23,16 @@ const bookingSchema = new mongoose.Schema(
   }
 );
 
+bookingSchema.index(
+  { user: 1, ride: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ['pending', 'confirmed', 'in_progress'] },
+    },
+  }
+);
+
 const Booking = mongoose.model('Booking', bookingSchema);
 
 module.exports = Booking;

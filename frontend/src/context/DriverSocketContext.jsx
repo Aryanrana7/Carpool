@@ -4,35 +4,54 @@ import { DriverAuthContext } from './DriverAuthContext';
 
 export const DriverSocketContext = createContext();
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 export const DriverSocketProvider = ({ children }) => {
   const authContext = useContext(DriverAuthContext);
   const driver = authContext?.driver;
   const socketRef = useRef(null);
   const locationIntervalRef = useRef(null);
+  const [socket, setSocket] = useState(null);
   const [isTracking, setIsTracking] = useState(false);
 
-  useEffect(() => {
-    socketRef.current = io(SOCKET_URL, { transports: ['websocket'] });
+  const stopTracking = () => {
+    if (locationIntervalRef.current) {
+      clearInterval(locationIntervalRef.current);
+      locationIntervalRef.current = null;
+    }
+    setIsTracking(false);
+  };
 
-    socketRef.current.on('connect', () => {
-      if (driver?._id) {
-        socketRef.current.emit('driver:register', { driverId: driver._id });
-      }
+  useEffect(() => {
+    if (!driver?._id) {
+      stopTracking();
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+      setSocket(null);
+      return undefined;
+    }
+
+    const instance = io(SOCKET_URL, { transports: ['websocket'] });
+    socketRef.current = instance;
+    setSocket(instance);
+
+    instance.on('connect', () => {
+      instance.emit('driver:register', { driverId: driver._id });
     });
 
     return () => {
-      stopTracking();
-      socketRef.current?.disconnect();
+      if (locationIntervalRef.current) {
+        clearInterval(locationIntervalRef.current);
+        locationIntervalRef.current = null;
+      }
+      instance.disconnect();
+      socketRef.current = null;
+      setSocket(null);
     };
   }, [driver?._id]);
 
-  /**
-   * Start emitting GPS location every 3 seconds for an active booking
-   */
   const startTracking = (bookingId, passengerId) => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation || !driver?._id) return;
     setIsTracking(true);
 
     locationIntervalRef.current = setInterval(() => {
@@ -53,24 +72,13 @@ export const DriverSocketProvider = ({ children }) => {
     }, 3000);
   };
 
-  const stopTracking = () => {
-    if (locationIntervalRef.current) {
-      clearInterval(locationIntervalRef.current);
-      locationIntervalRef.current = null;
-    }
-    setIsTracking(false);
-  };
-
-  /**
-   * Emit a ride status update to the passenger
-   */
   const emitRideStatus = (bookingId, passengerId, status) => {
     socketRef.current?.emit('driver:rideStatus', { bookingId, passengerId, status });
   };
 
   return (
     <DriverSocketContext.Provider value={{
-      socket: socketRef.current,
+      socket,
       isTracking,
       startTracking,
       stopTracking,

@@ -1,139 +1,143 @@
-# 🚗 Carpool - Full-Stack Web Application
+# Carpool - Full-Stack Web Application
 
-A full-stack desktop-optimized web application mimicking Uber's core carpooling functionality. This project features user and driver authentication, live interactive maps, routing, automatic seat management, booking workflows, and simulated payments.
-
----
-
-## 🌟 Key Features
-
-### 👤 Passenger Portal
-* **Live Search**: Auto-suggestions for addresses powered by Nominatim API.
-* **Interactive Maps**: Route planning and distance calculation powered by OpenStreetMap & OSRM routing.
-* **Booking Workflow**: Instant seat allocation and seat decrementing.
-* **Simulated Payments**: Integration screen with Card, UPI, and Wallet payment options.
-* **My Rides**: Booking history with filtering by status (Confirmed, Completed, Cancelled).
-
-### 👨‍✈️ Driver Portal
-* **Dashboard Overview**: Access driver statistics (total rides, active status, completed trips).
-* **Create a Ride**: Instantly offer ride shares specifying origin, destination, seats, and pricing.
-* **Real-time Tracking**: Emits current driver location coordinates to booked passengers via Socket.io.
-
-### ⚡ Technical Features
-* **Distinct Roles**: Independent authentication contexts for Passengers and Drivers.
-* **Real-time Communication**: Chat messaging and live location updates powered by Socket.io.
-* **Rich Styling**: Sleek Glassmorphism styling, clean animations via Framer Motion, and native Dark Mode support.
+A full-stack desktop-optimized web app for carpooling: passenger search and booking, driver ride offers, live maps, and simulated payments.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-* **Frontend**: React.js (Vite), Tailwind CSS, Framer Motion, Leaflet (Mapping), Lucide Icons, Socket.io-client.
-* **Backend**: Node.js, Express.js, MongoDB (Mongoose), Socket.io.
-* **Security & Auth**: JWT (JSON Web Tokens), Bcryptjs password hashing, Custom Auth Middleware.
+* **Frontend**: React (Vite), Tailwind CSS, Framer Motion, Leaflet, Lucide Icons, Socket.io-client
+* **Backend**: Node.js, Express, MongoDB (Mongoose), Socket.io
+* **Auth**: JWT + bcryptjs
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 Carpool/
 ├── README.md
-├── .gitignore
-└── carpool-app/
-    ├── backend/
-    │   ├── server.js
-    │   ├── config/          # Database configuration
-    │   ├── controllers/     # Route business logic
-    │   ├── middleware/      # Authentication & route protection
-    │   ├── models/          # Mongoose DB schemas
-    │   ├── routes/          # Express route definitions
-    │   └── utils/           # Utility helpers
-    └── frontend/
-        ├── index.html
-        ├── src/
-        │   ├── components/  # Reusable UI & portal widgets
-        │   ├── context/     # State management (Auth, Sockets, Theme)
-        │   ├── pages/       # Core app pages
-        │   └── services/    # Axios HTTP configuration
-        └── public/
+├── plan.md
+├── backend/
+│   ├── server.js          # HTTP + Socket.io entry
+│   ├── app.js             # Express app (used by server and tests)
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── tests/
+│   └── utils/
+└── frontend/
+    ├── src/
+    │   ├── components/
+    │   ├── context/
+    │   ├── pages/
+    │   └── services/
+    └── public/
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-* **Node.js** (v18 or higher recommended)
-* **MongoDB** (Local Community Edition or MongoDB Atlas connection string)
-* **npm** (comes bundled with Node.js)
 
-### 1. Database Setup
-Ensure that your local MongoDB server is running. On macOS (with Homebrew), you can run:
+* Node.js v18 or higher
+* MongoDB (local or Atlas)
+* npm
+
+### 1. Database
+
 ```bash
 brew services start mongodb-community
 ```
 
----
+### 2. Backend
 
-### 2. Backend Setup
-1. Open your terminal and navigate to the backend directory:
-   ```bash
-   cd carpool-app/backend
-   ```
-2. Install the backend dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file inside the `backend` folder and configure the following variables:
-   ```env
-   PORT=5001
-   MONGO_URI=mongodb://localhost:27017/carpool
-   NODE_ENV=development
-   JWT_SECRET=your_jwt_secret_key_here
-   ```
-4. Start the backend development server:
-   ```bash
-   npm run dev
-   ```
-   *The backend will run on [http://localhost:5001](http://localhost:5001).*
+```bash
+cd backend
+npm install
+cp .env.example .env
+```
 
----
+Edit `backend/.env`:
 
-### 3. Frontend Setup
-1. Open a new terminal and navigate to the frontend directory:
-   ```bash
-   cd carpool-app/frontend
-   ```
-2. Install the frontend dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-   *The frontend will run on [http://localhost:5173](http://localhost:5173).*
+```env
+PORT=5001
+MONGO_URI=mongodb://localhost:27017/carpool
+NODE_ENV=development
+JWT_SECRET=your_jwt_secret_key_here
+```
 
----
+```bash
+npm run dev
+```
 
-## 📡 API Reference
+API, health check, and Socket.io: [http://localhost:5001](http://localhost:5001) (`GET /health`).
 
-### 👤 User & Auth Endpoints
-* `POST /api/users` - Register a passenger profile.
-* `POST /api/auth/login` - Authenticate passenger & receive JWT token.
-* `GET /api/auth/user` - Retrieve active passenger profile.
+### 3. Frontend
 
-### 🚗 Ride Endpoints
-* `POST /api/rides` - Create a new ride offer (Driver only).
-* `GET /api/rides/search` - Search and filter available ride matches.
+```bash
+cd frontend
+npm install
+cp .env.example .env
+```
 
-### 📅 Booking Endpoints
-* `POST /api/bookings` - Book seats on a ride.
-* `GET /api/bookings/user` - Get passenger's booking history.
-* `PUT /api/bookings/:id/status` - Update booking state (Cancel/Complete).
+`frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:5001/api
+VITE_SOCKET_URL=http://localhost:5001
+```
+
+```bash
+npm run dev
+```
+
+App: [http://localhost:5173](http://localhost:5173).
+
+### Tests
+
+```bash
+cd backend
+npm test
+```
 
 ---
 
-## 👥 Authors
-* **Aryan Rana**
-# Carpool
+## API Reference
+
+### User & Auth
+
+* `POST /api/users` — Register passenger
+* `POST /api/users/login` — Passenger login, returns JWT
+* `GET /api/auth/me` — Current passenger profile (Bearer token)
+
+### Driver
+
+* `POST /api/drivers/register` — Register driver
+* `POST /api/drivers/login` — Driver login
+* `GET /api/drivers/profile` — Current driver profile
+
+### Rides
+
+* `POST /api/rides` — Create ride (driver)
+* `GET /api/rides/search` — Search available rides
+* `GET /api/rides/driver` — Driver's rides
+* `GET /api/rides/:id` — Ride details
+
+### Bookings
+
+* `POST /api/bookings` — Book a seat (passenger)
+* `GET /api/bookings/user` — Passenger booking history
+* `PUT /api/bookings/:id/status` — Passenger cancel (`cancelled` only)
+* `GET /api/bookings/driver` — Bookings for the driver's rides
+* `PUT /api/bookings/:id/driver-status` — Driver status updates
+* `GET /api/bookings/driver/stats` — Driver stats
+
+---
+
+## Authors
+
+* Aryan Rana
