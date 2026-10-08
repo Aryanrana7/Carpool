@@ -110,16 +110,24 @@ const updateBookingStatus = async (req, res) => {
       });
     }
 
-    if (shouldReleaseSeat(booking.status, status)) {
-      await releaseSeat(booking.ride);
+    const previousStatus = booking.status;
+    const updatedBooking = await Booking.findOneAndUpdate(
+      { _id: booking._id, user: req.user._id, status: previousStatus },
+      { $set: { status } },
+      { new: true }
+    );
+    if (!updatedBooking) {
+      return res.status(409).json({ message: 'Booking status changed; refresh and try again' });
     }
 
-    booking.status = status;
-    await booking.save();
-    await syncRideStatus(booking.ride);
-    emitBookingStatus(req, booking);
+    if (shouldReleaseSeat(previousStatus, status)) {
+      await releaseSeat(updatedBooking.ride);
+    }
 
-    res.json(booking);
+    await syncRideStatus(updatedBooking.ride);
+    emitBookingStatus(req, updatedBooking);
+
+    res.json(updatedBooking);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -161,16 +169,24 @@ const updateBookingStatusDriver = async (req, res) => {
       });
     }
 
-    if (shouldReleaseSeat(booking.status, status)) {
-      await releaseSeat(booking.ride._id);
+    const previousStatus = booking.status;
+    const updatedBooking = await Booking.findOneAndUpdate(
+      { _id: booking._id, status: previousStatus },
+      { $set: { status } },
+      { new: true }
+    );
+    if (!updatedBooking) {
+      return res.status(409).json({ message: 'Booking status changed; refresh and try again' });
     }
 
-    booking.status = status;
-    await booking.save();
-    await syncRideStatus(booking.ride._id);
-    emitBookingStatus(req, booking);
+    if (shouldReleaseSeat(previousStatus, status)) {
+      await releaseSeat(updatedBooking.ride);
+    }
 
-    res.json(booking);
+    await syncRideStatus(updatedBooking.ride);
+    emitBookingStatus(req, updatedBooking);
+
+    res.json(updatedBooking);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

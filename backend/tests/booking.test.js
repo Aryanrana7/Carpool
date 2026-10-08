@@ -12,6 +12,9 @@ const User = require('../models/User');
 const Driver = require('../models/Driver');
 const Ride = require('../models/Ride');
 const Booking = require('../models/Booking');
+const Chat = require('../models/Chat');
+const Message = require('../models/Message');
+const Review = require('../models/Review');
 
 const app = createApp();
 const futureTime = () => new Date(Date.now() + 60 * 60 * 1000).toISOString();
@@ -82,6 +85,9 @@ describe('bookings', () => {
       Driver.deleteMany({}),
       Ride.deleteMany({}),
       Booking.deleteMany({}),
+      Chat.deleteMany({}),
+      Message.deleteMany({}),
+      Review.deleteMany({}),
     ]);
   });
 
@@ -161,6 +167,26 @@ describe('bookings', () => {
 
     const updated = await Ride.findById(ride._id);
     assert.equal(updated.seats, 2);
+  });
+
+  it('restores a seat only once when cancellation requests race', async () => {
+    const driver = await createDriver();
+    const passenger = await createPassenger();
+    const ride = await createRide(driver.token, { seats: 1 });
+    const book = await request(app)
+      .post('/api/bookings')
+      .set(auth(passenger.token))
+      .send({ rideId: ride._id });
+
+    const [first, second] = await Promise.all([
+      request(app).put(`/api/bookings/${book.body._id}/status`).set(auth(passenger.token)).send({ status: 'cancelled' }),
+      request(app).put(`/api/bookings/${book.body._id}/status`).set(auth(passenger.token)).send({ status: 'cancelled' }),
+    ]);
+
+    const statuses = [first.status, second.status];
+    assert.ok(statuses.includes(200));
+    assert.ok(statuses.includes(400) || statuses.includes(409));
+    assert.equal((await Ride.findById(ride._id)).seats, 1);
   });
 
   it('rejects passenger completing a booking', async () => {
@@ -281,5 +307,69 @@ describe('bookings', () => {
       .post('/api/users/login')
       .send({ email: passenger.email, password: 'original-password' });
     assert.equal(login.status, 200);
+  });
+
+  it('prevents unrelated passengers from reading or writing a booking chat', async () => {
+    const driver = await createDriver();
+    const passenger = await createPassenger();
+    const unrelatedPassenger = await createPassenger();
+    const ride = await createRide(driver.token);
+    const booking = await Booking.create({ user: passenger._id, ride: ride._id, status: 'pending' });
+
+    const forbiddenCreate = await request(app)
+      .post('/api/chat')
+      .set(auth(unrelatedPassenger.token))
+      .send({ bookingId: booking._id.toString(), participantId: driver._id });
+    assert.equal(forbiddenCreate.status, 403);
+
+    const create = await request(app)
+      .post('/api/chat')
+      .set(auth(passenger.token))
+      .send({ bookingId: booking._id.toString(), participantId: driver._id });
+    assert.equal(create.status, 200);
+
+    const forbiddenRead = await request(app)
+      .get(`/api/chat/${create.body._id}`)
+      .set(auth(unrelatedPassenger.token));
+    assert.equal(forbiddenRead.status, 403);
+
+    const forbiddenMessage = await request(app)
+      .post('/api/chat/message')
+      .set(auth(unrelatedPassenger.token))
+      .send({ chatId: create.body._id, text: 'Not my chat' });
+    assert.equal(forbiddenMessage.status, 403);
+  });
+
+  it('derives review ownership from the completed booking', async () => {
+    const driver = await createDriver();
+    const passenger = await createPassenger();
+    const unrelatedPassenger = await createPassenger();
+    const ride = await createRide(driver.token);
+    const booking = await Booking.create({ user: passenger._id, ride: ride._id, status: 'completed' });
+
+    const forbiddenReview = await request(app)
+      .post('/api/reviews')
+      .set(auth(unrelatedPassenger.token))
+      .send({ bookingId: booking._id, rating: 5 });
+    assert.equal(forbiddenReview.status, 403);
+
+    const review = await request(app)
+      .post('/api/reviews')
+      .set(auth(passenger.token))
+      .send({
+        bookingId: booking._id,
+        targetId: unrelatedPassenger._id,
+        reviewerType: 'driver',
+        rating: 5,
+      });
+    assert.equal(review.status, 201);
+    assert.equal(review.body.reviewerType, 'user');
+    assert.equal(review.body.driver, driver._id);
+  });
+
+  it('does not expose a user directory', async () => {
+    const passenger = await createPassenger();
+    const response = await request(app).get('/api/users').set(auth(passenger.token));
+    assert.equal(response.status, 404);
   });
 });
