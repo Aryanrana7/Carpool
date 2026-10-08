@@ -9,6 +9,15 @@ const {
   syncRideStatus,
 } = require('../utils/bookingStatus');
 
+const emitBookingStatus = (req, booking) => {
+  const io = req.app.get('io');
+  const userSockets = req.app.get('userSockets');
+  const socketId = userSockets?.get(booking.user.toString());
+  if (io && socketId) {
+    io.to(socketId).emit('ride:statusUpdate', { bookingId: booking._id.toString(), status: booking.status });
+  }
+};
+
 const createBooking = async (req, res) => {
   try {
     const { rideId } = req.body;
@@ -23,7 +32,7 @@ const createBooking = async (req, res) => {
     }
 
     const ride = await Ride.findOneAndUpdate(
-      { _id: rideId, seats: { $gt: 0 } },
+      { _id: rideId, seats: { $gt: 0 }, status: 'active', time: { $gte: new Date() } },
       { $inc: { seats: -1 } },
       { new: true }
     );
@@ -33,7 +42,7 @@ const createBooking = async (req, res) => {
       if (!exists) {
         return res.status(404).json({ message: 'Ride not found' });
       }
-      return res.status(400).json({ message: 'No seats available on this ride' });
+      return res.status(400).json({ message: 'Ride is unavailable for booking' });
     }
 
     try {
@@ -108,6 +117,7 @@ const updateBookingStatus = async (req, res) => {
     booking.status = status;
     await booking.save();
     await syncRideStatus(booking.ride);
+    emitBookingStatus(req, booking);
 
     res.json(booking);
   } catch (error) {
@@ -158,6 +168,7 @@ const updateBookingStatusDriver = async (req, res) => {
     booking.status = status;
     await booking.save();
     await syncRideStatus(booking.ride._id);
+    emitBookingStatus(req, booking);
 
     res.json(booking);
   } catch (error) {

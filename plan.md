@@ -2,6 +2,22 @@
 
 Working roadmap from the current local demo toward a reliable, demo-ready (then production-shaped) ride-sharing app. Scope is grounded in the existing passenger + driver portals, Express/Mongo backend, and Socket.io maps/chat.
 
+## Next milestone — Secure, reliable demo
+
+Complete these items before adding matching, payments, or UI polish. They address the current trust boundaries and regressions found during the V2 review.
+
+| Priority | Work | Acceptance criteria |
+|---|---|---|
+| P0 | Authorize chat access | Only the passenger and driver associated with a booking can create, read, or post to its chat. Add negative authorization tests. |
+| P0 | Authenticate Socket.io | Verify the JWT during the Socket.io handshake; derive identity from it rather than `driverId` / `userId` supplied by the browser. |
+| P0 | Authorize reviews | Allow a rider to review only their completed booking's driver, and its driver to review only that rider. Ignore client-supplied target identity. |
+| P0 | Remove user-data exposure | Remove `GET /api/users` unless it is required, or limit it to an authorized admin and explicitly select safe fields. |
+| P1 | Close booking edge cases | Reject bookings for cancelled, completed, or in-progress rides; make cancellation/status updates atomic so a concurrent request cannot release a seat twice. |
+| P1 | Fix credential preservation | Change both password hooks to `return next()` when the password is unchanged, then test that profile updates do not invalidate login. |
+| P1 | Restore frontend quality gate | Fix the `RideHistory` rating callback and resolve all ESLint errors; `npm run lint --prefix frontend` must pass. |
+
+**Milestone exit check:** a passenger and driver can complete the booking → confirm → start → finish → review flow, while unauthorized HTTP and socket clients are rejected. Backend tests, frontend lint, and the production build all pass.
+
 **Out of scope unless explicitly pulled in later:** real card charging, Google Maps, mobile native apps, multi-region deploy.
 
 ---

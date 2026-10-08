@@ -9,6 +9,7 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 export const SocketProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
+  const token = authContext?.token;
   const socketRef = useRef(null);
   const [socket, setSocket] = useState(null);
   const [driverLocation, setDriverLocation] = useState(null);
@@ -16,7 +17,7 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!user?._id) {
+    if (!user?._id || !token) {
       socketRef.current?.disconnect();
       socketRef.current = null;
       setSocket(null);
@@ -24,13 +25,12 @@ export const SocketProvider = ({ children }) => {
       return undefined;
     }
 
-    const instance = io(SOCKET_URL, { transports: ['websocket'] });
+    const instance = io(SOCKET_URL, { transports: ['websocket'], auth: { token } });
     socketRef.current = instance;
     setSocket(instance);
 
     instance.on('connect', () => {
       setIsConnected(true);
-      instance.emit('user:register', { userId: user._id });
     });
 
     instance.on('disconnect', () => {
@@ -51,7 +51,7 @@ export const SocketProvider = ({ children }) => {
       setSocket(null);
       setIsConnected(false);
     };
-  }, [user?._id]);
+  }, [user?._id, token]);
 
   return (
     <SocketContext.Provider value={{

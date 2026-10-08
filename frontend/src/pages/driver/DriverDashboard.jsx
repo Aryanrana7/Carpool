@@ -27,7 +27,6 @@ const DriverDashboard = () => {
   
   const socketContext = useContext(DriverSocketContext);
   const socket = socketContext?.socket;
-  const emitRideStatus = socketContext?.emitRideStatus;
   const startTracking = socketContext?.startTracking;
   const stopTracking = socketContext?.stopTracking;
 
@@ -79,8 +78,7 @@ const DriverDashboard = () => {
   const handleUpdateStatus = async (booking, status) => {
     try {
       await api.put(`/bookings/${booking._id}/driver-status`, { status }, { headers: AUTH_HEADER() });
-      emitRideStatus(booking._id, booking.user?._id, status);
-      if (status === 'confirmed') startTracking(booking._id, booking.user?._id);
+      if (status === 'confirmed') startTracking(booking._id);
       if (status === 'completed' || status === 'rejected') stopTracking();
       const msgs = { confirmed: '✅ Accepted', rejected: '❌ Rejected', in_progress: '🚗 Ride started', completed: '🏁 Completed' };
       toast.success(msgs[status] || `Updated to ${status}`);

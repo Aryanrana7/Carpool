@@ -9,6 +9,7 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 export const DriverSocketProvider = ({ children }) => {
   const authContext = useContext(DriverAuthContext);
   const driver = authContext?.driver;
+  const driverToken = localStorage.getItem('driverToken');
   const socketRef = useRef(null);
   const locationIntervalRef = useRef(null);
   const [socket, setSocket] = useState(null);
@@ -23,7 +24,7 @@ export const DriverSocketProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!driver?._id) {
+    if (!driver?._id || !driverToken) {
       stopTracking();
       socketRef.current?.disconnect();
       socketRef.current = null;
@@ -31,13 +32,9 @@ export const DriverSocketProvider = ({ children }) => {
       return undefined;
     }
 
-    const instance = io(SOCKET_URL, { transports: ['websocket'] });
+    const instance = io(SOCKET_URL, { transports: ['websocket'], auth: { token: driverToken } });
     socketRef.current = instance;
     setSocket(instance);
-
-    instance.on('connect', () => {
-      instance.emit('driver:register', { driverId: driver._id });
-    });
 
     return () => {
       if (locationIntervalRef.current) {
@@ -48,9 +45,9 @@ export const DriverSocketProvider = ({ children }) => {
       socketRef.current = null;
       setSocket(null);
     };
-  }, [driver?._id]);
+  }, [driver?._id, driverToken]);
 
-  const startTracking = (bookingId, passengerId) => {
+  const startTracking = (bookingId) => {
     if (!navigator.geolocation || !driver?._id) return;
     setIsTracking(true);
 
@@ -59,11 +56,9 @@ export const DriverSocketProvider = ({ children }) => {
         (pos) => {
           const { latitude: lat, longitude: lng } = pos.coords;
           socketRef.current?.emit('driver:locationUpdate', {
-            driverId: driver._id,
             lat,
             lng,
             bookingId,
-            passengerId,
           });
         },
         (err) => console.warn('Geolocation error:', err),
@@ -72,17 +67,12 @@ export const DriverSocketProvider = ({ children }) => {
     }, 3000);
   };
 
-  const emitRideStatus = (bookingId, passengerId, status) => {
-    socketRef.current?.emit('driver:rideStatus', { bookingId, passengerId, status });
-  };
-
   return (
     <DriverSocketContext.Provider value={{
       socket,
       isTracking,
       startTracking,
       stopTracking,
-      emitRideStatus,
     }}>
       {children}
     </DriverSocketContext.Provider>

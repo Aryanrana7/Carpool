@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, DollarSign, Calendar } from 'lucide-react';
+import { MapPin, Navigation, DollarSign } from 'lucide-react';
 import { Shimmer } from './SkeletonLoaders';
 
 const STATUS_BADGE = {
@@ -12,7 +11,7 @@ const STATUS_BADGE = {
   pending:    'badge-warning',
 };
 
-const RideHistory = ({ bookings, loading }) => {
+const RideHistory = ({ bookings, loading, onRateOpen }) => {
   const history = bookings.filter(b => ['completed', 'cancelled', 'rejected'].includes(b.status));
 
   return (

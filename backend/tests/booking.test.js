@@ -253,4 +253,33 @@ describe('bookings', () => {
 
     assert.equal(second.status, 201);
   });
+
+  it('rejects booking a completed ride even when seats remain', async () => {
+    const driver = await createDriver();
+    const passenger = await createPassenger();
+    const ride = await createRide(driver.token, { seats: 2 });
+    await Ride.findByIdAndUpdate(ride._id, { status: 'completed' });
+
+    const booking = await request(app)
+      .post('/api/bookings')
+      .set(auth(passenger.token))
+      .send({ rideId: ride._id });
+
+    assert.equal(booking.status, 400);
+    assert.equal((await Ride.findById(ride._id)).seats, 2);
+  });
+
+  it('does not rehash an unchanged password on save', async () => {
+    const passenger = await createPassenger({ password: 'original-password' });
+    const user = await User.findById(passenger._id);
+    const passwordHash = user.password;
+    user.name = 'Updated Passenger';
+    await user.save();
+
+    assert.equal(user.password, passwordHash);
+    const login = await request(app)
+      .post('/api/users/login')
+      .send({ email: passenger.email, password: 'original-password' });
+    assert.equal(login.status, 200);
+  });
 });

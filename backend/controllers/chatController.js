@@ -1,19 +1,54 @@
 const Chat = require('../models/Chat');
 const Message = require('../models/Message');
+const Booking = require('../models/Booking');
+
+const getActorId = (req) => req.user?._id || req.driver?._id;
+
+const getAuthorizedBooking = async (bookingId, req) => {
+  const booking = await Booking.findById(bookingId).populate('ride', 'driver');
+  if (!booking || !booking.ride) return null;
+
+  const actorId = getActorId(req);
+  const isPassenger = Boolean(req.user && booking.user.equals(actorId));
+  const isDriver = Boolean(req.driver && booking.ride.driver.equals(actorId));
+
+  if (!isPassenger && !isDriver) return null;
+  return { booking, isPassenger, isDriver };
+};
+
+const getAuthorizedChat = async (chatId, req) => {
+  const chat = await Chat.findById(chatId).populate({ path: 'booking', populate: { path: 'ride', select: 'driver' } });
+  if (!chat?.booking?.ride) return null;
+
+  const actorId = getActorId(req);
+  const isPassenger = Boolean(req.user && chat.booking.user.equals(actorId));
+  const isDriver = Boolean(req.driver && chat.booking.ride.driver.equals(actorId));
+  const isParticipant = chat.participants.some((participant) => participant.equals(actorId));
+
+  return isParticipant && (isPassenger || isDriver) ? chat : null;
+};
 
 const accessChat = async (req, res) => {
   try {
     const { bookingId, participantId } = req.body;
-    
-    let chat = await Chat.findOne({
-      booking: bookingId,
-      participants: { $all: [req.user ? req.user._id : req.driver._id, participantId] }
-    }).populate('lastMessage');
+    const authorized = await getAuthorizedBooking(bookingId, req);
+    if (!authorized) return res.status(403).json({ message: 'Not authorized to access this booking chat' });
+
+    const actorId = getActorId(req);
+    const otherParticipantId = authorized.isPassenger
+      ? authorized.booking.ride.driver
+      : authorized.booking.user;
+
+    if (participantId && participantId !== otherParticipantId.toString()) {
+      return res.status(400).json({ message: 'Chat participant does not match this booking' });
+    }
+
+    let chat = await Chat.findOne({ booking: bookingId }).populate('lastMessage');
 
     if (!chat) {
       chat = await Chat.create({
         booking: bookingId,
-        participants: [req.user ? req.user._id : req.driver._id, participantId]
+        participants: [actorId, otherParticipantId]
       });
     }
 
@@ -25,7 +60,10 @@ const accessChat = async (req, res) => {
 
 const getMessages = async (req, res) => {
   try {
-    const messages = await Message.find({ chat: req.params.chatId })
+    const chat = await getAuthorizedChat(req.params.chatId, req);
+    if (!chat) return res.status(403).json({ message: 'Not authorized to read this chat' });
+
+    const messages = await Message.find({ chat: chat._id })
       .sort({ createdAt: 1 });
     res.status(200).json(messages);
   } catch (error) {
@@ -36,15 +74,18 @@ const getMessages = async (req, res) => {
 const sendMessage = async (req, res) => {
   try {
     const { chatId, text } = req.body;
-    const senderId = req.user ? req.user._id : req.driver._id;
+    const senderId = getActorId(req);
+    const chat = await getAuthorizedChat(chatId, req);
+    if (!chat) return res.status(403).json({ message: 'Not authorized to send to this chat' });
+    if (!text?.trim()) return res.status(400).json({ message: 'Message text is required' });
 
-    let message = await Message.create({
-      chat: chatId,
+    const message = await Message.create({
+      chat: chat._id,
       sender: senderId,
-      text,
+      text: text.trim(),
     });
 
-    await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id });
+    await Chat.findByIdAndUpdate(chat._id, { lastMessage: message._id });
 
     res.status(201).json(message);
   } catch (error) {

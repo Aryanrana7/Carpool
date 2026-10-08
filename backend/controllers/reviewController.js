@@ -8,7 +8,7 @@ const Booking = require('../models/Booking');
 // @access  Private
 const createReview = async (req, res) => {
   try {
-    const { bookingId, targetId, rating, reviewText, reviewerType } = req.body;
+    const { bookingId, rating, reviewText } = req.body;
     
     // Populate ride so we can access ride.driver
     const booking = await Booking.findById(bookingId).populate('ride', 'driver');
@@ -20,8 +20,14 @@ const createReview = async (req, res) => {
     }
 
     const userId = booking.user;
-    // Use the driver embedded in the ride, or fall back to targetId supplied by client
-    const driverId = booking.ride?.driver || targetId;
+    const driverId = booking.ride.driver;
+    const isPassengerReviewer = Boolean(req.user && userId.equals(req.user._id));
+    const isDriverReviewer = Boolean(req.driver && driverId.equals(req.driver._id));
+    if (!isPassengerReviewer && !isDriverReviewer) {
+      return res.status(403).json({ message: 'Not authorized to review this booking' });
+    }
+
+    const reviewerType = isPassengerReviewer ? 'user' : 'driver';
 
     // Prevent duplicate review
     const existingReview = await Review.findOne({ booking: bookingId, reviewerType });
@@ -36,7 +42,7 @@ const createReview = async (req, res) => {
       driver: driverId,
       rating: Number(rating),
       reviewText,
-      reviewerType
+      reviewerType,
     });
 
     // Recalculate average rating for the target
