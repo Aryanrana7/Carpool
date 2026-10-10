@@ -1,160 +1,200 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --color-accent: 99 102 241;        /* indigo-500 */
-    --color-accent-hover: 79 70 229;   /* indigo-600 */
-    --color-success: 16 185 129;       /* emerald-500 */
-    --nav-height: 64px;
+    /* Brand & Ink Tokens */
+    --color-ink: #0B1220;
+    --color-primary: #2563EB;
+    --color-primary-hover: #1D4ED8;
+    --color-primary-subtle: #EAF1FF;
+
+    /* Light Canvas & Surfaces */
+    --color-background: #F6F8FB;
+    --color-surface: #FFFFFF;
+    --color-surface-raised: #FFFFFF;
+    --color-border: #E3E8EF;
+    --color-border-subtle: #EEF2F6;
+
+    /* Typography */
+    --color-text-primary: #0B1220;
+    --color-text-secondary: #5B6678;
+    --color-text-muted: #8F9CAE;
+
+    /* Semantic Status */
+    --color-success: #16A34A;
+    --color-success-subtle: #F0FDF4;
+    --color-warning: #D97706;
+    --color-warning-subtle: #FFFBEB;
+    --color-danger: #DC2626;
+    --color-danger-subtle: #FEF2F2;
+    --color-info: #0284C7;
+    --color-info-subtle: #F0F9FF;
+
+    --nav-height: 68px;
   }
 
-  * { box-sizing: border-box; }
+  .dark {
+    /* Dark Brand & Ink */
+    --color-ink: #F8FAFC;
+    --color-primary: #3B82F6;
+    --color-primary-hover: #60A5FA;
+    --color-primary-subtle: rgba(59, 130, 246, 0.15);
 
-  html { scroll-behavior: smooth; }
+    /* Dark Canvas & Surfaces */
+    --color-background: #0B1220;
+    --color-surface: #111A2E;
+    --color-surface-raised: #18233C;
+    --color-border: #1F2A44;
+    --color-border-subtle: #162035;
+
+    /* Dark Typography */
+    --color-text-primary: #F8FAFC;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+
+    /* Dark Semantic Status */
+    --color-success: #22C55E;
+    --color-success-subtle: rgba(34, 197, 94, 0.15);
+    --color-warning: #F59E0B;
+    --color-warning-subtle: rgba(245, 158, 11, 0.15);
+    --color-danger: #EF4444;
+    --color-danger-subtle: rgba(239, 68, 68, 0.15);
+    --color-info: #38BDF8;
+    --color-info-subtle: rgba(56, 189, 248, 0.15);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    @apply antialiased text-gray-900 bg-[#f8f8f8] dark:bg-[#0c0c0c] dark:text-gray-100;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  h1, h2, h3, h4 { @apply tracking-tight; }
+  /* Accessible focus indicators */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
-  /* ── Design tokens ─────────────────────── */
+  /* Surface classes */
   .surface {
-    @apply bg-white dark:bg-[#161616] border border-gray-100 dark:border-[#242424];
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
   }
+
   .surface-raised {
-    @apply bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-[#242424] shadow-sm;
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px -2px rgba(11, 18, 32, 0.06), 0 2px 4px -2px rgba(11, 18, 32, 0.03);
   }
 
-  /* ── Inputs ────────────────────────────── */
-  .input-base {
-    @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-[#2d2d2d]
-           bg-white dark:bg-[#111] text-gray-900 dark:text-white
-           placeholder:text-gray-400 dark:placeholder:text-gray-600
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
-           dark:focus:ring-indigo-500/20 dark:focus:border-indigo-500
-           transition-all duration-200;
-  }
-  .input-icon { @apply pl-11; }
-
-  /* ── Buttons ───────────────────────────── */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 font-semibold
-           rounded-xl transition-all duration-200 active:scale-[0.98] select-none;
-  }
-  .btn-primary {
-    @apply btn bg-[#111] dark:bg-white text-white dark:text-[#111]
-           hover:bg-gray-800 dark:hover:bg-gray-100
-           py-3 px-6 shadow-sm;
-  }
-  .btn-accent {
-    @apply btn bg-indigo-600 text-white hover:bg-indigo-700
-           py-3 px-6 shadow-lg shadow-indigo-500/20;
-  }
-  .btn-ghost {
-    @apply btn bg-transparent text-gray-700 dark:text-gray-300
-           hover:bg-gray-100 dark:hover:bg-[#222] py-3 px-6;
-  }
-  .btn-outline {
-    @apply btn border border-gray-200 dark:border-[#2d2d2d] text-gray-700 dark:text-gray-300
-           hover:bg-gray-50 dark:hover:bg-[#1a1a1a] py-3 px-6;
-  }
-  .btn-success {
-    @apply btn bg-emerald-500 hover:bg-emerald-600 text-white
-           py-3 px-6 shadow-lg shadow-emerald-500/20;
-  }
-  .btn-danger {
-    @apply btn border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400
-           hover:bg-red-50 dark:hover:bg-red-900/20 py-3 px-6;
+  .surface-overlay {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 12px 32px -4px rgba(11, 18, 32, 0.16), 0 4px 12px -2px rgba(11, 18, 32, 0.08);
   }
 
-  /* ── Cards ─────────────────────────────── */
+  /* Card primitive classes */
   .card {
-    @apply surface rounded-2xl;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(11, 18, 32, 0.04), 0 1px 2px -1px rgba(11, 18, 32, 0.03);
   }
+
   .card-hover {
-    @apply card transition-all duration-300
-           hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]
-           hover:-translate-y-0.5;
+    @apply card transition-all duration-200;
+  }
+  .card-hover:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 6px 16px -2px rgba(11, 18, 32, 0.08);
   }
 
-  /* ── Status badges ─────────────────────── */
-  .badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
-           text-[11px] font-bold uppercase tracking-wider;
+  /* Input base style */
+  .input-base {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  .badge-success  { @apply badge bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400; }
-  .badge-warning  { @apply badge bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400; }
-  .badge-error    { @apply badge bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400; }
-  .badge-info     { @apply badge bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400; }
-  .badge-violet   { @apply badge bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400; }
-  .badge-neutral  { @apply badge bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400; }
+  .input-base::placeholder {
+    color: var(--color-text-muted);
+  }
+  .input-base:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-subtle);
+  }
 
-  /* ── Section label ─────────────────────── */
-  .section-label {
-    @apply text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500;
-  }
-
-  /* ── Glass panel ───────────────────────── */
-  .glass {
-    background: rgba(12, 12, 12, 0.82);
-    backdrop-filter: blur(20px) saturate(1.4);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  .glass-light {
-    @apply bg-white/80 dark:bg-[#161616]/80 backdrop-blur-xl border border-white/20 dark:border-white/5;
+  /* Micro-label */
+  .micro-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
   }
 }
 
 @layer utilities {
-  .text-balance { text-wrap: balance; }
-  .scrollbar-none { scrollbar-width: none; }
-  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
 }
 
-/* ── Leaflet overrides ───────────────────── */
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Leaflet Container customization */
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 0;
+  font-family: inherit;
 }
 
-/* Subtle dark overlay on tiles in dark mode */
-html.dark .leaflet-container {
-  filter: brightness(0.85) saturate(0.8);
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-/* ── Custom scrollbar ────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 ::-webkit-scrollbar-thumb {
-  border-radius: 99px;
-  @apply bg-gray-200 dark:bg-[#333];
+  background-color: var(--color-border);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-300 dark:bg-[#444];
-}
-
-/* ── Skeleton shimmer ────────────────────── */
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.5s infinite;
-  @apply rounded-lg;
-}
-html.dark .skeleton {
-  background: linear-gradient(90deg, #1e1e1e 25%, #252525 50%, #1e1e1e 75%);
-  background-size: 800px 100%;
+  background-color: var(--color-text-muted);
 }
