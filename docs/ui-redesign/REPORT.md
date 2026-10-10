@@ -273,3 +273,4 @@ Zero backend controller, model, route, or realtime socket event changes were mad
 - `3d6a7ff`: `feat(phase-6): driver console redesign with hero online toggle, truthful StatTile metrics, CARTO basemap, and ride publisher`
 - `a54548c`: `feat(phase-7): polish ChatWidget, Modal, EmptyState, and Loader with design tokens`
 - `6869480`: `feat(phase-8): remove dead legacy components, optimize route lazy loading, and achieve 51% CSS reduction`
+- `93ae19b`: `fix(map): eliminate CARTO API key watermarks with reliable muted OSM basemap and fix disabled button contrast`
