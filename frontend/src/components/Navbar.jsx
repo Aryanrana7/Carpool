@@ -1,119 +1,215 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { ThemeContext } from '../context/ThemeContext';
-import { Car, LogOut } from 'lucide-react';
+import { Car, Compass, Calendar, LogOut, ArrowRight, User } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import { motion } from 'framer-motion';
 
-const NavLink = ({ to, children, active }) => (
-  <Link
-    to={to}
-    className={`relative text-sm font-medium px-1 py-1 transition-colors duration-150 ${
-      active
-        ? 'text-gray-900 dark:text-white'
-        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-    }`}
-  >
-    {children}
-    {active && (
-      <motion.div
-        layoutId="nav-indicator"
-        className="absolute -bottom-[18px] left-0 right-0 h-0.5 bg-indigo-500 rounded-full"
-      />
-    )}
-  </Link>
-);
-
-const Navbar = () => {
+export const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const handleLogout = () => {
+    setProfileOpen(false);
     logout();
     navigate('/login');
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-8 border-b transition-all duration-200 ${
-        isDarkMode
-          ? 'bg-[#0c0c0c]/95 border-[#1e1e1e]'
-          : 'bg-white/95 border-gray-100'
-      } backdrop-blur-xl`}
-    >
-      {/* Logo */}
-      <Link to="/" className="flex items-center gap-2.5 mr-10 flex-shrink-0">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-          <Car size={16} className="text-white" />
-        </div>
-        <span className="text-[15px] font-bold tracking-tight text-gray-900 dark:text-white">
-          Carpool<span className="text-indigo-500">.</span>
-        </span>
-      </Link>
-
-      {/* Nav links */}
-      {user && (
-        <div className="flex items-center gap-6 border-b border-transparent">
-          <NavLink to="/" active={pathname === '/'}>Book a Ride</NavLink>
-          <NavLink to="/my-rides" active={pathname === '/my-rides'}>My Trips</NavLink>
-        </div>
-      )}
-
-      {/* Right side */}
-      <div className="ml-auto flex items-center gap-3">
-        <Link 
-          to="/driver/dashboard" 
-          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition-colors"
-        >
-          <Car size={16} />
-          Driver Portal
+    <>
+      <header className="fixed top-0 left-0 right-0 z-[1000] h-[68px] flex items-center px-4 sm:px-8 bg-surface/95 backdrop-blur-md border-b border-border transition-colors">
+        {/* Brand Logo */}
+        <Link to="/" className="flex items-center gap-2.5 mr-8 shrink-0 group">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+            <Car size={18} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-base font-bold tracking-tight text-ink leading-tight">
+              CarPool
+            </span>
+          </div>
         </Link>
-        {/* Theme toggle */}
-        <ThemeToggle />
 
-        {user ? (
-          <div className="flex items-center gap-2 pl-3 border-l border-gray-100 dark:border-[#242424]">
-            {/* Avatar + name */}
-            <div className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-sm font-medium ${
-              isDarkMode ? 'bg-[#1e1e1e]' : 'bg-gray-100'
-            }`}>
-              <div className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {user.name?.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-gray-900 dark:text-white max-w-[100px] truncate">{user.name}</span>
-            </div>
-
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              title="Sign out"
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-                isDarkMode
-                  ? 'bg-[#1e1e1e] text-gray-400 hover:bg-red-500/10 hover:text-red-400'
-                  : 'bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500'
-              }`}
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 pl-3 border-l border-gray-100 dark:border-[#242424]">
-            <Link to="/login" className="btn-ghost text-sm py-2 px-4">Log in</Link>
+        {/* Desktop Navigation Links — Single Active Tab Indicator */}
+        {user && (
+          <nav className="hidden md:flex items-center gap-1.5" aria-label="Main Navigation">
             <Link
-              to="/register"
-              className={`btn text-sm py-2 px-4 rounded-xl font-semibold ${
-                isDarkMode ? 'bg-white text-[#0c0c0c]' : 'bg-[#111] text-white'
-              } hover:opacity-90`}
+              to="/"
+              className={`
+                px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
+                ${pathname === '/'
+                  ? 'bg-primary-subtle text-primary'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
+                }
+              `}
             >
-              Sign up
+              <Compass size={15} />
+              <span>Find a Ride</span>
             </Link>
-          </div>
+
+            <Link
+              to="/my-rides"
+              className={`
+                px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
+                ${pathname === '/my-rides'
+                  ? 'bg-primary-subtle text-primary'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
+                }
+              `}
+            >
+              <Calendar size={15} />
+              <span>My Trips</span>
+            </Link>
+          </nav>
         )}
-      </div>
-    </nav>
+
+        {/* Right Actions */}
+        <div className="ml-auto flex items-center gap-2.5">
+          {/* Switch to Driver Portal Button */}
+          <Link
+            to="/driver/dashboard"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-border bg-surface hover:bg-background text-text-secondary hover:text-text-primary transition-colors"
+          >
+            <Car size={14} className="text-primary" />
+            <span>Driver Portal</span>
+            <ArrowRight size={12} className="text-text-muted" />
+          </Link>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* User Account / Auth Actions */}
+          {user ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setProfileOpen((prev) => !prev)}
+                className="flex items-center gap-2 p-1 pl-2 rounded-md hover:bg-border-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-expanded={profileOpen}
+                aria-haspopup="true"
+              >
+                <div className="w-7 h-7 rounded-full bg-primary-subtle text-primary border border-primary/20 flex items-center justify-center text-xs font-bold shrink-0">
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[100px] truncate">
+                  {user.name}
+                </span>
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {profileOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileOpen(false)}
+                    aria-hidden="true"
+                  />
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full mt-2 w-52 rounded-lg bg-surface border border-border shadow-overlay p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100"
+                  >
+                    <div className="px-3 py-2 border-b border-border mb-1">
+                      <p className="text-xs font-semibold text-text-primary truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-[11px] text-text-muted truncate">
+                        {user.email}
+                      </p>
+                    </div>
+
+                    <Link
+                      to="/my-rides"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors"
+                    >
+                      <Calendar size={14} />
+                      <span>My Trips</span>
+                    </Link>
+
+                    <Link
+                      to="/driver/dashboard"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                      className="sm:hidden flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors"
+                    >
+                      <Car size={14} />
+                      <span>Driver Portal</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-danger hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-colors mt-1"
+                    >
+                      <LogOut size={14} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="px-3 py-1.5 text-xs font-semibold rounded-md text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-primary text-white hover:bg-primary-hover transition-colors shadow-sm"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Passenger Mobile Bottom Navigation Bar */}
+      {user && (
+        <nav
+          aria-label="Mobile Navigation"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-surface/95 backdrop-blur-md border-t border-border flex items-center justify-around py-2 safe-area-bottom shadow-card"
+        >
+          <Link
+            to="/"
+            className={`flex flex-col items-center gap-1 px-4 py-1 rounded-md text-xs font-semibold transition-colors ${
+              pathname === '/'
+                ? 'text-primary'
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            <Compass size={18} />
+            <span>Find</span>
+          </Link>
+
+          <Link
+            to="/my-rides"
+            className={`flex flex-col items-center gap-1 px-4 py-1 rounded-md text-xs font-semibold transition-colors ${
+              pathname === '/my-rides'
+                ? 'text-primary'
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            <Calendar size={18} />
+            <span>Trips</span>
+          </Link>
+
+          <Link
+            to="/driver/dashboard"
+            className="flex flex-col items-center gap-1 px-4 py-1 rounded-md text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors"
+          >
+            <Car size={18} />
+            <span>Driver</span>
+          </Link>
+        </nav>
+      )}
+    </>
   );
 };
 
