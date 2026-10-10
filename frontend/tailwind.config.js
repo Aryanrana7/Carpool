@@ -9,6 +9,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        heading: ['Manrope', 'system-ui', 'sans-serif'],
       },
       colors: {
         ink: 'var(--color-ink)',
@@ -16,6 +17,12 @@ export default {
           DEFAULT: 'var(--color-primary)',
           hover: 'var(--color-primary-hover)',
           subtle: 'var(--color-primary-subtle)',
+        },
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+          hover: 'var(--color-accent-hover)',
+          subtle: 'var(--color-accent-subtle)',
+          text: 'var(--color-accent-text)',
         },
         background: 'var(--color-background)',
         surface: {
