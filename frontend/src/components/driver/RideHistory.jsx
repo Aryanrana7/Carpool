@@ -1,52 +1,58 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, DollarSign } from 'lucide-react';
+import { MapPin, Navigation, History } from 'lucide-react';
 import { Shimmer } from './SkeletonLoaders';
+import Badge from '../ui/Badge';
+import { formatCurrency, formatDate, formatTime } from '../../utils/formatters';
 
-const STATUS_BADGE = {
-  completed: 'badge-success',
-  cancelled:  'badge-error',
-  rejected:   'badge-neutral',
-  in_progress:'badge-info',
-  confirmed:  'badge-violet',
-  pending:    'badge-warning',
+const STATUS_VARIANT = {
+  completed: 'success',
+  cancelled: 'error',
+  rejected: 'neutral',
+  in_progress: 'info',
+  confirmed: 'success',
+  pending: 'warning',
 };
 
-const RideHistory = ({ bookings, loading, onRateOpen }) => {
-  const history = bookings.filter(b => ['completed', 'cancelled', 'rejected'].includes(b.status));
+const RideHistory = ({ bookings, loading }) => {
+  const history = bookings.filter((b) => ['completed', 'cancelled', 'rejected'].includes(b.status));
 
   return (
-    <div className="card overflow-hidden">
+    <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-subtle">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50 dark:border-[#1e1e1e]">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
-          <h2 className="font-black text-[15px] text-gray-900 dark:text-white">Ride History</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{history.length} completed trips</p>
+          <h2 className="font-bold text-sm text-text-primary">Trip History & Past Rides</h2>
+          <p className="text-xs text-text-muted mt-0.5">{history.length} completed operations recorded</p>
         </div>
       </div>
 
-      {/* Table head */}
-      <div className="hidden md:grid grid-cols-5 gap-4 px-6 py-3 bg-gray-50 dark:bg-[#0f0f0f] border-b border-gray-50 dark:border-[#1e1e1e]">
-        {['Date', 'Route', '', 'Earnings', 'Status'].map((h, i) => (
-          <span key={i} className={`section-label ${i === 1 ? 'col-span-2' : ''}`}>{h}</span>
-        ))}
+      {/* Table Headers for Desktop */}
+      <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-2.5 bg-background border-b border-border text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+        <span className="col-span-3">Date & Time</span>
+        <span className="col-span-5">Route Summary</span>
+        <span className="col-span-2 text-right">Fare Earnings</span>
+        <span className="col-span-2 text-right">Status</span>
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-gray-50 dark:divide-[#1a1a1a]">
+      <div className="divide-y divide-border">
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="px-6 py-4 animate-pulse grid grid-cols-5 gap-4 items-center">
-              <Shimmer className="h-4 w-20" />
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="px-5 py-4 animate-pulse grid grid-cols-12 gap-4 items-center">
+              <Shimmer className="h-4 col-span-3" />
+              <Shimmer className="h-4 col-span-5" />
               <Shimmer className="h-4 col-span-2" />
-              <Shimmer className="h-4 w-12" />
-              <Shimmer className="h-5 w-20 rounded-full" />
+              <Shimmer className="h-5 col-span-2 rounded-full" />
             </div>
           ))
         ) : history.length === 0 ? (
-          <div className="py-20 text-center">
-            <p className="text-3xl mb-3">📋</p>
-            <p className="font-semibold text-sm text-gray-400">No history yet</p>
-            <p className="text-xs text-gray-300 dark:text-gray-600 mt-1">Completed rides appear here</p>
+          <div className="py-12 text-center text-text-muted">
+            <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center mx-auto mb-2.5 text-text-muted">
+              <History size={18} />
+            </div>
+            <p className="font-semibold text-sm text-text-primary">No Past Trips Found</p>
+            <p className="text-xs text-text-muted mt-0.5">Completed rides and recorded settlements will appear here</p>
           </div>
         ) : (
           history.map((booking, idx) => (
@@ -54,46 +60,49 @@ const RideHistory = ({ bookings, loading, onRateOpen }) => {
               key={booking._id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: idx * 0.03 }}
-              className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-[#0f0f0f] transition-colors grid grid-cols-5 gap-4 items-center"
+              transition={{ delay: idx * 0.02 }}
+              className="px-5 py-3.5 hover:bg-background/60 transition-colors flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4 items-start md:items-center text-xs"
             >
-              <div>
-                <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">
-                  {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '—'}
+              {/* Date & Time */}
+              <div className="md:col-span-3">
+                <p className="font-semibold text-text-primary">
+                  {booking.createdAt ? formatDate(booking.createdAt) : '—'}
                 </p>
-                <p className="text-[10px] text-gray-400">
-                  {booking.createdAt ? new Date(booking.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                <p className="text-[11px] text-text-muted">
+                  {booking.createdAt ? formatTime(booking.createdAt) : ''}
                 </p>
               </div>
 
-              <div className="col-span-2 space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <MapPin size={10} className="text-indigo-500 flex-shrink-0" />
-                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate font-medium">{booking.ride?.source?.split(',')[0] || '—'}</p>
+              {/* Route */}
+              <div className="md:col-span-5 space-y-1 w-full">
+                <div className="flex items-center gap-1.5 text-text-primary font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                  <span className="truncate">{booking.ride?.source?.split(',')[0] || 'Pickup point'}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Navigation size={10} className="text-violet-500 flex-shrink-0" />
-                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate font-medium">{booking.ride?.destination?.split(',')[0] || '—'}</p>
+                <div className="flex items-center gap-1.5 text-text-muted">
+                  <span className="w-1.5 h-1.5 rounded-sm bg-text-primary shrink-0" />
+                  <span className="truncate">{booking.ride?.destination?.split(',')[0] || 'Dropoff point'}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
-                <DollarSign size={12} className="text-emerald-500" />
-                <p className={`font-black text-sm ${booking.status === 'completed' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-300 dark:text-gray-600 line-through'}`}>
-                  {booking.ride?.price ?? '0'}
-                </p>
+              {/* Earnings */}
+              <div className="md:col-span-2 md:text-right flex items-center md:justify-end">
+                <span
+                  className={`font-bold tabular-nums ${
+                    booking.status === 'completed'
+                      ? 'text-text-primary'
+                      : 'text-text-muted line-through'
+                  }`}
+                >
+                  {formatCurrency(booking.ride?.price ?? 0)}
+                </span>
               </div>
 
-              <div className="flex items-center justify-end gap-3">
-                <span className={STATUS_BADGE[booking.status]}>{booking.status}</span>
-                {booking.status === 'completed' && (
-                  <button
-                    onClick={() => onRateOpen && onRateOpen(booking)}
-                    className="text-amber-500 hover:text-amber-600 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 px-2.5 py-1 rounded-md text-[10px] font-bold transition-colors"
-                  >
-                    ⭐️ Rate
-                  </button>
-                )}
+              {/* Status */}
+              <div className="md:col-span-2 md:text-right flex items-center md:justify-end">
+                <Badge variant={STATUS_VARIANT[booking.status] || 'neutral'}>
+                  {booking.status}
+                </Badge>
               </div>
             </motion.div>
           ))

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, memo } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -8,49 +8,48 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import { ThemeContext } from '../../context/ThemeContext';
+import { Navigation2, Crosshair, MapPin } from 'lucide-react';
+import api from '../../services/api';
 
-// Driver marker icon
+// Driver marker SVG divIcon
 const buildDriverIcon = () =>
   L.divIcon({
     html: `
-      <div
-        style="
-          background:#10b981;
-          width:40px;
-          height:40px;
-          border-radius:50%;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          border:3px solid white;
-          box-shadow:0 4px 16px rgba(16,185,129,0.5);
-          font-size:18px;
-        "
-      >
-        🚗
+      <div style="
+        width: 36px;
+        height: 36px;
+        background: #2563EB;
+        border: 2.5px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+      ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+          <circle cx="7" cy="17" r="2"/>
+          <path d="M9 17h6"/>
+          <circle cx="17" cy="17" r="2"/>
+        </svg>
       </div>
     `,
     className: '',
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20],
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18],
   });
 
-// Automatically move map when driver location changes
+// Smoothly pan map on location update
 const FlyToLocation = ({ position }) => {
   const map = useMap();
 
   useEffect(() => {
     if (!position) return;
-
-    map.flyTo(
-      [position.lat, position.lng],
-      15,
-      {
-        animate: true,
-        duration: 1.5,
-      }
-    );
+    map.flyTo([position.lat, position.lng], 15, {
+      animate: true,
+      duration: 1.0,
+    });
   }, [position, map]);
 
   return null;
@@ -58,23 +57,18 @@ const FlyToLocation = ({ position }) => {
 
 const DriverLiveMap = ({ driverLocation }) => {
   const { isDarkMode } = useContext(ThemeContext);
-
   const [currentPos, setCurrentPos] = useState(driverLocation || null);
+  const [placeName, setPlaceName] = useState('');
 
-  // Update position whenever socket sends a new location
   useEffect(() => {
     if (driverLocation) {
       setCurrentPos(driverLocation);
     }
   }, [driverLocation]);
 
-  // Use browser GPS if socket location isn't available
   useEffect(() => {
     if (driverLocation) return;
-
-    if (!navigator.geolocation) {
-      return;
-    }
+    if (!navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -84,7 +78,7 @@ const DriverLiveMap = ({ driverLocation }) => {
         });
       },
       (error) => {
-        console.log('Geolocation unavailable:', error.message);
+        console.warn('Driver geolocation fallback:', error.message);
       },
       {
         enableHighAccuracy: true,
@@ -94,48 +88,72 @@ const DriverLiveMap = ({ driverLocation }) => {
     );
   }, [driverLocation]);
 
-  // Default location if GPS/socket isn't available
+  // Reverse geocode to friendly landmark if coordinates exist
+  useEffect(() => {
+    let isMounted = true;
+    if (!currentPos?.lat || !currentPos?.lng) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const { data } = await api.get('/proxy/reverse', {
+          params: { lat: currentPos.lat, lon: currentPos.lng },
+        });
+        if (isMounted && data?.address) {
+          const parts = [
+            data.address.road || data.address.suburb,
+            data.address.city || data.address.town || data.address.county,
+          ].filter(Boolean);
+          if (parts.length > 0) {
+            setPlaceName(parts.join(', '));
+          }
+        }
+      } catch {
+        // Graceful fallback to default status text
+      }
+    }, 1000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [currentPos?.lat, currentPos?.lng]);
+
   const center = currentPos
     ? [currentPos.lat, currentPos.lng]
-    : [30.7333, 76.7794]; // Chandigarh
+    : [30.7333, 76.7794];
+
+  const tileUrl = isDarkMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
   return (
-    <div className="bg-white dark:bg-[#1c1c1c] rounded-3xl border border-gray-100 dark:border-[#2a2a2a] h-full flex flex-col overflow-hidden">
-
+    <div className="bg-surface border border-border rounded-xl h-full flex flex-col overflow-hidden shadow-subtle">
       {/* Header */}
-      <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2a2a2a] flex-shrink-0">
-
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
         <div>
-          <h2 className="text-base font-black text-gray-900 dark:text-white">
-            Live Location
+          <h2 className="font-bold text-sm text-text-primary flex items-center gap-2">
+            <Navigation2 size={16} className="text-primary" />
+            Live Vehicle GPS
           </h2>
-
-          <p className="text-[10px] text-gray-400 mt-0.5">
-            Your position updates in real-time
+          <p className="text-xs text-text-muted mt-0.5">
+            Streaming real-time coordinates to assigned riders
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-
-          <div
+          <span
             className={`w-2 h-2 rounded-full ${
-              currentPos
-                ? 'bg-emerald-400 animate-pulse'
-                : 'bg-gray-300'
+              currentPos ? 'bg-success animate-pulse' : 'bg-border'
             }`}
           />
-
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-            {currentPos ? 'Live' : 'Offline'}
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+            {currentPos ? 'Broadcasting' : 'Standby'}
           </span>
-
         </div>
-
       </div>
 
-      {/* Map */}
+      {/* Map Canvas */}
       <div className="flex-1 relative min-h-0">
-
         <MapContainer
           center={center}
           zoom={14}
@@ -143,119 +161,54 @@ const DriverLiveMap = ({ driverLocation }) => {
           zoomControl={true}
           scrollWheelZoom={true}
         >
-
-          {/* OpenStreetMap
-              No API key required
-          */}
           <TileLayer
-            key={isDarkMode ? 'dark' : 'light'}
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            key={isDarkMode ? 'carto-dark' : 'carto-light'}
+            url={tileUrl}
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           />
 
-          {/* Move map to driver's current position */}
-          {currentPos && (
-            <FlyToLocation position={currentPos} />
-          )}
+          {currentPos && <FlyToLocation position={currentPos} />}
 
-          {/* Driver marker */}
           {currentPos && (
-            <Marker
-              position={[
-                currentPos.lat,
-                currentPos.lng,
-              ]}
-              icon={buildDriverIcon()}
-            >
+            <Marker position={[currentPos.lat, currentPos.lng]} icon={buildDriverIcon()}>
               <Popup>
-                <div style={{ textAlign: 'center' }}>
-                  <strong>🚗 You are here</strong>
-                  <br />
-                  <span style={{ fontSize: '12px' }}>
-                    Live driver location
-                  </span>
+                <div className="p-1 text-center font-sans">
+                  <p className="font-bold text-xs text-slate-900">Current Position</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {placeName || 'Live Location Active'}
+                  </p>
                 </div>
               </Popup>
             </Marker>
           )}
-
         </MapContainer>
 
-        {/* Location coordinates */}
+        {/* Human-readable location / coordinates banner */}
         {currentPos && (
-          <div
-            className="
-              absolute
-              bottom-4
-              left-4
-              z-[1000]
-              bg-white/90
-              dark:bg-[#1c1c1c]/90
-              backdrop-blur-sm
-              px-4
-              py-2
-              rounded-xl
-              text-xs
-              font-bold
-              text-gray-700
-              dark:text-gray-300
-              border
-              border-gray-100
-              dark:border-[#2a2a2a]
-              shadow-lg
-            "
-          >
-            📍 {currentPos.lat?.toFixed(4)}, {currentPos.lng?.toFixed(4)}
+          <div className="absolute top-3 left-3 z-[400] bg-surface/90 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs font-medium text-text-primary border border-border shadow-subtle flex items-center gap-2">
+            <MapPin size={14} className="text-primary shrink-0" />
+            <span className="truncate max-w-[200px]">
+              {placeName || 'Broadcasting live location'}
+            </span>
+            <span className="text-[10px] text-text-muted font-mono pl-1 border-l border-border">
+              {currentPos.lat?.toFixed(4)}, {currentPos.lng?.toFixed(4)}
+            </span>
           </div>
         )}
 
-        {/* Waiting for location */}
+        {/* Waiting for geolocation fix */}
         {!currentPos && (
-          <div
-            className="
-              absolute
-              inset-0
-              z-[900]
-              flex
-              items-center
-              justify-center
-              pointer-events-none
-            "
-          >
-            <div
-              className="
-                bg-white/95
-                dark:bg-[#1c1c1c]/95
-                backdrop-blur-sm
-                px-6
-                py-4
-                rounded-2xl
-                shadow-xl
-                border
-                border-gray-100
-                dark:border-[#2a2a2a]
-                text-center
-              "
-            >
-              <div className="text-2xl mb-2">
-                📍
-              </div>
-
-              <p className="text-sm font-bold text-gray-800 dark:text-white">
-                Getting your location...
-              </p>
-
-              <p className="text-xs text-gray-400 mt-1">
-                Please allow location access
-              </p>
+          <div className="absolute inset-0 z-[900] flex items-center justify-center pointer-events-none p-4">
+            <div className="bg-surface/95 backdrop-blur-md px-6 py-4 rounded-xl border border-border shadow-overlay text-center">
+              <Crosshair size={22} className="text-primary animate-spin mx-auto mb-2" />
+              <p className="text-xs font-semibold text-text-primary">Acquiring GPS Fix…</p>
+              <p className="text-[11px] text-text-muted mt-0.5">Please grant browser location permissions</p>
             </div>
           </div>
         )}
-
       </div>
-
     </div>
   );
 };
 
-export default DriverLiveMap;
+export default memo(DriverLiveMap);

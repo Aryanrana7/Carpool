@@ -1,22 +1,33 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { DriverSocketContext } from '../../context/DriverSocketContext';
 import { DriverAuthContext } from '../../context/DriverAuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
-import StatCard from '../../components/driver/StatCard';
+import StatTile from '../../components/ui/StatTile';
 import BookingRequestsPanel from '../../components/driver/BookingRequestsPanel';
+import IncomingRequestsPanel from '../../components/driver/IncomingRequestsPanel';
 import ActiveRidePanel from '../../components/driver/ActiveRidePanel';
 import DriverLiveMap from '../../components/driver/DriverLiveMap';
 import RideHistory from '../../components/driver/RideHistory';
 import ChatWidget from '../../components/chat/ChatWidget';
-import RatingModal from '../../components/RatingModal';
+import Button from '../../components/ui/Button';
+import IconButton from '../../components/ui/IconButton';
 import { StatCardSkeleton } from '../../components/driver/SkeletonLoaders';
 
-import { CheckCircle, DollarSign, Car, Wifi, WifiOff, BarChart2, RefreshCw, PlusCircle, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import StarRating from '../../components/StarRating';
+import {
+  CheckCircle2,
+  Wallet,
+  Car,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  PlusCircle,
+  Star,
+} from 'lucide-react';
+import { formatCurrency } from '../../utils/formatters';
 
 const AUTH_HEADER = () => ({ Authorization: `Bearer ${localStorage.getItem('driverToken')}` });
 
@@ -24,18 +35,19 @@ const DriverDashboard = () => {
   const navigate = useNavigate();
   const authContext = useContext(DriverAuthContext);
   const driver = authContext?.driver;
-  
+
   const socketContext = useContext(DriverSocketContext);
   const socket = socketContext?.socket;
   const startTracking = socketContext?.startTracking;
   const stopTracking = socketContext?.stopTracking;
+  const updateLocationOnce = socketContext?.updateLocationOnce;
+
+  const isMountedRef = useRef(true);
 
   const [bookings, setBookings] = useState([]);
+  const [activeOnDemandRide, setActiveOnDemandRide] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [chatBooking, setChatBooking] = useState(null);
-  
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [ratingBooking, setRatingBooking] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -43,36 +55,69 @@ const DriverDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [driverLiveLocation, setDriverLiveLocation] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos =>
-        setDriverLiveLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-      );
-    }
-  }, []);
-
-  const fetchData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const [bookingsRes, statsRes] = await Promise.all([
         api.get('/bookings/driver', { headers: AUTH_HEADER() }),
         api.get('/bookings/driver/stats', { headers: AUTH_HEADER() }),
       ]);
-      setBookings(bookingsRes.data);
-      setStats(statsRes.data);
+      if (isMountedRef.current) {
+        setBookings(bookingsRes.data || []);
+        setStats(statsRes.data || null);
+      }
     } catch {
-      toast.error('Failed to load dashboard data');
+      if (isMountedRef.current) {
+        toast.error('Failed to load dashboard data');
+      }
     } finally {
-      setLoading(false);
-      setStatsLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+        setStatsLoading(false);
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    (async () => {
+      await fetchDashboardData();
+    })();
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        if (isMountedRef.current) {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setDriverLiveLocation(loc);
+          api.put('/drivers/location', loc, { headers: AUTH_HEADER() }).catch(() => {});
+        }
+      });
+    }
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [fetchDashboardData]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchData();
+    await fetchDashboardData();
     setRefreshing(false);
-    toast.success('Refreshed');
+    toast.success('Console refreshed');
+  };
+
+  const handleToggleOnline = async () => {
+    const nextState = !isOnline;
+    setIsOnline(nextState);
+    try {
+      await api.put('/drivers/availability', { isAvailable: nextState }, { headers: AUTH_HEADER() });
+      if (nextState && updateLocationOnce) {
+        updateLocationOnce();
+      }
+      toast.success(nextState ? 'Online — accepting ride requests' : 'Offline — matching paused');
+    } catch {
+      setIsOnline(!nextState);
+      toast.error('Failed to update availability status');
+    }
   };
 
   const handleUpdateStatus = async (booking, status) => {
@@ -80,109 +125,208 @@ const DriverDashboard = () => {
       await api.put(`/bookings/${booking._id}/driver-status`, { status }, { headers: AUTH_HEADER() });
       if (status === 'confirmed') startTracking(booking._id);
       if (status === 'completed' || status === 'rejected') stopTracking();
-      const msgs = { confirmed: '✅ Accepted', rejected: '❌ Rejected', in_progress: '🚗 Ride started', completed: '🏁 Completed' };
+      const msgs = {
+        confirmed: 'Booking Accepted',
+        rejected: 'Booking Rejected',
+        in_progress: 'Ride Started',
+        completed: 'Trip Completed',
+      };
       toast.success(msgs[status] || `Updated to ${status}`);
-      
-      if (status === 'completed') {
-        setRatingBooking(booking);
-        setShowRatingModal(true);
-      }
-      
-      fetchData();
+      fetchDashboardData();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update');
+      toast.error(err.response?.data?.message || 'Failed to update booking status');
     }
   };
 
-  const handleChatOpen = (booking) => {
-    setChatBooking(booking);
+  const handleOnDemandAccepted = (rideReq, bookingId) => {
+    setActiveOnDemandRide(rideReq);
+    if (startTracking) {
+      startTracking(bookingId, rideReq._id);
+    }
+    fetchDashboardData();
+  };
+
+  const handleOnDemandStatusUpdated = (newStatus) => {
+    if (activeOnDemandRide) {
+      setActiveOnDemandRide((prev) => ({ ...prev, status: newStatus }));
+      if (newStatus === 'completed') {
+        if (stopTracking) stopTracking();
+        setTimeout(() => setActiveOnDemandRide(null), 3000);
+      }
+    }
+    fetchDashboardData();
+  };
+
+  const handleChatOpen = (target) => {
+    if (target.user && target.ride) {
+      setChatBooking({
+        _id: target.booking || target._id,
+        user: target.user,
+      });
+    } else {
+      setChatBooking(target);
+    }
     setShowChat(true);
   };
 
-  const handleRateOpen = (booking) => {
-    setRatingBooking(booking);
-    setShowRatingModal(true);
-  };
+  const activeRide = bookings.find((b) => b.status === 'confirmed' || b.status === 'in_progress') || null;
 
-  const activeRide = bookings.find(b => b.status === 'confirmed' || b.status === 'in_progress') || null;
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#f8f8f8] dark:bg-[#0c0c0c]">
-      <div className="max-w-[1600px] mx-auto p-6 space-y-5">
-
-        {/* ── Top bar ─────────────────────────────── */}
-        <div className="flex items-center justify-between">
+    <div className="min-h-[calc(100vh-64px)] bg-background">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* ── Console Header ─────────────────────────────────── */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border">
           <div>
-            <p className="section-label mb-1">Driver Console</p>
-            <h1 className="text-2xl font-black text-gray-900 dark:text-white">
-              Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'},{' '}
-              <span className="text-emerald-500">{driver?.name?.split(' ')[0] || 'Driver'}</span>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Welcome back,{' '}
+              <span className="text-primary">
+                {driver?.name?.split(' ')[0] || 'Driver'}
+              </span>
             </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{driver?.carModel} · {driver?.carNumber}</p>
+            <p className="text-xs text-text-muted mt-1">
+              {driver?.carModel || 'Standard Vehicle'} · {driver?.carNumber || 'Verified Registration'}
+            </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* HERO CONTROL: Online / Offline status toggle */}
             <button
-              onClick={handleRefresh}
-              className="w-9 h-9 rounded-xl bg-white dark:bg-[#161616] border border-gray-100 dark:border-[#242424] flex items-center justify-center text-gray-500 hover:text-emerald-500 transition-colors"
+              onClick={handleToggleOnline}
+              className={`
+                h-11 px-5 rounded-lg font-semibold text-sm flex items-center gap-2.5 transition-all shadow-subtle
+                ${
+                  isOnline
+                    ? 'bg-success text-white hover:bg-success/90 ring-4 ring-success/20'
+                    : 'bg-surface text-text-muted border border-border hover:bg-background'
+                }
+              `}
+              aria-label={isOnline ? 'Go offline' : 'Go online'}
             >
-              <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+              {isOnline ? (
+                <>
+                  <Wifi size={16} />
+                  <span>Online & Ready</span>
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                </>
+              ) : (
+                <>
+                  <WifiOff size={16} />
+                  <span>Go Online</span>
+                  <span className="w-2 h-2 rounded-full bg-text-muted" />
+                </>
+              )}
             </button>
-            <button
+
+            {/* Secondary Action: Post Scheduled Ride */}
+            <Button
+              variant="secondary"
               onClick={() => navigate('/driver/create-ride')}
-              className="btn-success text-sm py-2 px-4"
+              className="h-11 text-xs"
             >
-              <PlusCircle size={15} /> Post a Ride
-            </button>
-            <button
-              onClick={() => { setIsOnline(p => !p); toast(!isOnline ? '🟢 Online' : '🔴 Offline'); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all ${
-                isOnline
-                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
-                  : 'bg-white dark:bg-[#161616] border-gray-200 dark:border-[#242424] text-gray-500'
-              }`}
-            >
-              {isOnline ? <Wifi size={15} /> : <WifiOff size={15} />}
-              {isOnline ? 'Online' : 'Offline'}
-              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
-            </button>
+              <PlusCircle size={15} className="mr-1.5" />
+              Post Scheduled Ride
+            </Button>
+
+            {/* Refresh */}
+            <IconButton
+              icon={RefreshCw}
+              variant="secondary"
+              size="md"
+              ariaLabel="Refresh console"
+              onClick={handleRefresh}
+              className={refreshing ? 'animate-spin' : ''}
+            />
           </div>
         </div>
 
-        {/* ── Stats cards ─────────────────────────── */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* ── Truthful Metric Strip ───────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
           {statsLoading ? (
-            Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
+            Array.from({ length: 5 }).map((_, i) => <StatCardSkeleton key={i} />)
           ) : (
             <>
-              <StatCard icon={CheckCircle} label="Completed Rides" value={stats?.totalRides ?? 0} sub="All time" color="emerald" trend={8} />
-              <StatCard icon={DollarSign} label="Total Earnings" value={`$${stats?.totalEarnings ?? '0.00'}`} sub="From completed rides" color="blue" trend={12} />
-              <StatCard icon={BarChart2} label="Rides Posted" value={stats?.totalRidesOffered ?? 0} sub="Published routes" color="violet" />
-              <StatCard icon={Star} label="Your Rating" value={driver?.averageRating > 0 ? driver.averageRating.toFixed(1) : '—'} sub={`${driver?.totalReviews ?? 0} reviews`} color="amber" />
-              <StatCard icon={Car} label="Status" value={isOnline ? 'Online' : 'Offline'} sub={`${stats?.pendingRequests ?? 0} pending`} color={isOnline ? 'emerald' : 'amber'}>
-                <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-gray-400'}`} />
-              </StatCard>
+              <StatTile
+                icon={CheckCircle2}
+                label="Completed Trips"
+                value={stats?.totalRides ?? 0}
+                subtext="Finished journeys"
+              />
+              <StatTile
+                icon={Wallet}
+                label="Earnings"
+                value={formatCurrency(stats?.totalEarnings ?? 0)}
+                subtext="Settled revenue"
+              />
+              <StatTile
+                icon={Car}
+                label="Rides Posted"
+                value={stats?.totalRidesOffered ?? 0}
+                subtext="Scheduled routes"
+              />
+              <StatTile
+                icon={Star}
+                label="Rating"
+                value={driver?.averageRating > 0 ? driver.averageRating.toFixed(1) : ''}
+                empty={!driver?.totalReviews || driver.totalReviews === 0}
+                emptyText="No reviews yet"
+                subtext={
+                  driver?.totalReviews > 0
+                    ? `${driver.totalReviews} verified review${driver.totalReviews > 1 ? 's' : ''}`
+                    : 'Awaiting first review'
+                }
+              />
+              <StatTile
+                icon={Wifi}
+                label="Dispatch Status"
+                value={isOnline ? 'Active' : 'Standby'}
+                subtext={isOnline ? 'Receiving broadcasts' : 'Offline'}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full inline-block ${
+                    isOnline ? 'bg-success animate-pulse' : 'bg-text-muted'
+                  }`}
+                />
+              </StatTile>
             </>
           )}
         </div>
 
-        {/* ── Main 3-column grid ───────────────────── */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5" style={{ height: '520px' }}>
-          <div className="xl:col-span-4 h-full">
-            <BookingRequestsPanel bookings={bookings} loading={loading} onUpdateStatus={handleUpdateStatus} />
+        {/* ── On-Demand Incoming Broadcasts Section ────────── */}
+        <IncomingRequestsPanel
+          socket={socket}
+          isOnline={isOnline}
+          activeOnDemandRide={activeOnDemandRide}
+          onRideAccepted={handleOnDemandAccepted}
+          onRideStatusUpdated={handleOnDemandStatusUpdated}
+          onChatOpen={handleChatOpen}
+        />
+
+        {/* ── 3-Column Operations Grid ─────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:h-[500px]">
+          <div className="lg:col-span-4 h-full min-h-[360px] lg:min-h-0">
+            <BookingRequestsPanel
+              bookings={bookings}
+              loading={loading}
+              onUpdateStatus={handleUpdateStatus}
+            />
           </div>
-          <div className="xl:col-span-4 h-full">
-            <ActiveRidePanel booking={activeRide} onUpdateStatus={handleUpdateStatus} onChatOpen={handleChatOpen} />
+          <div className="lg:col-span-4 h-full min-h-[360px] lg:min-h-0">
+            <ActiveRidePanel
+              booking={activeRide}
+              onUpdateStatus={handleUpdateStatus}
+              onChatOpen={handleChatOpen}
+            />
           </div>
-          <div className="xl:col-span-4 h-full">
+          <div className="lg:col-span-4 h-full min-h-[360px] lg:min-h-0">
             <DriverLiveMap driverLocation={driverLiveLocation} />
           </div>
         </div>
 
-        {/* ── Ride history ─────────────────────────── */}
-        <RideHistory bookings={bookings} loading={loading} onRateOpen={handleRateOpen} />
-        <div className="h-4" />
+        {/* ── Past Trip History ───────────────────────────── */}
+        <RideHistory bookings={bookings} loading={loading} />
       </div>
 
+      {/* Driver Chat Messenger */}
       <AnimatePresence>
         {showChat && chatBooking && (
           <ChatWidget
@@ -195,15 +339,6 @@ const DriverDashboard = () => {
           />
         )}
       </AnimatePresence>
-
-      <RatingModal
-        isOpen={showRatingModal}
-        onClose={() => setShowRatingModal(false)}
-        bookingId={ratingBooking?._id}
-        targetId={ratingBooking?.user?._id}
-        reviewerType="driver"
-        targetName={ratingBooking?.user?.name || 'Passenger'}
-      />
     </div>
   );
 };
