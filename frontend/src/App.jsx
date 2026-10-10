@@ -9,31 +9,29 @@ import { Toaster } from 'react-hot-toast';
 
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
-
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Payment from './pages/Payment';
-import MyRides from './pages/MyRides';
-
 import DriverNavbar from './components/DriverNavbar';
 import DriverProtectedRoute from './components/DriverProtectedRoute';
-import DriverLogin from './pages/driver/DriverLogin';
-import DriverRegister from './pages/driver/DriverRegister';
-import CreateRide from './pages/driver/CreateRide';
 import ErrorBoundary from './components/ErrorBoundary';
 
-// Lazy loaded routes for production bundle optimization
+// Lazy loaded route pages for optimal production bundle splitting
+const Home = React.lazy(() => import('./pages/Home'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Register = React.lazy(() => import('./pages/Register'));
+const Payment = React.lazy(() => import('./pages/Payment'));
+const MyRides = React.lazy(() => import('./pages/MyRides'));
 const Booking = React.lazy(() => import('./pages/Booking'));
+const DriverLogin = React.lazy(() => import('./pages/driver/DriverLogin'));
+const DriverRegister = React.lazy(() => import('./pages/driver/DriverRegister'));
 const DriverDashboard = React.lazy(() => import('./pages/driver/DriverDashboard'));
+const CreateRide = React.lazy(() => import('./pages/driver/CreateRide'));
 
-// Fullscreen skeleton loader fallback
+// Accessible skeleton fallback
 const PageFallback = () => (
-  <div className="w-full h-[calc(100vh-68px)] flex flex-col items-center justify-center p-8 space-y-4 bg-background">
-    <div className="w-10 h-10 rounded-lg bg-primary-subtle animate-pulse border border-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+  <div className="w-full h-[calc(100vh-68px)] flex flex-col items-center justify-center p-8 space-y-3 bg-background">
+    <div className="w-10 h-10 rounded-lg bg-primary-subtle border border-primary/20 flex items-center justify-center text-primary font-bold text-sm">
       CP
     </div>
-    <div className="w-24 h-2.5 rounded-full bg-border animate-pulse" />
+    <div className="w-20 h-2 rounded-full bg-border animate-pulse" />
   </div>
 );
 
@@ -80,7 +78,7 @@ function App() {
                   />
                   <Routes>
                     <Route element={<Layout />}>
-                      {/* User Routes */}
+                      {/* Passenger Routes */}
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
 
