@@ -2,9 +2,14 @@
 
 ## Executive Summary
 
-The CarPool mobility web application has undergone a comprehensive full-stack presentation and experience layer redesign. The product now reflects a modern, cohesive, and trustworthy mobility service suitable for production deployment, investor demonstrations, and technical portfolios.
+The CarPool mobility web application has undergone a complete, full-stack presentation and experience layer redesign. Taking inspiration from proven usability patterns in established platforms (**BlaBlaCar**, **Quick Ride**) while developing a distinct brand identity, CarPool is now a portfolio- and interview-ready, plausibly deployable mobility platform.
 
-All design requirements, accessibility guidelines, role separations, and working flows were preserved without modifying backend behavior or introducing fake metrics.
+Key design pillars achieved:
+- **Usability from BlaBlaCar & Quick Ride**: Trust-first ride cards via `TrustStrip` (displaying only real verified metrics, average rating with review counts, vehicle details), clear route timeline via `RouteConnector` (dot-line-square vertical hierarchy), prominent tabular fares via `FareLabel`, and no dead-end empty states.
+- **Distinct CarPool Visual Identity**: Signature vertical Route Line motif across all portals, **Cobalt (#2A4BE0)** primary with **Sunrise (#F97316)** accent and **Ink (#0B1220)** driver bar; geometric **Manrope** headings and tabular numerals paired with crisp **Inter** body text; map-first single-canvas architecture with muted OpenStreetMap basemaps (zero watermarks or API key requirements).
+- **Zero Backend Behavior Changes**: 100% preservation of API contracts, models, authorization rules, and Socket.io event names.
+- **Zero Fake Metrics**: Removal of all fabricated trend badges (`+8%`, `+12%`) and hollow placeholder ratings (`5.0 with 0 reviews`).
+- **Local Context**: Tricity area focus (Chandigarh / Mohali / Panchkula), Indian Rupee (`₹`) formatting via `Intl.NumberFormat('en-IN')`, and local timezone arithmetic preventing UTC date drift.
 
 ---
 
@@ -14,29 +19,31 @@ All design requirements, accessibility guidelines, role separations, and working
 - Conducted full inspection of routes, components, state contexts, socket events, API endpoints, and styles.
 - Documented baseline build metrics: `npm run build` completed in 562ms with 75.97 kB CSS and 741 kB JS bundle.
 - Identified duplicated components, dead legacy files, date shift bugs (`toISOString()` UTC shifts in IST), raw `$` currency symbols, and fake metrics (`+8%`, `+12%`, `5.0 rating with 0 reviews`).
+- Audited database schema fields for `Driver` (`name`, `carModel`, `carNumber`, `averageRating`, `totalReviews`) to ensure `TrustStrip` only displays real properties.
 - Produced [`AUDIT.md`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/docs/ui-redesign/AUDIT.md).
-- **Git Commit**: `07d8f76`
+- **Git Commits**: `07d8f76`, `4b88790`
 
 ### Phase 1 — Design System Foundation & UI Primitives
 - **Design Tokens**: Configured semantic tokens in [`tailwind.config.js`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/frontend/tailwind.config.js) and [`index.css`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/frontend/src/index.css) using CSS variables:
-  - `ink`: `#0B1220` (driver header, dark surfaces, primary contrast)
-  - `primary`: `#2563EB`, `primary-hover`: `#1D4ED8`, `primary-subtle`: `#EAF1FF`
+  - `ink`: `#0B1220` (driver operations top bar, route destination square, dark mode canvas)
+  - `primary`: `#2A4BE0` (Cobalt), `primary-hover`: `#2140C4`, `primary-subtle`: `#EEF2FF`
+  - `accent`: `#F97316` (Sunrise), `accent-text`: `#C2410C` (WCAG AA compliant text)
   - `background`: `#F6F8FB` (light) / `#0B1220` (dark)
   - `surface`: `#FFFFFF` (light) / `#111A2E` (dark)
   - `border`: `#E3E8EF` (light) / `#1F2A44` (dark)
   - `text-primary`: `#0B1220` (light) / `#F1F5F9` (dark)
   - `text-muted`: `#5B6678` (light) / `#94A3B8` (dark)
-  - Semantic status colors: `success` (`#16A34A`), `warning` (`#D97706`), `danger` (`#DC2626`).
-- **Typography & Grid**: Inter font family, 4px/8px modular spacing scale, 8px input/button radius, 12px card radius, 16px bottom sheets.
+  - Semantic status colors: `success` (`#16A34A`), `warning` (`#B45309`), `danger` (`#DC2626`).
+- **Typography & Font Loading**: Configured **Manrope** (`font-heading`) for titles, fares, and hero numbers, and **Inter** (`font-sans`) for body and interface labels loaded via `<link>` with font-display swap.
 - **Shared Formatters**: Created [`frontend/src/utils/formatters.js`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/frontend/src/utils/formatters.js):
   - `formatCurrency(val)`: Formats in Indian Rupee (`₹`) via `Intl.NumberFormat('en-IN')`.
   - `getLocalISODate(d)`: Prevents UTC date shift bugs during early morning IST hours.
   - `formatDate()`, `formatTime()`, `formatDistance()`, `formatDuration()`.
 - **Reusable UI Primitives**: Created under [`frontend/src/components/ui/`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/frontend/src/components/ui/):
-  - `Button`, `IconButton`, `Input`, `PasswordInput`, `Badge`, `Card`, `RouteConnector`, `RatingStars`, `StatTile`, `EmptyState`, `ErrorState`, `Skeleton`, `BottomSheet`.
+  - `Button`, `IconButton`, `Input`, `PasswordInput`, `Badge`, `Card`, `RouteConnector`, `TrustStrip`, `FareLabel`, `RatingStars`, `StatTile`, `EmptyState`, `ErrorState`, `Skeleton`, `BottomSheet`.
 - **Top-Level Error Boundary**: Implemented in [`frontend/src/components/ErrorBoundary.jsx`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/frontend/src/components/ErrorBoundary.jsx).
-- **Map System**: Muted CARTO Voyager (light) and CARTO Dark Matter (dark) basemap tiles with proper OpenStreetMap and CARTO attributions. SVG Lucide `divIcon` markers for user locations, cars, and destinations.
-- **Git Commit**: `f5db73e`
+- **Map System**: OpenStreetMap raster tiles styled with custom saturation/contrast filters to remove CARTO watermark errors while preserving clean contrast. Custom SVG markers for pickup dots, destination squares, user location, and cars.
+- **Git Commits**: `f5db73e`, `676ded5`, `93ae19b`
 
 ### Phase 2 — App Shells, Navigation & Accessibility
 - **Passenger Navigation** ([`Navbar.jsx`](file:///Users/aryanrana/Documents/vscode/Projects/Carpool/frontend/src/components/Navbar.jsx)):
@@ -241,10 +248,10 @@ Zero backend controller, model, route, or realtime socket event changes were mad
 
 | Metric | Before Redesign | After Redesign | Change |
 | :--- | :--- | :--- | :--- |
-| **CSS Minified Bundle** | 75.97 kB (gzip: 11.23 kB) | **37.14 kB** (gzip: 7.76 kB) | **-51.1%** |
-| **Initial JS Chunk** | 741.01 kB (gzip: 224.28 kB) | **346.55 kB** (gzip: 110.79 kB) | **-53.2%** |
-| **Route Code Splitting** | Monolithic JS bundle | 10 lazy-loaded route chunks | Optimized |
-| **Vite Build Time** | 562ms | **435ms** | -22.6% |
+| **CSS Minified Bundle** | 75.97 kB (gzip: 11.23 kB) | **38.79 kB** (gzip: 8.07 kB) | **-48.9%** |
+| **Initial JS Chunk** | 741.01 kB (gzip: 224.28 kB) | **346.60 kB** (gzip: 110.82 kB) | **-53.2%** |
+| **Route Code Splitting** | Monolithic JS bundle | 12 lazy-loaded route & modal chunks | Optimized |
+| **Vite Build Time** | 562ms | **458ms** | -18.5% |
 | **Dead Legacy Files** | 9 unused files | 0 | Removed |
 
 ---
@@ -252,7 +259,7 @@ Zero backend controller, model, route, or realtime socket event changes were mad
 ## 7. Known Issues & Recommendations
 
 ### Bugs & Gotchas Discovered (Outside Redesign Scope):
-1. **CDP Browser Context Management**: The local automated browser subagent CDP endpoint does not support `Browser.setDownloadBehavior`, preventing headless browser subagent automation in this specific IDE container.
+1. **CDP Browser Context Management**: The local automated browser subagent CDP endpoint returned `playwright: Protocol error (Browser.setDownloadBehavior): Browser context management is not supported`, preventing headless browser subagent automation in this specific Mac IDE container. Development servers run normally and are directly testable via Google Chrome or Safari on `http://localhost:5173`.
 2. **Same User in Seed Data**: Test seed data contains shared names across driver and passenger tables. The UI treats each role independently through separate JWT tokens and context state.
 
 ### Recommended Next Steps for Product Team:
@@ -273,4 +280,8 @@ Zero backend controller, model, route, or realtime socket event changes were mad
 - `3d6a7ff`: `feat(phase-6): driver console redesign with hero online toggle, truthful StatTile metrics, CARTO basemap, and ride publisher`
 - `a54548c`: `feat(phase-7): polish ChatWidget, Modal, EmptyState, and Loader with design tokens`
 - `6869480`: `feat(phase-8): remove dead legacy components, optimize route lazy loading, and achieve 51% CSS reduction`
+- `f8ee15f`: `docs(report): complete comprehensive UI/UX redesign final report`
 - `93ae19b`: `fix(map): eliminate CARTO API key watermarks with reliable muted OSM basemap and fix disabled button contrast`
+- `4b88790`: `docs(audit): update Phase 0 audit with BlaBlaCar/Quick Ride pattern analysis and trust data schema`
+- `676ded5`: `feat(phase-1): design foundation with Cobalt & Sunrise tokens, Manrope typography, RouteConnector, TrustStrip, and FareLabel`
+- `4e58982`: `feat(redesign): integrate TrustStrip, FareLabel, RouteConnector and IndianRupee across all portals`
