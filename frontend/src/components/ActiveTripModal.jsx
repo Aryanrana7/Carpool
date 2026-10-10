@@ -94,13 +94,8 @@ export const ActiveTripModal = ({ isOpen, booking, onClose, onChatOpen }) => {
   const routePositions = [pickupCoords, dropoffCoords];
   const bounds = L.latLngBounds([pickupCoords, dropoffCoords, currentDriverPos]);
 
-  const tileUrl = useMemo(() => {
-    return isDarkMode
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-  }, [isDarkMode]);
-
-  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   if (!isOpen || !booking) return null;
 

@@ -346,8 +346,8 @@ export const FloatingSearchCard = ({
                     onClick={() => setDepartureDate(localToday)}
                     className={`py-1.5 text-xs font-semibold rounded border transition-colors cursor-pointer ${
                       departureDate === localToday
-                        ? 'bg-primary text-white border-primary'
-                        : 'bg-surface border-border text-text-secondary hover:bg-background'
+                        ? 'bg-primary text-white border-primary shadow-sm'
+                        : 'bg-surface border-border text-text-primary hover:bg-background'
                     }`}
                   >
                     Today
@@ -363,8 +363,8 @@ export const FloatingSearchCard = ({
                         onClick={() => setDepartureDate(tomorrowStr)}
                         className={`py-1.5 text-xs font-semibold rounded border transition-colors cursor-pointer ${
                           departureDate === tomorrowStr
-                            ? 'bg-primary text-white border-primary'
-                            : 'bg-surface border-border text-text-secondary hover:bg-background'
+                            ? 'bg-primary text-white border-primary shadow-sm'
+                            : 'bg-surface border-border text-text-primary hover:bg-background'
                         }`}
                       >
                         Tomorrow
@@ -375,7 +375,7 @@ export const FloatingSearchCard = ({
                   <button
                     type="button"
                     onClick={() => setShowScheduleDetails((prev) => !prev)}
-                    className="py-1.5 text-xs font-semibold rounded border border-border bg-surface text-text-secondary hover:bg-background transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                    className="py-1.5 text-xs font-semibold rounded border border-border bg-surface text-text-primary hover:bg-background transition-colors flex items-center justify-center gap-1 cursor-pointer"
                   >
                     <span>Custom</span>
                     {showScheduleDetails ? <ChevronUp size={12} /> : <ChevronDown size={12} />}

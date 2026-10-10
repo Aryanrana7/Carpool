@@ -122,9 +122,8 @@ const DriverLiveMap = ({ driverLocation }) => {
     ? [currentPos.lat, currentPos.lng]
     : [30.7333, 76.7794];
 
-  const tileUrl = isDarkMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
     <div className="bg-surface border border-border rounded-xl h-full flex flex-col overflow-hidden shadow-subtle">
@@ -162,9 +161,9 @@ const DriverLiveMap = ({ driverLocation }) => {
           scrollWheelZoom={true}
         >
           <TileLayer
-            key={isDarkMode ? 'carto-dark' : 'carto-light'}
+            key={isDarkMode ? 'dark' : 'light'}
             url={tileUrl}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            attribution={tileAttribution}
           />
 
           {currentPos && <FlyToLocation position={currentPos} />}

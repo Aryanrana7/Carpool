@@ -175,12 +175,24 @@
   }
 }
 
-/* Leaflet Container customization */
+/* Leaflet Container customization & Muted Basemap */
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 0;
   font-family: inherit;
+  background-color: var(--color-background);
+}
+
+/* Light mode: gently muted to remove neon glare while keeping streets crystal-clear */
+.leaflet-tile-pane {
+  filter: saturate(0.68) brightness(1.02) contrast(0.96);
+  transition: filter 0.25s ease;
+}
+
+/* Dark mode: sleek dark canvas map matching dark navy surfaces */
+.dark .leaflet-tile-pane {
+  filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35) brightness(0.75);
 }
 
 /* Custom scrollbars */

@@ -39,9 +39,9 @@ export const Button = React.forwardRef(({
       type={type}
       disabled={isDisabled}
       className={`
-        inline-flex items-center justify-center font-medium transition-colors duration-150
+        inline-flex items-center justify-center font-semibold transition-colors duration-150
         select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none
+        disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-600 dark:disabled:text-slate-400 disabled:border disabled:border-slate-200 dark:disabled:border-slate-700 disabled:shadow-none disabled:cursor-not-allowed disabled:opacity-100
         ${variantClass}
         ${sizeClass}
         ${fullWidth ? 'w-full' : ''}

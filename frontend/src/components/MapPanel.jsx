@@ -200,14 +200,9 @@ export const MapPanel = ({
     }
   }, [routePoints, source, destination]);
 
-  // Memoized TileLayer URL: CARTO Voyager (light) or CARTO Dark Matter (dark)
-  const tileUrl = useMemo(() => {
-    return isDarkMode
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-  }, [isDarkMode]);
-
-  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  // OpenStreetMap tile URL with muted filter applied via .leaflet-tile-pane
+  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
     <div className="w-full h-full relative z-0 overflow-hidden bg-background">
@@ -226,7 +221,6 @@ export const MapPanel = ({
           url={tileUrl}
           attribution={tileAttribution}
           maxZoom={19}
-          subdomains="abcd"
         />
 
         <ChangeView bounds={bounds} showDrawer={showDrawer} />
