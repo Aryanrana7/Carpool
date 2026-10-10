@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Car, TrendingUp, Clock, MapPin, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Zap, Car, Bike, Shield, ChevronRight, AlertTriangle } from 'lucide-react';
 import Loader from './Loader';
+import { formatCurrency, formatDistance, formatDuration } from '../utils/formatters';
 
-const RIDE_TYPE_META = {
-  mini: { icon: '🛵', color: 'from-sky-400 to-blue-600', label: 'Mini', desc: 'Affordable rides' },
-  sedan: { icon: '🚗', color: 'from-emerald-400 to-teal-600', label: 'Sedan', desc: 'Comfortable daily' },
-  suv: { icon: '🚙', color: 'from-violet-400 to-purple-600', label: 'SUV', desc: 'Spacious premium' },
+const RIDE_TYPE_ICONS = {
+  mini: Bike,
+  sedan: Car,
+  suv: Shield,
 };
 
-const PricingPanel = ({ source, destination, selectedRideType, onRideTypeSelect }) => {
+const RIDE_TYPE_LABELS = {
+  mini: { label: 'Mini', desc: 'Compact & economical' },
+  sedan: { label: 'Sedan', desc: 'Comfortable daily ride' },
+  suv: { label: 'SUV', desc: 'Spacious for groups' },
+};
+
+export const PricingPanel = ({ source, destination, selectedRideType, onRideTypeSelect }) => {
   const [pricing, setPricing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!source || !destination) return;
+    if (!source?.lat || !destination?.lat) return;
 
     const fetchPricing = async () => {
       setLoading(true);
@@ -31,12 +38,12 @@ const PricingPanel = ({ source, destination, selectedRideType, onRideTypeSelect 
           },
         });
         setPricing(data);
-        // Auto-select sedan if no type selected
-        if (!selectedRideType && onRideTypeSelect) {
-          onRideTypeSelect('sedan', data.fares.find(f => f.rideType === 'sedan'));
+        if (!selectedRideType && onRideTypeSelect && data.fares?.length) {
+          const defaultFare = data.fares.find((f) => f.rideType === 'sedan') || data.fares[0];
+          onRideTypeSelect(defaultFare.rideType, defaultFare);
         }
-      } catch (err) {
-        setError('Could not calculate fare. Please try again.');
+      } catch {
+        setError('Could not calculate fare estimate for these points.');
       } finally {
         setLoading(false);
       }
@@ -48,110 +55,112 @@ const PricingPanel = ({ source, destination, selectedRideType, onRideTypeSelect 
   if (!source || !destination) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-2 mb-4">
-        <Zap size={16} className="text-[#10b981]" />
-        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Smart Pricing</h3>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <Zap size={14} className="text-primary" />
+          <h3 className="micro-label">Fare Estimates</h3>
+        </div>
+        {pricing && (
+          <span className="text-[11px] font-medium text-text-muted tabular-nums">
+            {formatDistance(pricing.distanceKm)} · {formatDuration(pricing.durationMin)}
+          </span>
+        )}
       </div>
 
       {loading && (
-        <div className="flex justify-center py-6">
+        <div className="flex justify-center py-5">
           <Loader />
         </div>
       )}
 
       {error && (
-        <div className="flex items-center space-x-2 text-red-500 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-xs">
-          <AlertTriangle size={14} />
+        <div className="flex items-center gap-2 text-danger bg-danger-subtle p-2.5 rounded-md text-xs border border-red-200 dark:border-red-900/40">
+          <AlertTriangle size={14} className="shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {pricing && !loading && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-          {/* Route Stats */}
-          <div className="flex space-x-3 bg-gray-50 dark:bg-[#111] rounded-2xl p-3">
-            <div className="flex-1 text-center">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Distance</p>
-              <p className="text-lg font-black text-gray-900 dark:text-white">{pricing.distanceKm} km</p>
-            </div>
-            <div className="w-px bg-gray-200 dark:bg-[#2a2a2a]" />
-            <div className="flex-1 text-center">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Est. Time</p>
-              <p className="text-lg font-black text-gray-900 dark:text-white">{pricing.durationMin} min</p>
-            </div>
-          </div>
+        <div className="space-y-2">
+          {pricing.fares.map((fare) => {
+            const IconComponent = RIDE_TYPE_ICONS[fare.rideType] || Car;
+            const meta = RIDE_TYPE_LABELS[fare.rideType] || { label: fare.rideType, desc: 'Ride' };
+            const isSelected = selectedRideType === fare.rideType;
 
-          {/* Ride Type Cards */}
-          <div className="space-y-2">
-            {pricing.fares.map((fare) => {
-              const meta = RIDE_TYPE_META[fare.rideType];
-              const isSelected = selectedRideType === fare.rideType;
-              return (
-                <motion.button
-                  key={fare.rideType}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onRideTypeSelect?.(fare.rideType, fare)}
-                  className={`w-full flex items-center p-3 rounded-2xl border-2 transition-all text-left ${
-                    isSelected
-                      ? 'border-[#10b981] bg-[#10b981]/5 dark:bg-[#10b981]/10'
-                      : 'border-gray-100 dark:border-[#2a2a2a] bg-white dark:bg-[#1a1a1a] hover:border-gray-200 dark:hover:border-[#333]'
-                  }`}
-                >
-                  <div className="text-2xl mr-3">{meta.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-black text-gray-900 dark:text-white text-sm">{meta.label}</p>
-                      <p className="text-lg font-black text-gray-900 dark:text-white">${fare.finalPrice}</p>
-                    </div>
-                    <div className="flex items-center justify-between mt-0.5">
-                      <p className="text-[10px] text-gray-400">{meta.desc}</p>
-                      {fare.isPeakHour && (
-                        <span className="text-[9px] bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider">
-                          {fare.surgeMultiplier}× surge
-                        </span>
-                      )}
-                    </div>
+            return (
+              <button
+                key={fare.rideType}
+                type="button"
+                onClick={() => onRideTypeSelect?.(fare.rideType, fare)}
+                className={`w-full flex items-center p-3 rounded-lg border transition-all text-left cursor-pointer ${
+                  isSelected
+                    ? 'border-primary bg-primary-subtle text-text-primary'
+                    : 'border-border bg-surface hover:border-border-subtle'
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-md flex items-center justify-center mr-3 shrink-0 ${
+                  isSelected ? 'bg-primary text-white' : 'bg-border-subtle text-text-secondary'
+                }`}>
+                  <IconComponent size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-text-primary text-xs">{meta.label}</p>
+                    <p className="text-sm font-bold text-text-primary tabular-nums">
+                      {formatCurrency(fare.finalPrice)}
+                    </p>
                   </div>
-                  {isSelected && <ChevronRight size={16} className="text-[#10b981] ml-2 flex-shrink-0" />}
-                </motion.button>
-              );
-            })}
-          </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[11px] text-text-muted">{meta.desc}</p>
+                    {fare.isPeakHour && (
+                      <span className="text-[10px] font-semibold text-warning bg-warning-subtle px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/40">
+                        {fare.surgeMultiplier}× surge
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {isSelected && <ChevronRight size={15} className="text-primary ml-1 shrink-0" />}
+              </button>
+            );
+          })}
 
-          {/* Fare Breakdown for selected ride type */}
+          {/* Breakdown for Selected Ride Type */}
           <AnimatePresence>
-            {selectedRideType && pricing.fares.find(f => f.rideType === selectedRideType) && (
+            {selectedRideType && pricing.fares.find((f) => f.rideType === selectedRideType) && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <div className="bg-gray-50 dark:bg-[#111] rounded-2xl p-4 space-y-2 border border-gray-100 dark:border-[#2a2a2a]">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Fare Breakdown</p>
+                <div className="p-3 rounded-md bg-background border border-border space-y-1.5 text-xs">
+                  <p className="micro-label">Fare Breakdown</p>
                   {(() => {
-                    const f = pricing.fares.find(fare => fare.rideType === selectedRideType);
+                    const f = pricing.fares.find((fare) => fare.rideType === selectedRideType);
                     return (
                       <>
-                        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-                          <span>Base fare</span><span className="font-bold">${f.baseFare}</span>
+                        <div className="flex justify-between text-text-secondary">
+                          <span>Base Fare</span>
+                          <span className="font-medium text-text-primary tabular-nums">{formatCurrency(f.baseFare)}</span>
                         </div>
-                        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-                          <span>Distance ({f.distanceKm} km)</span><span className="font-bold">${f.distanceFare}</span>
+                        <div className="flex justify-between text-text-secondary">
+                          <span>Distance ({formatDistance(f.distanceKm)})</span>
+                          <span className="font-medium text-text-primary tabular-nums">{formatCurrency(f.distanceFare)}</span>
                         </div>
-                        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-                          <span>Time ({f.durationMin} min)</span><span className="font-bold">${f.timeFare}</span>
+                        <div className="flex justify-between text-text-secondary">
+                          <span>Time ({formatDuration(f.durationMin)})</span>
+                          <span className="font-medium text-text-primary tabular-nums">{formatCurrency(f.timeFare)}</span>
                         </div>
-                        {f.surgeMultiplier > 1.0 && (
-                          <div className="flex justify-between text-xs text-orange-500">
-                            <span className="flex items-center"><TrendingUp size={10} className="mr-1"/>Surge × {f.surgeMultiplier}</span>
-                            <span className="font-bold">+${(f.subtotal * (f.surgeMultiplier - 1)).toFixed(2)}</span>
+                        {f.isPeakHour && (
+                          <div className="flex justify-between text-warning font-medium">
+                            <span>Surge Multiplier</span>
+                            <span>{f.surgeMultiplier}×</span>
                           </div>
                         )}
-                        <div className="border-t border-gray-200 dark:border-[#2a2a2a] pt-2 flex justify-between">
-                          <span className="font-black text-gray-900 dark:text-white text-sm">Total</span>
-                          <span className="font-black text-[#10b981] text-sm">${f.finalPrice}</span>
+                        <div className="border-t border-border pt-1 flex justify-between font-bold text-text-primary">
+                          <span>Estimated Total</span>
+                          <span className="text-primary tabular-nums">{formatCurrency(f.finalPrice)}</span>
                         </div>
                       </>
                     );
@@ -160,7 +169,7 @@ const PricingPanel = ({ source, destination, selectedRideType, onRideTypeSelect 
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
       )}
     </div>
   );

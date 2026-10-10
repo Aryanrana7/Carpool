@@ -1,146 +1,249 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Car, Clock, User, Users, ChevronRight, Zap } from 'lucide-react';
+import { X, Car, Bike, Shield, Clock, Star, ChevronRight, Zap, MapPinOff, ArrowUpDown, Filter } from 'lucide-react';
+import { formatCurrency, formatTime } from '../../utils/formatters';
+import Skeleton from '../ui/Skeleton';
+import Badge from '../ui/Badge';
 
-const RIDE_EMOJI = { mini: '🛵', sedan: '🚗', suv: '🚙' };
+const RIDE_TYPE_ICONS = {
+  mini: Bike,
+  sedan: Car,
+  suv: Shield,
+};
 
-/* ── Skeleton card ────────────────────────────────────── */
+/* ── Skeleton Card ────────────────────────────────────── */
 const SkeletonCard = () => (
-  <div className="flex-shrink-0 w-52 bg-white/5 rounded-2xl p-4 animate-pulse space-y-3">
-    <div className="flex items-center gap-2">
-      <div className="w-10 h-10 skeleton rounded-xl flex-shrink-0" />
-      <div className="space-y-1.5 flex-1">
-        <div className="skeleton h-3.5 w-24 rounded" />
-        <div className="skeleton h-2.5 w-16 rounded" />
-      </div>
+  <div className="shrink-0 w-64 bg-surface border border-border rounded-lg p-3.5 space-y-2.5">
+    <div className="flex justify-between items-center">
+      <Skeleton width="45%" height="16px" />
+      <Skeleton width="30%" height="20px" />
     </div>
-    <div className="skeleton h-8 w-full rounded-xl" />
+    <Skeleton width="80%" height="14px" />
+    <div className="flex justify-between items-center pt-1 border-t border-border">
+      <Skeleton width="40%" height="14px" />
+      <Skeleton width="30%" height="14px" />
+    </div>
   </div>
 );
 
-/* ── Individual ride card (horizontal) ───────────────── */
-const RideHorizontalCard = React.memo(({ ride, selected, onSelect, onHoverIn, onHoverOut }) => (
-  <motion.div
-    animate={{
-      scale: selected ? 1.03 : 1,
-      boxShadow: selected ? '0 0 25px rgba(99,102,241,0.45)' : '0 4px 12px rgba(0,0,0,0.1)'
-    }}
-    whileHover={{
-      y: selected ? 0 : -4,
-      scale: selected ? 1.03 : 1.02,
-      boxShadow: selected ? '0 0 30px rgba(99,102,241,0.6)' : '0 12px 24px rgba(0,0,0,0.3)'
-    }}
-    whileTap={{ scale: 0.97 }}
-    transition={{ type: 'spring', stiffness: 400, damping: 24 }}
-    onClick={() => onSelect(ride)}
-    onMouseEnter={() => onHoverIn(ride)}
-    onMouseLeave={() => onHoverOut(null)}
-    className={`flex-shrink-0 w-52 rounded-2xl p-4 cursor-pointer border-2 transition-colors duration-200 ${
-      selected
-        ? 'border-indigo-400 bg-white/15'
-        : 'border-transparent bg-white/8 hover:bg-white/12 hover:border-white/20'
-    }`}
-    style={{ backgroundColor: selected ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.07)' }}
-  >
-    {/* Top row */}
-    <div className="flex items-start gap-2.5 mb-3">
-      <div className="text-2xl flex-shrink-0 leading-none mt-0.5">
-        {RIDE_EMOJI[ride.rideType] ?? '🚗'}
+/* ── Individual Ride Card ─────────────────────────────── */
+const RideHorizontalCard = React.memo(({ ride, selected, onSelect, onHoverIn, onHoverOut }) => {
+  const IconComponent = RIDE_TYPE_ICONS[ride.rideType] || Car;
+  const isSeatsLow = ride.seats === 1;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onSelect(ride)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(ride);
+        }
+      }}
+      onMouseEnter={() => onHoverIn?.(ride)}
+      onMouseLeave={() => onHoverOut?.(null)}
+      className={`
+        shrink-0 w-64 rounded-lg p-3.5 cursor-pointer border text-left transition-all duration-150
+        ${selected
+          ? 'border-primary bg-primary-subtle ring-2 ring-primary/20 shadow-subtle'
+          : 'border-border bg-surface hover:border-primary/50 shadow-subtle'
+        }
+      `}
+    >
+      {/* 1. Departure Time and Fare (Visually Strongest) */}
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <div className="flex items-center gap-1.5 text-text-primary">
+          <Clock size={13} className="text-primary shrink-0" />
+          <span className="text-xs font-bold tabular-nums">
+            {formatTime(ride.time || ride.date)}
+          </span>
+        </div>
+        <span className="text-lg font-bold text-text-primary tabular-nums leading-none">
+          {formatCurrency(ride.price)}
+        </span>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-bold text-[13px] text-white truncate leading-tight">
-          {ride.carType || 'Standard Sedan'}
-        </p>
-        <div className="flex items-center gap-1 mt-0.5">
-          <User size={10} className="text-white/40 flex-shrink-0" />
-          <p className="text-[10px] text-white/50 truncate">{ride.driver?.name || 'Verified Driver'}</p>
+
+      {/* 2. Route Route Hint (From -> To) */}
+      <p className="text-xs font-medium text-text-secondary truncate mb-2.5">
+        {ride.pickupLocation?.split(',')[0] || ride.source} → {ride.dropoffLocation?.split(',')[0] || ride.destination}
+      </p>
+
+      {/* 3. Driver & Vehicle Info */}
+      <div className="flex items-center justify-between text-xs pt-2 border-t border-border">
+        <div className="flex items-center gap-1.5 min-w-0 pr-1">
+          <div className="w-5 h-5 rounded bg-border-subtle flex items-center justify-center text-text-secondary shrink-0">
+            <IconComponent size={12} />
+          </div>
+          <span className="text-xs font-semibold text-text-primary truncate">
+            {ride.driver?.name || 'Driver'}
+          </span>
+          {ride.driver?.rating > 0 && (
+            <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
+              <Star size={10} className="fill-amber-400 text-amber-400" />
+              <span className="text-[10px] font-bold tabular-nums">{ride.driver.rating.toFixed(1)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 4. Seats Left Badge */}
+        <div>
+          {ride.seats > 0 ? (
+            <span
+              className={`
+                text-[10px] font-semibold px-1.5 py-0.5 rounded tabular-nums border
+                ${isSeatsLow
+                  ? 'bg-warning-subtle text-warning border-amber-200 dark:border-amber-900/40'
+                  : 'bg-border-subtle text-text-secondary border-border'
+                }
+              `}
+            >
+              {ride.seats} {ride.seats === 1 ? 'seat left' : 'seats left'}
+            </span>
+          ) : (
+            <span className="text-[10px] font-semibold text-danger bg-danger-subtle px-1.5 py-0.5 rounded border border-red-200 dark:border-red-900/40">
+              Sold out
+            </span>
+          )}
         </div>
       </div>
     </div>
+  );
+});
 
-    {/* Details row */}
-    <div className="flex items-center gap-2 mb-3">
-      <div className="flex items-center gap-1 text-[10px] text-white/50">
-        <Clock size={9} />
-        <span>{new Date(ride.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-      </div>
-      <div className="w-px h-3 bg-white/10" />
-      <div className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-        ride.seats > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-      }`}>
-        {ride.seats > 0 ? `${ride.seats} seats` : 'Full'}
-      </div>
-    </div>
+RideHorizontalCard.displayName = 'RideHorizontalCard';
 
-    {/* Price + CTA */}
-    <div className="flex items-center justify-between">
-      <span className="text-xl font-black text-white">${ride.price}</span>
-      <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${
-        selected
-          ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-          : 'bg-white/10 text-white/70'
-      }`}>
-        {selected ? <><Zap size={11} /> Selected</> : <>View <ChevronRight size={11} /></>}
-      </div>
-    </div>
-  </motion.div>
-));
-
-/* ── Main component ───────────────────────────────────── */
-const FloatingRideResults = ({ show, rides, loading, selectedRide, onSelectRide, onHoverRide, onClose }) => {
+/* ── Main Floating Results Dock ───────────────────────── */
+export const FloatingRideResults = ({
+  show,
+  rides = [],
+  loading = false,
+  selectedRide,
+  onSelectRide,
+  onHoverRide,
+  onClose,
+  onSwitchToOnDemand,
+}) => {
   const listRef = useRef(null);
+  const [sortBy, setSortBy] = useState('time'); // 'time' | 'price' | 'seats'
+
+  const sortedRides = useMemo(() => {
+    if (!rides || rides.length === 0) return [];
+    const copy = [...rides];
+    if (sortBy === 'price') {
+      return copy.sort((a, b) => (a.price || 0) - (b.price || 0));
+    }
+    if (sortBy === 'seats') {
+      return copy.sort((a, b) => (b.seats || 0) - (a.seats || 0));
+    }
+    return copy.sort((a, b) => new Date(a.time || a.date).getTime() - new Date(b.time || b.date).getTime());
+  }, [rides, sortBy]);
 
   return (
     <AnimatePresence>
       {show && (
         <motion.div
           key="results-panel"
-          initial={{ y: 100, opacity: 0 }}
+          initial={{ y: 60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 360, damping: 32 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[500] w-[calc(100%-360px)] max-w-3xl"
-          style={{ left: 'calc(50% + 40px)' }}
+          exit={{ y: 60, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute bottom-2 sm:bottom-6 left-1/2 -translate-x-1/2 z-[500] w-[calc(100vw-16px)] sm:w-[calc(100vw-24px)] md:w-[calc(100%-400px)] max-w-2xl"
         >
-          <div
-            className="rounded-2xl shadow-2xl shadow-black/40 border border-white/10 overflow-hidden"
-            style={{ background: 'rgba(14,14,14,0.88)', backdropFilter: 'blur(20px) saturate(1.4)' }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-4 pb-2">
+          <div className="bg-surface border border-border rounded-xl p-3.5 sm:p-4 shadow-overlay">
+            {/* Header & Filter Controls */}
+            <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-border">
               <div className="flex items-center gap-2">
-                <Car size={14} className="text-indigo-400" />
-                <p className="text-[13px] font-black text-white">
-                  {loading ? 'Searching rides…' : `${rides.length} ride${rides.length !== 1 ? 's' : ''} available`}
-                </p>
-                {!loading && rides.length > 0 && (
-                  <span className="text-[10px] text-white/40 font-medium">· click a card to see full details</span>
-                )}
+                <Car size={16} className="text-primary shrink-0" />
+                <h3 className="text-xs sm:text-sm font-bold text-text-primary truncate">
+                  {loading
+                    ? 'Searching active routes…'
+                    : `${rides.length} matching ride${rides.length !== 1 ? 's' : ''} found`}
+                </h3>
               </div>
+
+              {/* Sort Chips */}
+              {!loading && rides.length > 1 && (
+                <div className="hidden sm:flex items-center gap-1.5 text-xs">
+                  <span className="text-[11px] text-text-muted">Sort:</span>
+                  <button
+                    type="button"
+                    onClick={() => setSortBy('time')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition-colors cursor-pointer ${
+                      sortBy === 'time'
+                        ? 'bg-primary-subtle text-primary border-primary'
+                        : 'border-border text-text-secondary hover:bg-background'
+                    }`}
+                  >
+                    Earliest
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSortBy('price')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition-colors cursor-pointer ${
+                      sortBy === 'price'
+                        ? 'bg-primary-subtle text-primary border-primary'
+                        : 'border-border text-text-secondary hover:bg-background'
+                    }`}
+                  >
+                    Lowest Price
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSortBy('seats')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition-colors cursor-pointer ${
+                      sortBy === 'seats'
+                        ? 'bg-primary-subtle text-primary border-primary'
+                        : 'border-border text-text-secondary hover:bg-background'
+                    }`}
+                  >
+                    Most Seats
+                  </button>
+                </div>
+              )}
+
               <button
+                type="button"
                 onClick={onClose}
-                className="w-7 h-7 rounded-xl bg-white/8 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/15 transition-all"
+                aria-label="Close results panel"
+                className="w-7 h-7 rounded-md border border-border bg-surface hover:bg-background flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
             </div>
 
-            {/* Horizontal scrollable list */}
+            {/* Horizontal Scrollable Results */}
             <div
               ref={listRef}
-              className="flex gap-3 px-5 pb-4 pt-2 overflow-x-auto scrollbar-none"
-              style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+              className="flex gap-2.5 overflow-x-auto scrollbar-none py-1"
             >
               {loading ? (
-                Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-              ) : rides.length === 0 ? (
-                <div className="flex-1 py-8 text-center">
-                  <p className="text-2xl mb-2">🗺️</p>
-                  <p className="text-white/40 text-sm font-semibold">No rides found for this route</p>
-                  <p className="text-white/25 text-xs mt-1">Try different locations</p>
+                Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+              ) : sortedRides.length === 0 ? (
+                <div className="flex-1 py-6 text-center">
+                  <div className="w-10 h-10 rounded-full bg-border-subtle flex items-center justify-center text-text-muted mx-auto mb-2.5">
+                    <MapPinOff size={18} />
+                  </div>
+                  <p className="text-text-primary text-sm font-semibold">
+                    No rides available for this route.
+                  </p>
+                  <p className="text-text-secondary text-xs mt-1 max-w-sm mx-auto mb-3">
+                    No driver is currently scheduled for this journey. You can adjust your date or request an on-demand ride.
+                  </p>
+                  {onSwitchToOnDemand && (
+                    <button
+                      type="button"
+                      onClick={onSwitchToOnDemand}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-semibold bg-primary text-white hover:bg-primary-hover shadow-sm transition-colors cursor-pointer"
+                    >
+                      <Zap size={13} />
+                      <span>Request On-Demand Ride Instead</span>
+                    </button>
+                  )}
                 </div>
               ) : (
-                rides.map(ride => (
+                sortedRides.map((ride) => (
                   <RideHorizontalCard
                     key={ride._id}
                     ride={ride}

@@ -1,16 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MapPin, X } from 'lucide-react';
+import api from '../services/api';
 
-const LocationInput = ({ label, placeholder, icon: Icon, iconColor, onPlaceSelected, initialValue }) => {
+export const LocationInput = ({
+  label,
+  placeholder,
+  icon: Icon = MapPin,
+  iconColor,
+  onPlaceSelected,
+  initialValue,
+  id,
+}) => {
   const [query, setQuery] = useState(initialValue || '');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
   useEffect(() => {
-    if (initialValue) {
-      setQuery(initialValue);
+    if (initialValue !== undefined) {
+      setQuery(initialValue || '');
     }
   }, [initialValue]);
 
@@ -21,26 +32,26 @@ const LocationInput = ({ label, placeholder, icon: Icon, iconColor, onPlaceSelec
         setIsFocused(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [wrapperRef]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
-      if (query.length > 2) {
+      if (query.trim().length > 2) {
         try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
-          const data = await response.json();
-          setSuggestions(data);
+          const { data } = await api.get('/proxy/geocode', { params: { q: query.trim() } });
+          setSuggestions(data || []);
           setShowSuggestions(true);
-        } catch (error) {
-          console.error('Error fetching suggestions:', error);
+          setSelectedIndex(-1);
+        } catch {
+          // silent error
         }
       } else {
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    }, 400);
+    }, 300);
 
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
@@ -48,72 +59,121 @@ const LocationInput = ({ label, placeholder, icon: Icon, iconColor, onPlaceSelec
   const handleSelect = (place) => {
     setQuery(place.display_name);
     setShowSuggestions(false);
-    onPlaceSelected({
-      address: place.display_name,
-      lat: parseFloat(place.lat),
-      lng: parseFloat(place.lon)
-    });
+    setIsFocused(false);
+    if (onPlaceSelected) {
+      onPlaceSelected({
+        address: place.display_name,
+        lat: parseFloat(place.lat),
+        lng: parseFloat(place.lon),
+      });
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+    } else if (e.key === 'Enter') {
+      if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+        e.preventDefault();
+        handleSelect(suggestions[selectedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
   };
 
   return (
     <div className="w-full relative" ref={wrapperRef}>
       {label && (
-        <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">
+        <label htmlFor={id} className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
           {label}
         </label>
       )}
-      <motion.div
-        animate={{ scale: isFocused ? 1.02 : 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 24 }}
-        className="relative rounded-xl"
-      >
+
+      <div className="relative flex items-center">
         {Icon && (
-          <motion.div
-            animate={{ scale: isFocused ? 1.15 : 1 }}
-            className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10"
-          >
-            <Icon className={`h-4 w-4 transition-colors ${isFocused ? 'text-indigo-400' : iconColor || 'text-white/40'}`} />
-          </motion.div>
+          <div className="absolute left-3 text-text-muted pointer-events-none flex items-center">
+            <Icon size={16} className={isFocused ? 'text-primary' : iconColor || 'text-text-muted'} />
+          </div>
         )}
-        <motion.input
+
+        <input
+          id={id}
           type="text"
-          whileFocus={{ boxShadow: '0 0 20px rgba(99,102,241,0.35)' }}
-          className={`input-base transition-all duration-200 ${Icon ? 'pl-10' : ''}`}
-          style={{
-            background: isFocused ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.4)',
-            borderColor: isFocused ? '#6366f1' : 'rgba(255,255,255,0.08)',
-            color: '#fff'
-          }}
+          className={`
+            input-base text-sm ${Icon ? 'pl-9' : 'pl-3.5'} pr-8
+            ${isFocused ? 'border-primary ring-2 ring-primary/20' : 'border-border'}
+          `}
           placeholder={placeholder}
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => {
+            const val = e.target.value;
+            setQuery(val);
+            if (onPlaceSelected) {
+              onPlaceSelected({
+                address: val,
+                lat: null,
+                lng: null,
+              });
+            }
+          }}
           onFocus={() => {
             setIsFocused(true);
-            if (query.length > 2) setShowSuggestions(true);
+            if (query.length > 2 && suggestions.length > 0) setShowSuggestions(true);
           }}
-          onBlur={() => setIsFocused(false)}
         />
-      </motion.div>
+
+        {query && (
+          <button
+            type="button"
+            aria-label="Clear location input"
+            onClick={() => {
+              setQuery('');
+              setSuggestions([]);
+              setShowSuggestions(false);
+              if (onPlaceSelected) {
+                onPlaceSelected(null);
+              }
+            }}
+            className="absolute right-2.5 p-1 text-text-muted hover:text-text-primary rounded-full hover:bg-border-subtle transition-colors cursor-pointer"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
 
       <AnimatePresence>
         {showSuggestions && suggestions.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="absolute z-50 w-full mt-2 rounded-2xl shadow-2xl max-h-56 overflow-y-auto scrollbar-none border border-white/10"
-            style={{ background: 'rgba(18,18,18,0.95)', backdropFilter: 'blur(20px)' }}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            role="listbox"
+            className="absolute z-[600] w-full mt-1.5 rounded-lg shadow-overlay max-h-56 overflow-y-auto border border-border bg-surface text-text-primary"
           >
             {suggestions.map((place, index) => (
-              <motion.div
+              <div
                 key={index}
-                whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.05)' }}
-                className="px-4 py-3 text-white/80 hover:text-white cursor-pointer text-xs font-medium border-b last:border-0 border-white/5 transition-colors leading-relaxed truncate"
+                role="option"
+                aria-selected={selectedIndex === index}
+                className={`
+                  px-3.5 py-2.5 cursor-pointer text-xs font-medium border-b last:border-0 border-border
+                  flex items-start gap-2.5 transition-colors leading-relaxed truncate
+                  ${selectedIndex === index ? 'bg-primary-subtle text-primary' : 'hover:bg-background text-text-primary'}
+                `}
                 onClick={() => handleSelect(place)}
               >
-                {place.display_name}
-              </motion.div>
+                <MapPin size={14} className="shrink-0 mt-0.5 text-text-muted" />
+                <span className="truncate">{place.display_name}</span>
+              </div>
             ))}
           </motion.div>
         )}

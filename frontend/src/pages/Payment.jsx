@@ -1,160 +1,189 @@
-import React, { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { CreditCard, Smartphone, Wallet, CheckCircle, ArrowRight, Lock } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { CreditCard, Smartphone, Wallet, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { formatCurrency } from '../utils/formatters';
+import Button from '../components/ui/Button';
 
 const METHODS = [
-  { id: 'card',   label: 'Credit / Debit Card', icon: CreditCard,   desc: 'Visa, Mastercard, Amex' },
-  { id: 'upi',    label: 'UPI / Google Pay',     icon: Smartphone,   desc: 'Pay with any UPI app' },
-  { id: 'wallet', label: 'Digital Wallet',        icon: Wallet,       desc: 'Carpool balance' },
+  { id: 'card', label: 'Credit / Debit Card', icon: CreditCard, desc: 'Visa, Mastercard, RuPay' },
+  { id: 'upi', label: 'UPI Instant Payment', icon: Smartphone, desc: 'Google Pay, PhonePe, Paytm' },
+  { id: 'wallet', label: 'Carpool Wallet', icon: Wallet, desc: 'Account mobility balance' },
 ];
 
-const Payment = () => {
+export const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  if (!location.state || !location.state.ride) return <Navigate to="/" replace />;
-
-  const { ride } = location.state;
   const [method, setMethod] = useState('card');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handlePayment = async () => {
+  const isMountedRef = useRef(true);
+  const paymentTimerRef = useRef(null);
+  const redirectTimerRef = useRef(null);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (paymentTimerRef.current) clearTimeout(paymentTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
+
+  const ride = location.state?.ride;
+
+  if (!ride) {
+    return <Navigate to="/" replace />;
+  }
+
+  const handlePayment = () => {
     setLoading(true);
-    setTimeout(async () => {
+    paymentTimerRef.current = setTimeout(async () => {
       try {
         await api.post('/bookings', { rideId: ride._id });
+        if (!isMountedRef.current) return;
         setSuccess(true);
-        toast.success('Payment successful! Ride booked.', { icon: '🎉' });
-        setTimeout(() => navigate('/my-rides'), 2500);
+        toast.success('Payment authorized and ride booked successfully');
+        redirectTimerRef.current = setTimeout(() => {
+          if (isMountedRef.current) {
+            navigate('/my-rides');
+          }
+        }, 1800);
       } catch (err) {
+        if (!isMountedRef.current) return;
         const status = err.response?.status;
-        const msg = err.response?.data?.message || 'Payment failed. Please try again.';
-        
-        toast.error(msg, { icon: '⚠️' });
-        
+        const msg = err.response?.data?.message || 'Payment authorization failed.';
+
+        toast.error(msg);
+
         if (status === 400 || status === 404) {
-          // UX Fallback: Redirect if ride is unavailable or already booked
-          setTimeout(() => navigate('/', { replace: true }), 2500);
+          redirectTimerRef.current = setTimeout(() => {
+            if (isMountedRef.current) {
+              navigate('/', { replace: true });
+            }
+          }, 1800);
         } else {
           setLoading(false);
         }
       }
-    }, 1200);
+    }, 900);
   };
 
   if (success) {
     return (
-      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[#f8f8f8] dark:bg-[#0c0c0c]">
-        <motion.div
-          initial={{ scale: 0.85, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', damping: 22, stiffness: 280 }}
-          className="text-center max-w-sm"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.1, damping: 16, stiffness: 260 }}
-            className="w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6"
+      <div className="min-h-[calc(100vh-68px)] flex items-center justify-center bg-background p-6">
+        <div className="text-center max-w-sm bg-surface border border-border p-8 rounded-xl shadow-modal">
+          <div className="w-14 h-14 bg-success-subtle text-success rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-200 dark:border-emerald-800/40">
+            <CheckCircle2 size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-text-primary mb-1">
+            Booking Confirmed!
+          </h2>
+          <p className="text-xs text-text-secondary leading-relaxed mb-6">
+            Your seat reservation is confirmed. Redirecting you to My Trips…
+          </p>
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={() => navigate('/my-rides')}
           >
-            <CheckCircle size={48} className="text-emerald-500" strokeWidth={1.5} />
-          </motion.div>
-          <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">Booking Confirmed!</h2>
-          <p className="text-gray-500 dark:text-gray-400">Your driver will meet you at the pickup point.</p>
-          <div className="mt-3 text-sm text-gray-400">Redirecting to your trips…</div>
-        </motion.div>
+            Go to My Trips
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#f8f8f8] dark:bg-[#0c0c0c] flex justify-center items-start pt-10 pb-24 px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg"
-      >
-        {/* Header */}
-        <div className="mb-8">
-          <p className="section-label mb-2">Step 2 of 2</p>
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white">Payment</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Choose how you'd like to pay.</p>
+    <div className="min-h-[calc(100vh-68px)] bg-background flex justify-center items-start py-8 px-4 sm:px-6">
+      <div className="w-full max-w-lg space-y-5">
+        {/* Step Header */}
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-primary bg-primary-subtle px-2 py-0.5 rounded">
+              Step 2 of 2
+            </span>
+            <span className="text-xs text-text-muted">Payment</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+            Select Payment Method
+          </h1>
+          <p className="text-text-secondary mt-1 text-xs">
+            Complete your seat reservation with encrypted simulated checkout.
+          </p>
         </div>
 
-        {/* Amount card */}
-        <div className="card p-5 mb-4 flex items-center justify-between">
+        {/* Amount Due Card */}
+        <div className="bg-surface border border-border rounded-lg p-5 flex items-center justify-between">
           <div>
-            <p className="section-label mb-1">Amount due</p>
-            <p className="text-3xl font-black text-gray-900 dark:text-white">${ride.price}</p>
+            <p className="micro-label mb-1">Total Due</p>
+            <p className="text-2xl font-bold text-text-primary tabular-nums">
+              {formatCurrency(ride.price)}
+            </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">{ride.carType || 'Standard Sedan'}</p>
-            <p className="text-xs text-gray-400 mt-0.5">1 seat · estimated fare</p>
+            <p className="text-xs font-semibold text-text-primary">{ride.carType || 'Standard Vehicle'}</p>
+            <p className="text-[11px] text-text-muted mt-0.5">1 seat confirmed</p>
           </div>
         </div>
 
-        {/* Payment methods */}
-        <div className="card overflow-hidden mb-4">
-          <div className="p-4 border-b border-gray-100 dark:border-[#1e1e1e]">
-            <p className="section-label">Select Payment Method</p>
+        {/* Payment Methods */}
+        <div className="bg-surface border border-border rounded-lg overflow-hidden">
+          <div className="p-4 border-b border-border">
+            <p className="micro-label">Payment Options</p>
           </div>
           <div className="p-3 space-y-2">
-            {METHODS.map(({ id, label, icon: Icon, desc }) => (
+            {METHODS.map(({ id, label, icon: MethodIcon, desc }) => (
               <button
                 key={id}
+                type="button"
                 onClick={() => setMethod(id)}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-150 text-left ${
+                className={`w-full flex items-center gap-3 p-3 rounded-md border transition-all text-left cursor-pointer ${
                   method === id
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
-                    : 'border-transparent hover:bg-gray-50 dark:hover:bg-[#1a1a1a]'
+                    ? 'border-primary bg-primary-subtle'
+                    : 'border-border bg-surface hover:bg-background'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  method === id ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-[#222] text-gray-500 dark:text-gray-400'
+                <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${
+                  method === id ? 'bg-primary text-white' : 'bg-border-subtle text-text-secondary'
                 }`}>
-                  <Icon size={18} />
+                  <MethodIcon size={16} />
                 </div>
-                <div className="flex-1">
-                  <p className={`font-semibold text-sm ${method === id ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-900 dark:text-white'}`}>
-                    {label}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-text-primary">{label}</p>
+                  <p className="text-[11px] text-text-muted truncate">{desc}</p>
                 </div>
-                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
-                  method === id ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 dark:border-gray-600'
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                  method === id ? 'border-primary' : 'border-border'
                 }`}>
-                  {method === id && <div className="w-full h-full rounded-full bg-white scale-50" />}
+                  {method === id && <div className="w-2 h-2 rounded-full bg-primary" />}
                 </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Security note */}
-        <div className="flex items-center gap-2 text-xs text-gray-400 mb-6 px-1">
-          <Lock size={11} />
-          <span>Your payment is secured with 256-bit SSL encryption.</span>
+        {/* Security badge */}
+        <div className="flex items-center gap-2 text-xs text-text-muted justify-center">
+          <ShieldCheck size={14} className="text-primary" />
+          <span>Encrypted payment authorization · Direct driver settlement</span>
         </div>
 
-        <button
+        {/* Action Button */}
+        <Button
+          variant="primary"
+          fullWidth
+          loading={loading}
           onClick={handlePayment}
-          disabled={loading}
-          className="btn-primary w-full py-4 text-base disabled:opacity-60 disabled:cursor-not-allowed"
+          rightIcon={ArrowRight}
         >
-          {loading ? (
-            <span className="flex items-center gap-2.5">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Processing payment…
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">Pay ${ride.price} <ArrowRight size={18} /></span>
-          )}
-        </button>
-      </motion.div>
+          {loading ? 'Authorizing Payment…' : `Pay ${formatCurrency(ride.price)} & Confirm Booking`}
+        </Button>
+      </div>
     </div>
   );
 };
