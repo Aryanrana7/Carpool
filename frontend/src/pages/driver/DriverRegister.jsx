@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DriverAuthContext } from '../../context/DriverAuthContext';
-import { User, Mail, Car, Hash, ArrowRight, ShieldCheck, CheckCircle2, DollarSign } from 'lucide-react';
+import { User, Mail, Car, Hash, ArrowRight, ShieldCheck, CheckCircle2, IndianRupee } from 'lucide-react';
 import Input from '../../components/ui/Input';
 import PasswordInput from '../../components/ui/PasswordInput';
 import Button from '../../components/ui/Button';
@@ -57,7 +57,7 @@ export const DriverRegister = () => {
 
           <div className="space-y-3.5">
             <div className="flex items-center gap-3 text-xs text-slate-300">
-              <DollarSign size={16} className="text-primary shrink-0" />
+              <IndianRupee size={16} className="text-primary shrink-0" />
               <span>Direct per-seat pricing with transparent settlements</span>
             </div>
             <div className="flex items-center gap-3 text-xs text-slate-300">

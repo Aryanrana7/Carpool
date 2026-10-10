@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import RouteConnector from '../ui/RouteConnector';
+import FareLabel from '../ui/FareLabel';
 import { formatCurrency, formatDistance } from '../../utils/formatters';
 
 const AUTH_HEADER = () => ({ Authorization: `Bearer ${localStorage.getItem('driverToken')}` });
@@ -272,9 +273,7 @@ const IncomingRequestsPanel = ({
 
                 {/* Meta details */}
                 <div className="flex items-center justify-between text-xs pt-1 border-t border-border/60">
-                  <span className="font-bold text-sm text-text-primary tabular-nums">
-                    {formatCurrency(req.fare?.totalFare || 0)}
-                  </span>
+                  <FareLabel amount={req.fare?.totalFare || 0} size="md" highlight />
                   <div className="flex items-center gap-3 text-text-muted">
                     <span className="flex items-center gap-1">
                       <Users size={12} /> {req.passengerCount} seat{req.passengerCount > 1 ? 's' : ''}

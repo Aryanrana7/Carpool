@@ -4,6 +4,8 @@ import { Check, X, Users, Clock, Navigation2 } from 'lucide-react';
 import { BookingCardSkeleton } from './SkeletonLoaders';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import RouteConnector from '../ui/RouteConnector';
+import FareLabel from '../ui/FareLabel';
 import { formatCurrency, formatTime } from '../../utils/formatters';
 
 const STATUS_MAP = {
@@ -87,20 +89,10 @@ const BookingRequestsPanel = ({ bookings, loading, onUpdateStatus }) => {
                   </div>
 
                   {/* Route summary */}
-                  <div className="bg-surface rounded-md p-2.5 space-y-1.5 border border-border text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                      <p className="text-text-primary truncate font-medium">
-                        {booking.ride?.source}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-sm bg-text-primary shrink-0" />
-                      <p className="text-text-muted truncate">
-                        {booking.ride?.destination}
-                      </p>
-                    </div>
-                  </div>
+                  <RouteConnector
+                    pickup={booking.ride?.source || 'Pickup point'}
+                    destination={booking.ride?.destination || 'Destination point'}
+                  />
 
                   {/* Fare & Departure */}
                   <div className="flex justify-between items-center text-xs">
@@ -110,9 +102,7 @@ const BookingRequestsPanel = ({ bookings, loading, onUpdateStatus }) => {
                         {booking.ride?.time ? formatTime(booking.ride.time) : 'Scheduled'}
                       </span>
                     </div>
-                    <span className="font-bold text-text-primary tabular-nums">
-                      {formatCurrency(booking.ride?.price ?? 0)}
-                    </span>
+                    <FareLabel amount={booking.ride?.price ?? 0} size="sm" />
                   </div>
 
                   {/* Action controls */}

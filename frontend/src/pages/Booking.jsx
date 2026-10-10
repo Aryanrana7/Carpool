@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { formatCurrency, formatDate, formatTime } from '../utils/formatters';
 import Button from '../components/ui/Button';
 import RouteConnector from '../components/ui/RouteConnector';
+import TrustStrip from '../components/ui/TrustStrip';
+import FareLabel from '../components/ui/FareLabel';
 
 const RIDE_TYPE_ICONS = {
   mini: Bike,
@@ -107,34 +109,15 @@ export const Booking = () => {
           {/* Assigned Driver Card */}
           <div className="bg-surface border border-border rounded-lg p-5">
             <p className="micro-label mb-3">Driver & Vehicle</p>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-subtle text-primary border border-primary/20 rounded-md flex items-center justify-center font-bold text-base shrink-0">
-                  {ride.driver?.name?.charAt(0) || 'D'}
-                </div>
-                <div>
-                  <p className="font-bold text-sm text-text-primary">
-                    {ride.driver?.name || 'Assigned Driver'}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-text-secondary">
-                    {ride.driver?.rating > 0 ? (
-                      <div className="flex items-center gap-0.5 text-amber-500">
-                        <Star size={11} className="fill-amber-400 text-amber-400" />
-                        <span className="font-semibold tabular-nums">{ride.driver.rating.toFixed(1)}</span>
-                      </div>
-                    ) : (
-                      <span className="text-text-muted">Verified driver</span>
-                    )}
-                    <span>·</span>
-                    <span className="truncate">{ride.carType || 'Standard Vehicle'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-9 h-9 rounded-md bg-border-subtle flex items-center justify-center text-text-secondary shrink-0">
-                <IconComponent size={18} />
-              </div>
-            </div>
+            <TrustStrip
+              driver={{
+                ...ride.driver,
+                carModel: ride.driver?.carModel || ride.carType,
+                carNumber: ride.driver?.carNumber,
+              }}
+              size="md"
+              showVehicle={true}
+            />
           </div>
 
           {/* Fare Summary Card */}
@@ -161,7 +144,7 @@ export const Booking = () => {
               )}
               <div className="flex justify-between items-center pt-2.5 mt-2 border-t border-border">
                 <span className="font-bold text-text-primary text-sm">Total Fare (1 Seat)</span>
-                <span className="text-xl font-bold text-text-primary tabular-nums">{formatCurrency(ride.price)}</span>
+                <FareLabel amount={ride.price} size="lg" highlight />
               </div>
             </div>
           </div>

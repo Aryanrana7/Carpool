@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { MapPin, Navigation, History } from 'lucide-react';
 import { Shimmer } from './SkeletonLoaders';
 import Badge from '../ui/Badge';
+import RouteConnector from '../ui/RouteConnector';
+import FareLabel from '../ui/FareLabel';
 import { formatCurrency, formatDate, formatTime } from '../../utils/formatters';
 
 const STATUS_VARIANT = {
@@ -74,28 +76,22 @@ const RideHistory = ({ bookings, loading }) => {
               </div>
 
               {/* Route */}
-              <div className="md:col-span-5 space-y-1 w-full">
-                <div className="flex items-center gap-1.5 text-text-primary font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                  <span className="truncate">{booking.ride?.source?.split(',')[0] || 'Pickup point'}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-text-muted">
-                  <span className="w-1.5 h-1.5 rounded-sm bg-text-primary shrink-0" />
-                  <span className="truncate">{booking.ride?.destination?.split(',')[0] || 'Dropoff point'}</span>
-                </div>
+              <div className="md:col-span-5 w-full">
+                <RouteConnector
+                  pickup={booking.ride?.source?.split(',')[0] || 'Pickup point'}
+                  destination={booking.ride?.destination?.split(',')[0] || 'Dropoff point'}
+                />
               </div>
 
               {/* Earnings */}
               <div className="md:col-span-2 md:text-right flex items-center md:justify-end">
-                <span
-                  className={`font-bold tabular-nums ${
-                    booking.status === 'completed'
-                      ? 'text-text-primary'
-                      : 'text-text-muted line-through'
-                  }`}
-                >
-                  {formatCurrency(booking.ride?.price ?? 0)}
-                </span>
+                {booking.status === 'completed' ? (
+                  <FareLabel amount={booking.ride?.price ?? 0} size="sm" />
+                ) : (
+                  <span className="font-bold tabular-nums text-text-muted line-through">
+                    {formatCurrency(booking.ride?.price ?? 0)}
+                  </span>
+                )}
               </div>
 
               {/* Status */}

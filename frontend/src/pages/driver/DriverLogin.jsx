@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DriverAuthContext } from '../../context/DriverAuthContext';
-import { Mail, Car, ArrowRight, ShieldCheck, CheckCircle2, DollarSign } from 'lucide-react';
+import { Mail, Car, ArrowRight, ShieldCheck, CheckCircle2, IndianRupee } from 'lucide-react';
 import DemoLoginSection from '../../components/DemoLoginSection';
 import Input from '../../components/ui/Input';
 import PasswordInput from '../../components/ui/PasswordInput';
@@ -62,7 +62,7 @@ export const DriverLogin = () => {
 
           <div className="space-y-3.5">
             <div className="flex items-center gap-3 text-xs text-slate-300">
-              <DollarSign size={16} className="text-primary shrink-0" />
+              <IndianRupee size={16} className="text-primary shrink-0" />
               <span>Full control over your seat prices and scheduled routes</span>
             </div>
             <div className="flex items-center gap-3 text-xs text-slate-300">

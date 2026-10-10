@@ -25,6 +25,8 @@ import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import RouteConnector from '../components/ui/RouteConnector';
+import TrustStrip from '../components/ui/TrustStrip';
+import FareLabel from '../components/ui/FareLabel';
 
 const FILTERS = [
   { id: 'all', label: 'All Trips' },
@@ -249,15 +251,12 @@ export const MyRides = () => {
 
                   {/* Card Bottom: Driver, Price & Actions */}
                   <div className="pt-3.5 border-t border-border flex flex-wrap items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-2 text-xs text-text-secondary">
-                      <Car size={14} className="text-text-muted" />
-                      <span className="font-medium text-text-primary">
-                        {booking.ride?.carType || 'Sedan'}
-                      </span>
-                      {booking.ride?.driver?.name && (
-                        <span>· {booking.ride.driver.name}</span>
-                      )}
-                    </div>
+                    <TrustStrip
+                      driver={booking.ride?.driver}
+                      size="sm"
+                      showVehicle={false}
+                      className="min-w-0"
+                    />
 
                     <div className="flex items-center gap-2 flex-wrap">
                       {booking.status === 'in_progress' && (
@@ -310,9 +309,7 @@ export const MyRides = () => {
                         )
                       )}
 
-                      <span className="text-base font-bold text-text-primary tabular-nums pl-1">
-                        {formatCurrency(booking.ride?.price)}
-                      </span>
+                      <FareLabel amount={booking.ride?.price} size="md" />
                     </div>
                   </div>
                 </div>

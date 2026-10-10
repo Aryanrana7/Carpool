@@ -18,6 +18,8 @@ import toast from 'react-hot-toast';
 import { formatCurrency } from '../../utils/formatters';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import TrustStrip from '../ui/TrustStrip';
+import FareLabel from '../ui/FareLabel';
 
 const STATUS_STEPS = [
   { key: 'searching', label: 'Finding Driver' },
@@ -191,37 +193,15 @@ export const OnDemandRideTracker = ({
         {/* Assigned Driver Card */}
         {hasDriver && (
           <div className="my-3 p-3.5 rounded-lg bg-background border border-border space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-md bg-primary-subtle text-primary border border-primary/20 flex items-center justify-center text-sm font-bold shrink-0">
-                  {request.driver.name?.charAt(0) || 'D'}
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-text-primary leading-tight">
-                    {request.driver.name}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-text-muted">
-                    {request.driver.averageRating > 0 ? (
-                      <span className="text-amber-500 font-semibold flex items-center gap-0.5">
-                        <Star size={11} className="fill-amber-400 text-amber-400" />
-                        <span className="tabular-nums">{request.driver.averageRating.toFixed(1)}</span>
-                      </span>
-                    ) : (
-                      <span>Verified driver</span>
-                    )}
-                    <span>·</span>
-                    <span className="truncate">{request.driver.carModel || 'Sedan'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <p className="text-xs font-bold text-text-primary tabular-nums uppercase">
-                  {request.driver.carNumber}
-                </p>
-                <p className="text-[11px] text-text-muted">{request.driver.carModel}</p>
-              </div>
-            </div>
+            <TrustStrip
+              driver={{
+                ...request.driver,
+                carModel: request.driver.carModel,
+                carNumber: request.driver.carNumber,
+              }}
+              size="md"
+              showVehicle={true}
+            />
 
             {/* Chat Action */}
             <div className="pt-2 border-t border-border">
@@ -251,12 +231,10 @@ export const OnDemandRideTracker = ({
             </div>
           </div>
 
-          <div className="text-right flex flex-col justify-center">
+          <div className="text-right flex flex-col justify-center items-end">
             <p className="micro-label">Total Fare</p>
-            <p className="text-lg font-bold text-text-primary tabular-nums">
-              {formatCurrency(request.fare?.totalFare)}
-            </p>
-            <p className="text-[10px] text-text-muted">
+            <FareLabel amount={request.fare?.totalFare} size="md" highlight />
+            <p className="text-[10px] text-text-muted mt-0.5">
               {request.passengerCount} seat{request.passengerCount > 1 ? 's' : ''} · {request.rideType}
             </p>
           </div>

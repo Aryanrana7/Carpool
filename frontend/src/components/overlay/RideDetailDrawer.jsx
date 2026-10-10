@@ -18,6 +18,8 @@ import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import Skeleton from '../ui/Skeleton';
 import RouteConnector from '../ui/RouteConnector';
+import TrustStrip from '../ui/TrustStrip';
+import FareLabel from '../ui/FareLabel';
 
 const RIDE_TYPE_ICONS = {
   mini: Bike,
@@ -127,31 +129,15 @@ export const RideDetailDrawer = ({
                 <>
                   {/* Driver & Vehicle */}
                   <div className="bg-surface border border-border rounded-lg p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-md bg-primary-subtle text-primary border border-primary/20 flex items-center justify-center font-bold text-base shrink-0">
-                        {ride.driver?.name?.charAt(0).toUpperCase() || 'D'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-text-primary truncate">
-                          {ride.driver?.name || 'Verified Driver'}
-                        </p>
-                        <div className="flex items-center gap-2 mt-0.5 text-xs text-text-secondary">
-                          {ride.driver?.rating > 0 ? (
-                            <div className="flex items-center gap-0.5 text-amber-500">
-                              <Star size={11} className="fill-amber-400 text-amber-400" />
-                              <span className="font-semibold tabular-nums">{ride.driver.rating.toFixed(1)}</span>
-                            </div>
-                          ) : (
-                            <span className="text-text-muted">New driver</span>
-                          )}
-                          <span>·</span>
-                          <span className="truncate">{ride.carType || RIDE_LABEL[rideType] || 'Sedan'}</span>
-                        </div>
-                      </div>
-                      <div className="w-8 h-8 rounded-md bg-border-subtle flex items-center justify-center text-text-secondary shrink-0">
-                        <IconComponent size={16} />
-                      </div>
-                    </div>
+                    <TrustStrip
+                      driver={{
+                        ...ride.driver,
+                        carModel: ride.driver?.carModel || ride.carType || RIDE_LABEL[rideType],
+                        carNumber: ride.driver?.carNumber,
+                      }}
+                      size="md"
+                      showVehicle={true}
+                    />
 
                     <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border flex-wrap">
                       <Badge status="confirmed" label={`${ride.seats} seats left`} size="sm" />

@@ -8,6 +8,9 @@ import { ThemeContext } from '../context/ThemeContext';
 import { formatCurrency, formatDate, formatTime } from '../utils/formatters';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
+import TrustStrip from './ui/TrustStrip';
+import FareLabel from './ui/FareLabel';
+import RouteConnector from './ui/RouteConnector';
 
 // Clean SVG Pin and Car DivIcons
 const buildPinIcon = (color = '#2563EB', label = 'PICKUP') =>
@@ -209,36 +212,15 @@ export const ActiveTripModal = ({ isOpen, booking, onClose, onChatOpen }) => {
               {/* Driver Card */}
               <div className="bg-background border border-border rounded-lg p-4 space-y-3">
                 <p className="micro-label">Driver Details</p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-md bg-primary-subtle text-primary border border-primary/20 flex items-center justify-center font-bold text-sm">
-                      {driver?.name?.charAt(0) || 'D'}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-text-primary leading-tight">
-                        {driver?.name || 'Assigned Driver'}
-                      </h4>
-                      <div className="flex items-center gap-2 mt-0.5 text-xs text-text-muted">
-                        {driver?.rating > 0 ? (
-                          <span className="text-amber-500 font-semibold flex items-center gap-0.5">
-                            <Star size={11} className="fill-amber-400 text-amber-400" />
-                            <span className="tabular-nums">{driver.rating.toFixed(1)}</span>
-                          </span>
-                        ) : (
-                          <span>Verified driver</span>
-                        )}
-                        <span>·</span>
-                        <span>{driver?.carModel || ride?.carType || 'Sedan'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-text-primary uppercase tracking-wider tabular-nums">
-                      {driver?.carNumber || 'Active'}
-                    </p>
-                  </div>
-                </div>
+                <TrustStrip
+                  driver={{
+                    ...driver,
+                    carModel: driver?.carModel || ride?.carType,
+                    carNumber: driver?.carNumber,
+                  }}
+                  size="md"
+                  showVehicle={true}
+                />
 
                 {onChatOpen && (
                   <Button
@@ -254,28 +236,29 @@ export const ActiveTripModal = ({ isOpen, booking, onClose, onChatOpen }) => {
               </div>
 
               {/* Journey summary */}
-              <div className="bg-background border border-border rounded-lg p-4 space-y-2 text-xs">
+              <div className="bg-background border border-border rounded-lg p-4 space-y-3 text-xs">
                 <p className="micro-label">Journey Details</p>
-                <div className="space-y-2 pt-1">
-                  <div>
-                    <span className="text-[10px] text-text-muted uppercase font-semibold block">Pickup</span>
-                    <span className="font-semibold text-text-primary leading-snug">
-                      {ride?.pickupLocation || ride?.source}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-text-muted uppercase font-semibold block">Destination</span>
-                    <span className="font-semibold text-text-primary leading-snug">
-                      {ride?.dropoffLocation || ride?.destination}
-                    </span>
+                <div className="flex items-stretch gap-2.5">
+                  <RouteConnector className="py-1" />
+                  <div className="flex-1 space-y-3">
+                    <div>
+                      <span className="text-[10px] text-text-muted uppercase font-semibold block">Pickup</span>
+                      <span className="font-semibold text-text-primary leading-snug">
+                        {ride?.pickupLocation || ride?.source}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-text-muted uppercase font-semibold block">Destination</span>
+                      <span className="font-semibold text-text-primary leading-snug">
+                        {ride?.dropoffLocation || ride?.destination}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border flex justify-between items-center">
+                <div className="pt-2.5 border-t border-border flex justify-between items-center">
                   <span className="text-text-secondary">Fare Paid</span>
-                  <span className="text-base font-bold text-text-primary tabular-nums">
-                    {formatCurrency(ride?.price)}
-                  </span>
+                  <FareLabel amount={ride?.price} size="md" highlight />
                 </div>
               </div>
             </div>

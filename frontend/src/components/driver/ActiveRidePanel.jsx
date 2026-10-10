@@ -4,6 +4,7 @@ import { MessageSquare, Check, Car, User, Navigation2 } from 'lucide-react';
 import RouteConnector from '../ui/RouteConnector';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import FareLabel from '../ui/FareLabel';
 import { formatCurrency, formatTime } from '../../utils/formatters';
 
 const STATUS = {
@@ -129,11 +130,9 @@ const ActiveRidePanel = ({ booking, onUpdateStatus, onChatOpen }) => {
 
         {/* Fare & Time */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 rounded-lg bg-background border border-border text-center">
+          <div className="p-3 rounded-lg bg-background border border-border text-center flex flex-col items-center justify-center">
             <span className="text-[11px] font-medium text-text-muted block">Fare</span>
-            <p className="text-lg font-bold text-text-primary tabular-nums mt-0.5">
-              {formatCurrency(booking.ride?.price ?? 0)}
-            </p>
+            <FareLabel amount={booking.ride?.price ?? 0} size="md" highlight className="mt-0.5" />
           </div>
           <div className="p-3 rounded-lg bg-background border border-border text-center">
             <span className="text-[11px] font-medium text-text-muted block">Departure</span>

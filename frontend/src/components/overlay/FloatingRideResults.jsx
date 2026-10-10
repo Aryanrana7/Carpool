@@ -4,6 +4,8 @@ import { X, Car, Bike, Shield, Clock, Star, ChevronRight, Zap, MapPinOff, ArrowU
 import { formatCurrency, formatTime } from '../../utils/formatters';
 import Skeleton from '../ui/Skeleton';
 import Badge from '../ui/Badge';
+import FareLabel from '../ui/FareLabel';
+import TrustStrip from '../ui/TrustStrip';
 
 const RIDE_TYPE_ICONS = {
   mini: Bike,
@@ -28,7 +30,6 @@ const SkeletonCard = () => (
 
 /* ── Individual Ride Card ─────────────────────────────── */
 const RideHorizontalCard = React.memo(({ ride, selected, onSelect, onHoverIn, onHoverOut }) => {
-  const IconComponent = RIDE_TYPE_ICONS[ride.rideType] || Car;
   const isSeatsLow = ride.seats === 1;
 
   return (
@@ -60,35 +61,20 @@ const RideHorizontalCard = React.memo(({ ride, selected, onSelect, onHoverIn, on
             {formatTime(ride.time || ride.date)}
           </span>
         </div>
-        <span className="text-lg font-bold text-text-primary tabular-nums leading-none">
-          {formatCurrency(ride.price)}
-        </span>
+        <FareLabel amount={ride.price} size="md" />
       </div>
 
-      {/* 2. Route Route Hint (From -> To) */}
+      {/* 2. Route Hint (From -> To) */}
       <p className="text-xs font-medium text-text-secondary truncate mb-2.5">
         {ride.pickupLocation?.split(',')[0] || ride.source} → {ride.dropoffLocation?.split(',')[0] || ride.destination}
       </p>
 
-      {/* 3. Driver & Vehicle Info */}
-      <div className="flex items-center justify-between text-xs pt-2 border-t border-border">
-        <div className="flex items-center gap-1.5 min-w-0 pr-1">
-          <div className="w-5 h-5 rounded bg-border-subtle flex items-center justify-center text-text-secondary shrink-0">
-            <IconComponent size={12} />
-          </div>
-          <span className="text-xs font-semibold text-text-primary truncate">
-            {ride.driver?.name || 'Driver'}
-          </span>
-          {ride.driver?.rating > 0 && (
-            <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
-              <Star size={10} className="fill-amber-400 text-amber-400" />
-              <span className="text-[10px] font-bold tabular-nums">{ride.driver.rating.toFixed(1)}</span>
-            </div>
-          )}
-        </div>
+      {/* 3. Driver & Vehicle Info via TrustStrip */}
+      <div className="flex items-center justify-between text-xs pt-2 border-t border-border gap-2">
+        <TrustStrip driver={ride.driver} size="sm" showVehicle={false} className="min-w-0 flex-1" />
 
         {/* 4. Seats Left Badge */}
-        <div>
+        <div className="shrink-0">
           {ride.seats > 0 ? (
             <span
               className={`
@@ -99,7 +85,7 @@ const RideHorizontalCard = React.memo(({ ride, selected, onSelect, onHoverIn, on
                 }
               `}
             >
-              {ride.seats} {ride.seats === 1 ? 'seat left' : 'seats left'}
+              {ride.seats} {ride.seats === 1 ? 'seat left' : 'seats'}
             </span>
           ) : (
             <span className="text-[10px] font-semibold text-danger bg-danger-subtle px-1.5 py-0.5 rounded border border-red-200 dark:border-red-900/40">

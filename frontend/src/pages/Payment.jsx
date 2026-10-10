@@ -6,6 +6,7 @@ import { CreditCard, Smartphone, Wallet, CheckCircle2, ArrowRight, ShieldCheck }
 import { motion } from 'framer-motion';
 import { formatCurrency } from '../utils/formatters';
 import Button from '../components/ui/Button';
+import FareLabel from '../components/ui/FareLabel';
 
 const METHODS = [
   { id: 'card', label: 'Credit / Debit Card', icon: CreditCard, desc: 'Visa, Mastercard, RuPay' },
@@ -121,9 +122,7 @@ export const Payment = () => {
         <div className="bg-surface border border-border rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="micro-label mb-1">Total Due</p>
-            <p className="text-2xl font-bold text-text-primary tabular-nums">
-              {formatCurrency(ride.price)}
-            </p>
+            <FareLabel amount={ride.price} size="hero" highlight />
           </div>
           <div className="text-right">
             <p className="text-xs font-semibold text-text-primary">{ride.carType || 'Standard Vehicle'}</p>
