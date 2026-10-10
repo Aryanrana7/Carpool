@@ -2,14 +2,14 @@ import React, { useState, useRef, useEffect, useContext, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import MapPanel from '../components/MapPanel';
-import FloatingSearchCard from '../components/overlay/FloatingSearchCard';
-import FloatingRideResults from '../components/overlay/FloatingRideResults';
+import SearchAndResultsPanel from '../components/SearchAndResultsPanel';
 import OnDemandRideTracker from '../components/overlay/OnDemandRideTracker';
 import ChatWidget from '../components/chat/ChatWidget';
 import RatingModal from '../components/RatingModal';
 import { SocketContext } from '../context/SocketContext';
 import { AuthContext } from '../context/AuthContext';
 import { AnimatePresence } from 'framer-motion';
+import { Search, MapPin } from 'lucide-react';
 const RideDetailDrawer = React.lazy(() => import('../components/overlay/RideDetailDrawer'));
 import toast from 'react-hot-toast';
 
@@ -25,6 +25,9 @@ const Home = () => {
 
   // Search mode: 'scheduled' | 'on_demand'
   const [searchMode, setSearchMode] = useState('scheduled');
+
+  // Mobile active tab: 'search' | 'map'
+  const [mobileTab, setMobileTab] = useState('search');
 
   // Location & route
   const [source, setSource] = useState(null);
@@ -44,8 +47,7 @@ const Home = () => {
   const [onDemandRequest, setOnDemandRequest] = useState(null);
   const [requestingOnDemand, setRequestingOnDemand] = useState(false);
 
-  // Overlays & Modals
-  const [showResults, setShowResults] = useState(false);
+  // Drawer & Modals
   const [showDrawer, setShowDrawer] = useState(false);
   const [drawerLoading, setDrawerLoading] = useState(false);
 
@@ -130,7 +132,6 @@ const Home = () => {
     setSource(place);
     setRides([]);
     setHasSearched(false);
-    setShowResults(false);
     setSelectedRide(null);
     if (destination && place?.lat && destination?.lat) {
       calculateRoute(place, destination);
@@ -145,7 +146,6 @@ const Home = () => {
     setDestination(place);
     setRides([]);
     setHasSearched(false);
-    setShowResults(false);
     setSelectedRide(null);
     if (source && source?.lat && place?.lat) {
       calculateRoute(source, place);
@@ -182,7 +182,6 @@ const Home = () => {
     setSelectedRide(null);
     setShowDrawer(false);
     setHasSearched(true);
-    setShowResults(true);
 
     try {
       let searchUrl = `/rides/search?source=${encodeURIComponent(source.address.trim())}&destination=${encodeURIComponent(destination.address.trim())}`;
@@ -258,25 +257,21 @@ const Home = () => {
 
   const handleSelectRide = (ride) => {
     setSelectedRide(ride);
-    setShowResults(false);
     setDrawerLoading(true);
     setShowDrawer(true);
-    setTimeout(() => setDrawerLoading(false), 350);
+    setTimeout(() => setDrawerLoading(false), 250);
   };
 
   const handleCloseDrawer = () => {
     setShowDrawer(false);
     setSelectedRide(null);
     setDrawerLoading(false);
-    if (hasSearched) {
-      setShowResults(true);
-    }
   };
 
   const handleCloseResults = () => {
-    setShowResults(false);
     setHasSearched(false);
     setSelectedRide(null);
+    setRides([]);
   };
 
   const handleBook = (ride) => {
@@ -291,77 +286,122 @@ const Home = () => {
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden bg-slate-100 dark:bg-[#070C18]">
-      {/* ── Fullscreen map ─────────────────────────── */}
-      <MapPanel
-        source={source}
-        destination={destination}
-        routePoints={routePoints}
-        distance={distance}
-        duration={duration}
-        hasSearched={hasSearched}
-        rides={rides}
-        hoveredRide={hoveredRide}
-        selectedRide={selectedRide}
-        onSelectRide={handleSelectRide}
-        showDrawer={showDrawer}
-        fullscreen
-      />
-
-      {/* ── Floating search card (top-left) ────────── */}
-      {!onDemandRequest && (
-        <FloatingSearchCard
-          source={source}
-          destination={destination}
-          onSourceChange={handleSourceChange}
-          onDestinationChange={handleDestinationChange}
-          onSearch={handleSearch}
-          selectedRideType={selectedRideType}
-          onRideTypeSelect={handleRideTypeSelect}
-          loadingRides={loadingRides}
-          distance={distance}
-          duration={duration}
-          mode={searchMode}
-          onModeChange={setSearchMode}
-          onRequestOnDemand={handleRequestOnDemand}
-          requestingOnDemand={requestingOnDemand}
-          hasSearched={hasSearched}
-          hasResults={showResults}
-        />
-      )}
-
-      {/* ── On-Demand Active Ride Tracker ──────────── */}
-      <AnimatePresence>
-        {onDemandRequest && (
-          <OnDemandRideTracker
-            request={onDemandRequest}
-            onCancel={() => setOnDemandRequest(null)}
-            onChatOpen={(req) => setShowChat(true)}
-            onRateOpen={(req) => {
-              setRatingTarget(req);
-              setShowRatingModal(true);
-            }}
-            onClose={() => setOnDemandRequest(null)}
+    <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden bg-background flex flex-col md:flex-row">
+      {/* ── Left Column: Grounded Search & Results Panel ─── */}
+      <aside
+        className={`
+          w-full md:w-[420px] lg:w-[450px] shrink-0 h-full border-r border-border bg-surface flex flex-col z-10 shadow-sm overflow-hidden
+          ${mobileTab === 'map' ? 'hidden md:flex' : 'flex'}
+        `}
+      >
+        {onDemandRequest ? (
+          <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <div>
+                <h2 className="font-heading font-bold text-base text-ink">Active Trip Tracking</h2>
+                <p className="text-xs text-text-muted mt-0.5">Real-time driver dispatch & status</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOnDemandRequest(null)}
+                className="text-xs font-semibold text-text-muted hover:text-text-primary px-2.5 py-1 rounded bg-border-subtle hover:bg-border transition-colors"
+              >
+                Close View
+              </button>
+            </div>
+            <OnDemandRideTracker
+              request={onDemandRequest}
+              embedded={true}
+              onCancel={() => setOnDemandRequest(null)}
+              onChatOpen={() => setShowChat(true)}
+              onRateOpen={(req) => {
+                setRatingTarget(req);
+                setShowRatingModal(true);
+              }}
+              onClose={() => setOnDemandRequest(null)}
+            />
+          </div>
+        ) : (
+          <SearchAndResultsPanel
+            source={source}
+            destination={destination}
+            onSourceChange={handleSourceChange}
+            onDestinationChange={handleDestinationChange}
+            onSearch={handleSearch}
+            selectedRideType={selectedRideType}
+            onRideTypeSelect={handleRideTypeSelect}
+            loadingRides={loadingRides}
+            rides={rides}
+            selectedRide={selectedRide}
+            onSelectRide={handleSelectRide}
+            onHoverRide={setHoveredRide}
+            distance={distance}
+            duration={duration}
+            mode={searchMode}
+            onModeChange={setSearchMode}
+            onRequestOnDemand={handleRequestOnDemand}
+            requestingOnDemand={requestingOnDemand}
+            hasSearched={hasSearched}
+            onResetSearch={handleCloseResults}
           />
         )}
-      </AnimatePresence>
+      </aside>
 
-      {/* ── Floating ride results (bottom-center) ──── */}
-      <FloatingRideResults
-        show={showResults && !onDemandRequest}
-        rides={rides}
-        loading={loadingRides}
-        selectedRide={selectedRide}
-        onSelectRide={handleSelectRide}
-        onHoverRide={setHoveredRide}
-        onClose={handleCloseResults}
-        onSwitchToOnDemand={() => {
-          setSearchMode('on_demand');
-          setShowResults(false);
-        }}
-      />
+      {/* ── Right Column: Interactive Map Panel ──────────── */}
+      <section
+        className={`
+          flex-1 h-full relative overflow-hidden bg-slate-100 dark:bg-[#070C18]
+          ${mobileTab === 'search' ? 'hidden md:block' : 'block'}
+        `}
+      >
+        <MapPanel
+          source={source}
+          destination={destination}
+          routePoints={routePoints}
+          distance={distance}
+          duration={duration}
+          hasSearched={hasSearched}
+          rides={rides}
+          hoveredRide={hoveredRide}
+          selectedRide={selectedRide}
+          onSelectRide={handleSelectRide}
+          showDrawer={showDrawer}
+        />
+      </section>
 
-      {/* ── Ride detail drawer (right slide-in) ────── */}
+      {/* ── Mobile Segmented View Switcher (Only visible on screens < md) ── */}
+      <div className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[500] bg-surface/95 backdrop-blur-md border border-border shadow-modal rounded-full p-1 flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setMobileTab('search')}
+          className={`
+            flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all
+            ${mobileTab === 'search'
+              ? 'bg-primary text-white shadow-sm'
+              : 'text-text-secondary hover:text-text-primary'
+            }
+          `}
+        >
+          <Search size={13} />
+          <span>{rides.length > 0 ? `Rides (${rides.length})` : 'Search'}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('map')}
+          className={`
+            flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all
+            ${mobileTab === 'map'
+              ? 'bg-primary text-white shadow-sm'
+              : 'text-text-secondary hover:text-text-primary'
+            }
+          `}
+        >
+          <MapPin size={13} />
+          <span>Map</span>
+        </button>
+      </div>
+
+      {/* ── Ride detail drawer (slide-in) ────────────────── */}
       <Suspense fallback={null}>
         <RideDetailDrawer
           show={showDrawer}
@@ -375,7 +415,7 @@ const Home = () => {
         />
       </Suspense>
 
-      {/* ── On-demand Chat Widget ──────────────────── */}
+      {/* ── On-demand Chat Widget ────────────────────────── */}
       <AnimatePresence>
         {showChat && onDemandRequest && onDemandRequest.booking && (
           <ChatWidget
@@ -389,7 +429,7 @@ const Home = () => {
         )}
       </AnimatePresence>
 
-      {/* ── Rating Modal for completed on-demand ride ─ */}
+      {/* ── Rating Modal for completed on-demand ride ─────── */}
       <RatingModal
         isOpen={showRatingModal}
         onClose={() => {

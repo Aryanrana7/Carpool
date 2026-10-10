@@ -128,6 +128,25 @@ const MapFlyTo = ({ targetCoords, trigger }) => {
   return null;
 };
 
+// Ensure Leaflet recalculates dimensions when container resizes
+const MapResizeHandler = () => {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    const handleResize = () => {
+      map.invalidateSize();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+  return null;
+};
+
 export const MapPanel = ({
   source,
   destination,
@@ -224,6 +243,7 @@ export const MapPanel = ({
         />
 
         <ChangeView bounds={bounds} showDrawer={showDrawer} />
+        <MapResizeHandler />
         <MapFlyTo targetCoords={passengerLocation} trigger={recenterTrigger} />
 
         {/* Passenger Location Marker */}

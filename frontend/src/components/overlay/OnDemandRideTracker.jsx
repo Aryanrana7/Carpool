@@ -46,6 +46,7 @@ export const OnDemandRideTracker = ({
   onChatOpen,
   onRateOpen,
   onClose,
+  embedded = false,
 }) => {
   const [cancelling, setCancelling] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -91,14 +92,18 @@ export const OnDemandRideTracker = ({
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={embedded ? { opacity: 0, y: 10 } : { opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 30 }}
+        exit={embedded ? { opacity: 0, y: -10 } : { opacity: 0, y: 30 }}
         transition={{ duration: 0.2 }}
         role="region"
         aria-live="polite"
         aria-label="Active Ride Request Tracking"
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[600] w-[calc(100vw-24px)] max-w-lg bg-surface border border-border rounded-xl p-5 shadow-modal"
+        className={
+          embedded
+            ? "w-full bg-surface border border-border rounded-xl p-4 sm:p-5 shadow-sm"
+            : "absolute bottom-4 left-1/2 -translate-x-1/2 z-[600] w-[calc(100vw-24px)] max-w-lg bg-surface border border-border rounded-xl p-5 shadow-modal"
+        }
       >
         {/* Top Status Header */}
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-border">
