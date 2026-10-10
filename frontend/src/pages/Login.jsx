@@ -1,11 +1,15 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
-import { Mail, Lock, Car, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mail, Car, ArrowRight, ShieldCheck, CheckCircle2, Navigation } from 'lucide-react';
+import GoogleSignInButton from '../components/GoogleSignInButton';
+import DemoLoginSection from '../components/DemoLoginSection';
+import Input from '../components/ui/Input';
+import PasswordInput from '../components/ui/PasswordInput';
+import Button from '../components/ui/Button';
 
-const Login = () => {
+export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,120 +23,195 @@ const Login = () => {
     setLoading(true);
     try {
       const { data } = await api.post('/users/login', { email, password });
-      login({ name: data.name, email: data.email, _id: data._id, role: data.role }, data.token);
+      login(
+        { name: data.name, email: data.email, _id: data._id, role: data.role, picture: data.picture },
+        data.token
+      );
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+      setError(err.response?.data?.message || 'Invalid credentials. Please verify your email and password.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleSuccess = (userData) => {
+    login(
+      { name: userData.name, email: userData.email, _id: userData._id, role: userData.role, picture: userData.picture },
+      userData.token
+    );
+    navigate('/');
+  };
+
+  const handleDemoFill = (demoEmail, demoPassword, data) => {
+    if (data && data.token) {
+      login(
+        { name: data.name, email: data.email, _id: data._id, role: data.role, picture: data.picture },
+        data.token
+      );
+      navigate('/');
+    } else {
+      setEmail(demoEmail);
+      setPassword(demoPassword);
+    }
+  };
+
   return (
-    <div className="min-h-[calc(100vh-64px)] flex">
-      {/* Left panel – decorative */}
-      <div className="hidden lg:flex w-[45%] bg-[#111] dark:bg-[#0a0a0a] items-center justify-center p-16 relative overflow-hidden flex-shrink-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 via-transparent to-violet-600/20" />
-        <div className="relative z-10 max-w-sm text-white">
-          <div className="w-14 h-14 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center mb-8">
-            <Car size={28} className="text-indigo-400" />
+    <div className="min-h-[calc(100vh-68px)] flex bg-background">
+      {/* ── Left Branded Panel (Desktop) ───────────────── */}
+      <div className="hidden lg:flex w-[44%] bg-[#0B1220] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#1F2A44] select-none">
+        {/* Abstract SVG Route Network Graphic */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+          <svg width="600" height="600" viewBox="0 0 600 600" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="150" cy="150" r="8" fill="currentColor" />
+            <circle cx="450" cy="180" r="8" fill="currentColor" />
+            <circle cx="300" cy="380" r="8" fill="currentColor" />
+            <circle cx="480" cy="480" r="8" fill="currentColor" />
+            <path d="M150 150 Q 300 120 450 180" strokeDasharray="4 4" />
+            <path d="M150 150 Q 200 300 300 380" />
+            <path d="M450 180 Q 400 300 300 380" strokeDasharray="6 6" />
+            <path d="M300 380 Q 400 450 480 480" />
+          </svg>
+        </div>
+
+        <div className="relative z-10">
+          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
+            <Car size={20} />
           </div>
-          <h1 className="text-4xl font-black leading-tight mb-4">
-            Your ride,<br />your rules.
+
+          <span className="text-[11px] font-bold uppercase tracking-widest text-primary-hover mb-2 block">
+            Ride Sharing Platform
+          </span>
+
+          <h1 className="text-3xl font-bold tracking-tight text-white leading-tight mb-4">
+            Smart, coordinated rides on everyday routes.
           </h1>
-          <p className="text-gray-400 text-base leading-relaxed">
-            Connect with drivers heading your way. Fast, affordable, and reliable carpooling for everyone.
+
+          <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-10">
+            Connect with verified drivers already traveling your way. Enjoy transparent pricing, scheduled carpools, and live GPS tracking.
           </p>
-          <div className="mt-10 flex items-center gap-6">
-            {[['10k+', 'Active Riders'], ['2k+', 'Drivers'], ['4.9★', 'Rating']].map(([val, lbl]) => (
-              <div key={lbl}>
-                <p className="text-2xl font-black text-white">{val}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{lbl}</p>
-              </div>
-            ))}
+
+          <div className="space-y-3.5">
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <CheckCircle2 size={16} className="text-primary shrink-0" />
+              <span>Transparent seat pricing with zero hidden surcharges</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <Navigation size={16} className="text-primary shrink-0" />
+              <span>Real-time trip tracking with live vehicle telemetry</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <ShieldCheck size={16} className="text-primary shrink-0" />
+              <span>Verified community members and ratings</span>
+            </div>
           </div>
         </div>
-        {/* Decorative circles */}
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl" />
+
+        <div className="relative z-10 pt-6 border-t border-[#1F2A44] text-[11px] text-slate-400">
+          Secure JWT authentication with role-separated portals.
+        </div>
       </div>
 
-      {/* Right panel – form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#f8f8f8] dark:bg-[#0c0c0c]">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="w-full max-w-[400px]"
-        >
-          <div className="mb-8">
-            <h2 className="text-3xl font-black text-gray-900 dark:text-white">Welcome back</h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Sign in to your account to continue.</p>
+      {/* ── Right Form Container ─────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+        <div className="w-full max-w-[400px]">
+          {/* Role Segmented Switcher */}
+          <div className="flex rounded-md p-1 bg-border-subtle border border-border mb-6">
+            <button
+              type="button"
+              className="flex-1 py-1.5 text-xs font-semibold rounded bg-surface text-text-primary shadow-subtle text-center"
+            >
+              Passenger
+            </button>
+            <Link
+              to="/driver/login"
+              className="flex-1 py-1.5 text-xs font-semibold rounded text-text-secondary hover:text-text-primary text-center transition-colors"
+            >
+              Driver Partner
+            </Link>
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold tracking-tight text-text-primary">
+              Passenger Sign In
+            </h2>
+            <p className="text-text-secondary mt-1 text-xs">
+              Enter your credentials to manage rides and bookings.
+            </p>
           </div>
 
           {error && (
-            <div className="mb-6 flex items-center gap-2.5 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 p-3.5 rounded-xl">
-              <span className="text-red-400">⚠</span> {error}
+            <div
+              role="alert"
+              className="mb-4 text-xs font-medium text-danger bg-danger-subtle border border-red-200 dark:border-red-900/40 p-3 rounded-md"
+            >
+              {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  required
-                  className="input-base pl-10"
-                />
-              </div>
-            </div>
+          {/* Google Sign-In */}
+          <div className="mb-4">
+            <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={setError} text="Continue with Google" />
+          </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="input-base pl-10"
-                />
-              </div>
-            </div>
+          {/* Divider */}
+          <div className="relative flex py-2 items-center mb-4">
+            <div className="flex-grow border-t border-border" />
+            <span className="shrink mx-3 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+              or with email
+            </span>
+            <div className="flex-grow border-t border-border" />
+          </div>
 
-            <button
+          {/* Credentials Form */}
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            <Input
+              id="email"
+              name="email"
+              label="Email Address"
+              type="email"
+              autoComplete="email"
+              placeholder="name@example.com"
+              leftIcon={Mail}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <PasswordInput
+              id="password"
+              name="password"
+              label="Password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <Button
               type="submit"
-              disabled={loading}
-              className="btn-primary w-full mt-2 py-3.5 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+              variant="primary"
+              fullWidth
+              loading={loading}
+              rightIcon={ArrowRight}
+              className="mt-2"
             >
-              {loading ? (
-                <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Signing in...</span>
-              ) : (
-                <span className="flex items-center gap-2">Sign in <ArrowRight size={16} /></span>
-              )}
-            </button>
+              Sign In
+            </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          {/* Demo Shortcuts */}
+          <DemoLoginSection type="passenger" onSelectFill={handleDemoFill} />
+
+          {/* Registration link */}
+          <p className="mt-5 text-center text-xs text-text-secondary">
             Don't have an account?{' '}
-            <Link to="/register" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-2">
-              Create one
+            <Link to="/register" className="font-semibold text-primary hover:underline">
+              Create an account
             </Link>
           </p>
-
-          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-[#1e1e1e] text-center">
-            <Link to="/driver/login" className="text-xs text-gray-400 hover:text-indigo-500 transition-colors font-medium">
-              Are you a driver? Sign in here →
-            </Link>
-          </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -1,86 +1,173 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DriverAuthContext } from '../../context/DriverAuthContext';
-import { Mail, Lock, Car, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mail, Car, ArrowRight, ShieldCheck, CheckCircle2, DollarSign } from 'lucide-react';
+import DemoLoginSection from '../../components/DemoLoginSection';
+import Input from '../../components/ui/Input';
+import PasswordInput from '../../components/ui/PasswordInput';
+import Button from '../../components/ui/Button';
 
-const DriverLogin = () => {
+export const DriverLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { loginDriver } = useContext(DriverAuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     const success = await loginDriver(email, password);
-    if (success) navigate('/driver/dashboard');
-    else setLoading(false);
+    if (success) {
+      navigate('/driver/dashboard');
+    } else {
+      setError('Invalid driver credentials. Please verify your email and password.');
+      setLoading(false);
+    }
+  };
+
+  const handleDemoFill = async (demoEmail, demoPassword, data) => {
+    if (data && data.token) {
+      navigate('/driver/dashboard');
+    } else {
+      setEmail(demoEmail);
+      setPassword(demoPassword);
+    }
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[#f8f8f8] dark:bg-[#0c0c0c] p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[420px]"
-      >
-        {/* Icon + header */}
-        <div className="mb-8 text-center">
-          <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <Car size={26} className="text-emerald-500" />
+    <div className="min-h-[calc(100vh-68px)] flex bg-background">
+      {/* ── Left Branded Panel (Desktop) ───────────────── */}
+      <div className="hidden lg:flex w-[44%] bg-[#0B1220] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#1F2A44] select-none">
+        <div className="relative z-10">
+          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
+            <Car size={20} />
           </div>
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white">Driver Sign In</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Access your driver dashboard.</p>
+
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-primary-hover">
+              Driver Operations Console
+            </span>
+          </div>
+
+          <h1 className="text-3xl font-bold tracking-tight text-white leading-tight mb-4">
+            Monetize empty seats on your daily commute routes.
+          </h1>
+
+          <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-10">
+            Accept on-demand broadcasts nearby or publish scheduled carpools. Control your route, pricing, and availability.
+          </p>
+
+          <div className="space-y-3.5">
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <DollarSign size={16} className="text-primary shrink-0" />
+              <span>Full control over your seat prices and scheduled routes</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <CheckCircle2 size={16} className="text-primary shrink-0" />
+              <span>Instant on-demand matching broadcasts within your area</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <ShieldCheck size={16} className="text-primary shrink-0" />
+              <span>Verified passenger accounts and real-time navigation telemetry</span>
+            </div>
+          </div>
         </div>
 
-        <div className="card p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="driver@example.com" required className="input-base pl-10" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required className="input-base pl-10" />
-              </div>
-            </div>
+        <div className="relative z-10 pt-6 border-t border-[#1F2A44] text-[11px] text-slate-400">
+          CarPool Driver Operations · Partner Authentication
+        </div>
+      </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-success w-full py-3.5 text-sm mt-2 disabled:opacity-60"
+      {/* ── Right Form Container ─────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+        <div className="w-full max-w-[400px]">
+          {/* Role Segmented Switcher */}
+          <div className="flex rounded-md p-1 bg-border-subtle border border-border mb-6">
+            <Link
+              to="/login"
+              className="flex-1 py-1.5 text-xs font-semibold rounded text-text-secondary hover:text-text-primary text-center transition-colors"
             >
-              {loading ? (
-                <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Signing in…</span>
-              ) : (
-                <span className="flex items-center gap-2">Sign in <ArrowRight size={16} /></span>
-              )}
+              Passenger
+            </Link>
+            <button
+              type="button"
+              className="flex-1 py-1.5 text-xs font-semibold rounded bg-surface text-text-primary shadow-subtle text-center"
+            >
+              Driver Partner
             </button>
-          </form>
+          </div>
 
-          <div className="mt-6 pt-5 border-t border-gray-100 dark:border-[#1e1e1e] text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              New driver?{' '}
-              <Link to="/driver/register" className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline underline-offset-2">
-                Register here
-              </Link>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold tracking-tight text-text-primary">
+              Driver Sign In
+            </h2>
+            <p className="text-text-secondary mt-1 text-xs">
+              Access your driver console, live GPS dispatch, and rides.
             </p>
           </div>
-        </div>
 
-        <div className="mt-4 text-center">
-          <Link to="/login" className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            ← Back to passenger login
-          </Link>
+          {error && (
+            <div
+              role="alert"
+              className="mb-4 text-xs font-medium text-danger bg-danger-subtle border border-red-200 dark:border-red-900/40 p-3 rounded-md"
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Driver Form */}
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            <Input
+              id="driver-email"
+              name="email"
+              label="Driver Email Address"
+              type="email"
+              autoComplete="email"
+              placeholder="driver@example.com"
+              leftIcon={Mail}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <PasswordInput
+              id="driver-password"
+              name="password"
+              label="Password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              loading={loading}
+              rightIcon={ArrowRight}
+              className="mt-2"
+            >
+              Sign In to Console
+            </Button>
+          </form>
+
+          {/* Driver Demo Shortcuts */}
+          <DemoLoginSection type="driver" onSelectFill={handleDemoFill} />
+
+          {/* Driver Registration Link */}
+          <p className="mt-5 text-center text-xs text-text-secondary">
+            New driver partner?{' '}
+            <Link to="/driver/register" className="font-semibold text-primary hover:underline">
+              Register as Driver
+            </Link>
+          </p>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
