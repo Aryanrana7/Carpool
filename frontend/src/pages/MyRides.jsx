@@ -1,67 +1,96 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { MapPin, Navigation, Calendar, CheckCircle, XCircle, Clock, DollarSign, Car } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Car,
+  MessageSquare,
+  Star,
+  Compass,
+  ArrowRight,
+  ShieldCheck,
+  AlertTriangle,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SocketContext } from '../context/SocketContext';
 import { AuthContext } from '../context/AuthContext';
 import ChatWidget from '../components/chat/ChatWidget';
 import RatingModal from '../components/RatingModal';
+import ActiveTripModal from '../components/ActiveTripModal';
+import { formatCurrency, formatDate, formatTime } from '../utils/formatters';
+import Badge from '../components/ui/Badge';
+import Button from '../components/ui/Button';
+import Skeleton from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
+import RouteConnector from '../components/ui/RouteConnector';
 
-const STATUS_CONFIG = {
-  confirmed:   { badge: 'badge-success',  icon: CheckCircle, label: 'Confirmed' },
-  completed:   { badge: 'badge-violet',   icon: CheckCircle, label: 'Completed' },
-  cancelled:   { badge: 'badge-error',    icon: XCircle,     label: 'Cancelled' },
-  rejected:    { badge: 'badge-error',    icon: XCircle,     label: 'Rejected' },
-  pending:     { badge: 'badge-warning',  icon: Clock,       label: 'Pending' },
-  in_progress: { badge: 'badge-info',     icon: Car,         label: 'En Route' },
-};
-
-const FILTERS = ['all', 'pending', 'confirmed', 'completed', 'cancelled'];
+const FILTERS = [
+  { id: 'all', label: 'All Trips' },
+  { id: 'in_progress', label: 'En Route' },
+  { id: 'confirmed', label: 'Confirmed' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'completed', label: 'Completed' },
+  { id: 'cancelled', label: 'Cancelled' },
+];
 
 const SkeletonCard = () => (
-  <div className="card p-6 animate-pulse">
-    <div className="flex justify-between mb-5">
-      <div className="h-5 w-24 skeleton" />
-      <div className="h-5 w-20 skeleton" />
+  <div className="bg-surface border border-border rounded-lg p-5 space-y-3">
+    <div className="flex justify-between items-center">
+      <Skeleton width="90px" height="22px" />
+      <Skeleton width="80px" height="16px" />
     </div>
-    <div className="space-y-3 mb-5">
-      <div className="h-4 w-full skeleton" />
-      <div className="h-4 w-3/4 skeleton" />
+    <div className="space-y-2 py-2">
+      <Skeleton width="100%" height="16px" />
+      <Skeleton width="75%" height="16px" />
     </div>
-    <div className="h-px bg-gray-100 dark:bg-[#1e1e1e] mb-4" />
-    <div className="flex justify-between">
-      <div className="h-4 w-20 skeleton" />
-      <div className="h-6 w-14 skeleton" />
+    <div className="pt-2 border-t border-border flex justify-between items-center">
+      <Skeleton width="100px" height="16px" />
+      <Skeleton width="70px" height="20px" />
     </div>
   </div>
 );
 
-const MyRides = () => {
+export const MyRides = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('all');
+
   const [showChat, setShowChat] = useState(false);
   const [chatBooking, setChatBooking] = useState(null);
-  
+
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [ratingBooking, setRatingBooking] = useState(null);
 
-  const authContext = React.useContext(AuthContext);
+  const [showActiveModal, setShowActiveModal] = useState(false);
+  const [activeBooking, setActiveBooking] = useState(null);
+
+  const [cancelTarget, setCancelTarget] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const authContext = useContext(AuthContext);
   const user = authContext?.user;
-  
-  const socketContext = React.useContext(SocketContext);
+
+  const socketContext = useContext(SocketContext);
   const socket = socketContext?.socket;
   const rideStatus = socketContext?.rideStatus;
+  const handledBookingsRef = useRef(new Set());
 
   // Auto-trigger rating modal when ride is completed via socket
   useEffect(() => {
-    if (rideStatus?.status === 'completed') {
-      const booking = bookings.find(b => b._id === rideStatus.bookingId);
-      if (booking) {
-        setRatingBooking(booking);
-        setShowRatingModal(true);
+    if (rideStatus?.status === 'completed' && rideStatus?.bookingId) {
+      if (!handledBookingsRef.current.has(rideStatus.bookingId)) {
+        const booking = bookings.find((b) => b._id === rideStatus.bookingId);
+        if (booking) {
+          handledBookingsRef.current.add(rideStatus.bookingId);
+          queueMicrotask(() => {
+            setRatingBooking(booking);
+            setShowRatingModal(true);
+            setShowActiveModal(false);
+          });
+        }
       }
     }
   }, [rideStatus, bookings]);
@@ -76,25 +105,41 @@ const MyRides = () => {
     setShowRatingModal(true);
   };
 
-  const handleCancel = async (booking) => {
+  const handleReviewSuccess = (bookingId, newReview) => {
+    setBookings((prev) =>
+      prev.map((b) => (b._id === bookingId ? { ...b, review: newReview } : b))
+    );
+  };
+
+  const handleOpenActiveRide = (booking) => {
+    setActiveBooking(booking);
+    setShowActiveModal(true);
+  };
+
+  const confirmCancelBooking = async () => {
+    if (!cancelTarget) return;
+    setIsCancelling(true);
     try {
-      await api.put(`/bookings/${booking._id}/status`, { status: 'cancelled' });
+      await api.put(`/bookings/${cancelTarget._id}/status`, { status: 'cancelled' });
       setBookings((prev) =>
-        prev.map((b) => (b._id === booking._id ? { ...b, status: 'cancelled' } : b))
+        prev.map((b) => (b._id === cancelTarget._id ? { ...b, status: 'cancelled' } : b))
       );
-      toast.success('Booking cancelled');
+      toast.success('Booking cancelled successfully');
+      setCancelTarget(null);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Could not cancel booking');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const { data } = await api.get('/bookings/user');
+        const { data } = await api.get('/bookings/my-bookings');
         setBookings(data.reverse());
       } catch {
-        setError('Failed to load your trips.');
+        setError('Failed to retrieve your trip bookings. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -102,159 +147,237 @@ const MyRides = () => {
     fetchBookings();
   }, []);
 
-  const filtered = bookings.filter(b => filter === 'all' || b.status === filter);
+  const filtered = bookings.filter((b) => filter === 'all' || b.status === filter);
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#f8f8f8] dark:bg-[#0c0c0c] pt-10 pb-24 px-6">
-      <div className="max-w-5xl mx-auto">
-
-        {/* Page header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
+    <div className="min-h-[calc(100vh-68px)] bg-background py-8 sm:py-10 px-4 sm:px-8">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header Row */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-border">
           <div>
-            <p className="section-label mb-2">Account</p>
-            <h1 className="text-4xl font-black text-gray-900 dark:text-white">My Trips</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">
-              {loading ? 'Loading…' : `${bookings.length} bookings total`}
+            <p className="micro-label">Passenger Account</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary mt-0.5">
+              My Trips & Bookings
+            </h1>
+            <p className="text-xs text-text-secondary mt-1">
+              {loading ? 'Retrieving records…' : `${bookings.length} total ride bookings on record`}
             </p>
           </div>
 
-          {/* Filter tabs */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-[#161616] border border-gray-100 dark:border-[#242424] p-1.5 rounded-xl">
-            {FILTERS.map(f => (
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 p-1 rounded-md bg-surface border border-border overflow-x-auto scrollbar-none shadow-subtle">
+            {FILTERS.map((f) => (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                  filter === f
-                    ? 'bg-[#111] dark:bg-white text-white dark:text-[#111] shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                className={`px-3 py-1 text-xs font-semibold rounded whitespace-nowrap transition-colors cursor-pointer ${
+                  filter === f.id
+                    ? 'bg-primary text-white'
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
-                {f}
+                {f.label}
               </button>
             ))}
           </div>
         </div>
 
         {error && (
-          <div className="mb-6 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 p-4 rounded-xl">
+          <div className="text-xs font-medium text-danger bg-danger-subtle p-3.5 rounded-md border border-red-200 dark:border-red-900/40">
             {error}
           </div>
         )}
 
+        {/* Trips Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : bookings.length === 0 ? (
-          <div className="card p-16 text-center">
-            <div className="text-5xl mb-4">🗺️</div>
-            <p className="font-bold text-gray-500 dark:text-gray-400">No trips yet</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Book your first ride to see it here.</p>
-          </div>
+          <EmptyState
+            icon={Compass}
+            title="No Trips Booked Yet"
+            description="You haven't booked any rides yet. Search for available carpools or request an instant on-demand pickup."
+            actionLabel="Find a Ride"
+            onAction={() => (window.location.href = '/')}
+          />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <AnimatePresence mode="popLayout">
-              {filtered.map((booking, idx) => {
-                const cfg = STATUS_CONFIG[booking.status] || STATUS_CONFIG.pending;
-                const StatusIcon = cfg.icon;
-
-                return (
-                  <motion.div
-                    key={booking._id}
-                    layout
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ delay: idx * 0.04, duration: 0.25 }}
-                    className="card-hover p-6"
-                  >
-                    {/* Top row */}
-                    <div className="flex items-center justify-between mb-5">
-                      <span className={cfg.badge}>
-                        <StatusIcon size={11} />
-                        {cfg.label}
+              {filtered.map((booking) => (
+                <div
+                  key={booking._id}
+                  className={`
+                    bg-surface border rounded-lg p-5 transition-all text-left flex flex-col justify-between
+                    ${booking.status === 'in_progress'
+                      ? 'border-primary ring-1 ring-primary/30 shadow-card'
+                      : 'border-border hover:border-border-subtle shadow-subtle'
+                    }
+                  `}
+                >
+                  <div>
+                    {/* Header: Status Badge & Booking Date */}
+                    <div className="flex items-center justify-between mb-4">
+                      <Badge status={booking.status} size="sm" />
+                      <span className="text-xs text-text-muted tabular-nums">
+                        {formatDate(booking.createdAt, { relative: false })}
                       </span>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
-                        <Calendar size={11} />
-                        {new Date(booking.createdAt).toLocaleDateString('en', {
-                          month: 'short', day: 'numeric', year: 'numeric'
-                        })}
-                      </div>
                     </div>
 
-                    {/* Route */}
-                    <div className="relative pl-5 mb-5 space-y-4">
-                      <div className="absolute left-1.5 top-1.5 bottom-1.5 w-px bg-gray-100 dark:bg-[#2a2a2a]" />
-                      <div className="absolute left-0 top-1.5 w-3 h-3 bg-indigo-500 rounded-full" />
-                      <div className="absolute left-0 bottom-1.5 w-3 h-3 bg-violet-500 rounded-sm" />
-                      <div>
-                        <p className="section-label mb-1">Pickup</p>
-                        <p className="font-semibold text-gray-900 dark:text-white text-sm leading-tight">
-                          {booking.ride?.source || 'Unknown'}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="section-label mb-1">Dropoff</p>
-                        <p className="font-semibold text-gray-900 dark:text-white text-sm leading-tight">
-                          {booking.ride?.destination || 'Unknown'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-[#1e1e1e]">
-                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                        <Car size={12} />
-                        <span>{booking.ride?.carType || 'Standard'}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {(booking.status === 'pending' || booking.status === 'confirmed') && (
-                          <button
-                            onClick={() => handleCancel(booking)}
-                            className="text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                        {(booking.status === 'confirmed' || booking.status === 'in_progress') && (
-                          <button
-                            onClick={() => handleChatOpen(booking)}
-                            className="text-indigo-500 hover:text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
-                          >
-                            💬 Chat
-                          </button>
-                        )}
-                        {booking.status === 'completed' && (
-                          <button
-                            onClick={() => handleRateOpen(booking)}
-                            className="text-amber-500 hover:text-amber-600 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
-                          >
-                            ⭐️ Rate
-                          </button>
-                        )}
-                        <div className="flex items-center gap-1">
-                          <DollarSign size={14} className="text-emerald-500" />
-                          <span className="text-xl font-black text-gray-900 dark:text-white">
-                            {booking.ride?.price ?? '—'}
-                          </span>
+                    {/* Route Visualizer */}
+                    <div className="flex items-stretch gap-2.5 mb-4">
+                      <RouteConnector className="py-1" />
+                      <div className="flex-1 space-y-2 text-xs">
+                        <div>
+                          <p className="text-[10px] text-text-muted uppercase font-semibold">Pickup</p>
+                          <p className="font-semibold text-text-primary leading-snug">
+                            {booking.ride?.pickupLocation || booking.ride?.source || 'Pickup point'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-text-muted uppercase font-semibold">Dropoff</p>
+                          <p className="font-semibold text-text-primary leading-snug">
+                            {booking.ride?.dropoffLocation || booking.ride?.destination || 'Destination point'}
+                          </p>
                         </div>
                       </div>
                     </div>
-                  </motion.div>
-                );
-              })}
+                  </div>
+
+                  {/* Card Bottom: Driver, Price & Actions */}
+                  <div className="pt-3.5 border-t border-border flex flex-wrap items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2 text-xs text-text-secondary">
+                      <Car size={14} className="text-text-muted" />
+                      <span className="font-medium text-text-primary">
+                        {booking.ride?.carType || 'Sedan'}
+                      </span>
+                      {booking.ride?.driver?.name && (
+                        <span>· {booking.ride.driver.name}</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {booking.status === 'in_progress' && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          leftIcon={Car}
+                          onClick={() => handleOpenActiveRide(booking)}
+                        >
+                          View Active Ride
+                        </Button>
+                      )}
+
+                      {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => setCancelTarget(booking)}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+
+                      {(booking.status === 'confirmed' || booking.status === 'in_progress') && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          leftIcon={MessageSquare}
+                          onClick={() => handleChatOpen(booking)}
+                        >
+                          Chat
+                        </Button>
+                      )}
+
+                      {booking.status === 'completed' && (
+                        booking.review ? (
+                          <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1 rounded border border-amber-200 dark:border-amber-800/40 flex items-center gap-1">
+                            <Star size={11} className="fill-amber-400 text-amber-400" />
+                            {booking.review.rating}/5 Rated
+                          </span>
+                        ) : (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={Star}
+                            onClick={() => handleRateOpen(booking)}
+                          >
+                            Rate Driver
+                          </Button>
+                        )
+                      )}
+
+                      <span className="text-base font-bold text-text-primary tabular-nums pl-1">
+                        {formatCurrency(booking.ride?.price)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </AnimatePresence>
 
             {filtered.length === 0 && bookings.length > 0 && (
-              <div className="col-span-full card p-12 text-center">
-                <p className="font-semibold text-gray-400">No trips match this filter.</p>
+              <div className="col-span-full p-8 text-center bg-surface border border-border rounded-lg text-xs text-text-muted">
+                No trips match this filter criteria.
               </div>
             )}
           </div>
         )}
       </div>
 
+      {/* Cancellation Confirmation Dialog */}
+      <AnimatePresence>
+        {cancelTarget && (
+          <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm">
+            <div
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="cancel-title"
+              className="bg-surface border border-border rounded-xl p-6 max-w-sm w-full shadow-modal space-y-4"
+            >
+              <div className="flex items-center gap-3 text-danger">
+                <AlertTriangle size={20} />
+                <h3 id="cancel-title" className="text-base font-bold text-text-primary">
+                  Cancel Booking?
+                </h3>
+              </div>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Are you sure you want to cancel this booking? The held seat will be restored to the driver's ride.
+              </p>
+              <div className="flex gap-2 justify-end pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCancelTarget(null)}
+                >
+                  Keep Booking
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  loading={isCancelling}
+                  onClick={confirmCancelBooking}
+                >
+                  Yes, Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Active Trip Modal */}
+      <ActiveTripModal
+        isOpen={showActiveModal}
+        booking={activeBooking}
+        onClose={() => setShowActiveModal(false)}
+        onChatOpen={handleChatOpen}
+      />
+
+      {/* Chat Widget */}
       <AnimatePresence>
         {showChat && chatBooking && (
           <ChatWidget
@@ -268,13 +391,13 @@ const MyRides = () => {
         )}
       </AnimatePresence>
 
+      {/* Rating Modal */}
       <RatingModal
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}
         bookingId={ratingBooking?._id}
-        targetId={ratingBooking?.ride?.driver?._id || ratingBooking?.ride?.driver}
-        reviewerType="user"
         targetName={ratingBooking?.ride?.driver?.name || 'Driver'}
+        onSuccess={handleReviewSuccess}
       />
     </div>
   );

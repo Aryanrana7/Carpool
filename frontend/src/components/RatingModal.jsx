@@ -3,30 +3,49 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, X } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import Button from './ui/Button';
 
-const RatingModal = ({ isOpen, onClose, bookingId, targetId, reviewerType, targetName }) => {
+const RATING_TEXTS = {
+  1: 'Poor experience',
+  2: 'Fair experience',
+  3: 'Good journey',
+  4: 'Very good driver',
+  5: 'Outstanding ride experience',
+};
+
+export const RatingModal = ({ isOpen, onClose, bookingId, targetName, onSuccess }) => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (rating === 0) return;
+    if (rating === 0) {
+      toast.error('Please select a star rating (1 to 5)');
+      return;
+    }
+    if (reviewText.length > 500) {
+      toast.error('Review comments cannot exceed 500 characters');
+      return;
+    }
     setIsSubmitting(true);
-    
+
     try {
-      await api.post('/reviews', {
+      const { data } = await api.post('/reviews', {
         bookingId,
-        targetId,
         rating,
-        reviewText,
-        reviewerType
+        reviewText: reviewText.trim(),
       });
-      
-      toast.success('Thank you for your feedback!');
+
+      toast.success('Thank you for rating your driver!');
+      if (onSuccess) {
+        onSuccess(bookingId, data);
+      }
+      setRating(0);
+      setReviewText('');
       onClose();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit review');
+      toast.error(error.response?.data?.message || 'Failed to submit driver review');
     } finally {
       setIsSubmitting(false);
     }
@@ -35,89 +54,96 @@ const RatingModal = ({ isOpen, onClose, bookingId, targetId, reviewerType, targe
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
+        <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-[1100] flex items-center justify-center p-4">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={onClose}
+            initial={{ scale: 0.96, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.96, opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rating-title"
+            className="w-full max-w-sm bg-surface rounded-xl shadow-modal overflow-hidden border border-border"
           >
-            {/* Modal */}
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-white dark:bg-[#1c1c1c] rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-white/10"
-            >
-              {/* Header */}
-              <div className="relative p-6 text-center border-b border-gray-100 dark:border-white/5">
-                <button 
-                  onClick={onClose}
-                  className="absolute right-4 top-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-50 dark:bg-white/5 rounded-full transition-colors"
-                >
-                  <X size={18} />
-                </button>
-                <div className="w-16 h-16 mx-auto bg-gradient-to-tr from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-amber-500/30 transform rotate-3">
-                  <Star size={32} className="text-white fill-white" />
-                </div>
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-1">Rate your trip</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  How was your experience with {targetName}?
-                </p>
+            {/* Header */}
+            <div className="relative p-5 text-center border-b border-border bg-background">
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close review dialog"
+                className="absolute right-3.5 top-3.5 p-1 text-text-muted hover:text-text-primary rounded-md transition-colors"
+              >
+                <X size={16} />
+              </button>
+              <div className="w-12 h-12 mx-auto bg-amber-50 dark:bg-amber-950/40 text-amber-500 rounded-full flex items-center justify-center mb-2.5 border border-amber-200 dark:border-amber-800/40">
+                <Star size={24} className="fill-amber-400 text-amber-400" />
+              </div>
+              <h2 id="rating-title" className="text-base font-bold text-text-primary">
+                Rate Driver Experience
+              </h2>
+              <p className="text-xs text-text-secondary mt-0.5">
+                How was your trip with <span className="font-semibold text-text-primary">{targetName}</span>?
+              </p>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-4">
+              {/* Star Rating Row */}
+              <div className="flex items-center justify-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    aria-label={`Rate ${star} stars`}
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                    className="p-1 focus:outline-none transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+                  >
+                    <Star
+                      size={28}
+                      className={`transition-colors ${
+                        star <= (hoveredRating || rating)
+                          ? 'text-amber-400 fill-amber-400'
+                          : 'text-border dark:text-border-subtle fill-transparent'
+                      }`}
+                    />
+                  </button>
+                ))}
               </div>
 
-              {/* Body */}
-              <div className="p-6 space-y-6">
-                {/* Star Rating */}
-                <div className="flex items-center justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <motion.button
-                      key={star}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => setRating(star)}
-                      onMouseEnter={() => setHoveredRating(star)}
-                      onMouseLeave={() => setHoveredRating(0)}
-                      className="p-1"
-                    >
-                      <Star 
-                        size={40} 
-                        className={`transition-colors duration-200 ${
-                          star <= (hoveredRating || rating)
-                            ? 'text-amber-400 fill-amber-400'
-                            : 'text-gray-200 dark:text-gray-700'
-                        }`} 
-                      />
-                    </motion.button>
-                  ))}
-                </div>
+              {/* Rating Text Label */}
+              <p className="text-center text-xs font-semibold text-text-primary min-h-[18px]">
+                {RATING_TEXTS[hoveredRating || rating] || 'Select rating'}
+              </p>
 
-                {/* Review Text */}
-                <div>
-                  <textarea
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    placeholder="Leave a comment (optional)..."
-                    rows={3}
-                    className="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-2xl p-4 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all resize-none"
-                  />
+              {/* Review Text */}
+              <div className="space-y-1">
+                <textarea
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value.slice(0, 500))}
+                  placeholder="Share feedback on driving safety, cleanliness, or route punctuality…"
+                  rows={3}
+                  className="input-base text-xs resize-none"
+                />
+                <div className="flex justify-end text-[10px] text-text-muted tabular-nums">
+                  {reviewText.length}/500
                 </div>
-
-                {/* Submit */}
-                <button
-                  onClick={handleSubmit}
-                  disabled={rating === 0 || isSubmitting}
-                  className="w-full py-3.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md"
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Rating'}
-                </button>
               </div>
-            </motion.div>
+
+              {/* Submit CTA */}
+              <Button
+                variant="primary"
+                fullWidth
+                disabled={rating === 0}
+                loading={isSubmitting}
+                onClick={handleSubmit}
+              >
+                Submit Review
+              </Button>
+            </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
