@@ -31,23 +31,23 @@ export const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Navigation Links — Single Active Tab Indicator */}
-        {user && (
-          <nav className="hidden md:flex items-center gap-1.5" aria-label="Main Navigation">
-            <Link
-              to="/"
-              className={`
-                px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
-                ${pathname === '/'
-                  ? 'bg-primary-subtle text-primary'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
-                }
-              `}
-            >
-              <Compass size={15} />
-              <span>Find a Ride</span>
-            </Link>
+        {/* Desktop Navigation Links — Accessible & Commercial */}
+        <nav className="hidden md:flex items-center gap-2" aria-label="Main Navigation">
+          <Link
+            to="/"
+            className={`
+              px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
+              ${pathname === '/'
+                ? 'bg-primary-subtle text-primary'
+                : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
+              }
+            `}
+          >
+            <Compass size={15} />
+            <span>Find a Ride</span>
+          </Link>
 
+          {user && (
             <Link
               to="/my-rides"
               className={`
@@ -61,8 +61,16 @@ export const Navbar = () => {
               <Calendar size={15} />
               <span>My Trips</span>
             </Link>
-          </nav>
-        )}
+          )}
+
+          <Link
+            to="/driver/dashboard"
+            className="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2 text-text-secondary hover:text-text-primary hover:bg-border-subtle"
+          >
+            <Car size={15} />
+            <span>Offer a Ride</span>
+          </Link>
+        </nav>
 
         {/* Right Actions */}
         <div className="ml-auto flex items-center gap-2.5">
