@@ -18,17 +18,17 @@ export const DriverNavbar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[1000] h-[68px] flex items-center px-4 sm:px-8 bg-[#0B1220] border-b border-[#1F2A44] text-white transition-colors">
+      <header className="fixed top-0 left-0 right-0 z-[1000] h-[68px] flex items-center px-4 sm:px-8 bg-[#18241F] border-b border-[#25382F] text-white transition-colors">
         {/* Brand & Driver Badge */}
         <Link to="/driver/dashboard" className="flex items-center gap-2.5 mr-8 shrink-0 group">
-          <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
             <Car size={18} />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-base font-bold tracking-tight text-white leading-tight">
               CarPool
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-emerald-400 border border-primary/30 px-1.5 py-0.5 rounded">
               Driver
             </span>
           </div>
@@ -42,8 +42,8 @@ export const DriverNavbar = () => {
               className={`
                 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
                 ${pathname === '/driver/dashboard'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-slate-300 hover:text-white hover:bg-[#25382F]'
                 }
               `}
             >
@@ -56,8 +56,8 @@ export const DriverNavbar = () => {
               className={`
                 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
                 ${pathname === '/driver/create-ride'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-slate-300 hover:text-white hover:bg-[#25382F]'
                 }
               `}
             >
@@ -72,9 +72,9 @@ export const DriverNavbar = () => {
           {/* Switch to Passenger Portal */}
           <Link
             to="/"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-[#2D4539] bg-[#22352B] hover:bg-[#283E33] text-slate-200 transition-colors"
           >
-            <ArrowLeft size={13} className="text-slate-400" />
+            <ArrowLeft size={13} className="text-emerald-400" />
             <span>Passenger Portal</span>
           </Link>
 
@@ -87,11 +87,11 @@ export const DriverNavbar = () => {
               <button
                 type="button"
                 onClick={() => setProfileOpen((prev) => !prev)}
-                className="flex items-center gap-2 p-1 pl-2 rounded-md hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="flex items-center gap-2 p-1 pl-2 rounded-md hover:bg-[#25382F] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
               >
-                <div className="w-7 h-7 rounded-full bg-blue-600/30 text-blue-400 border border-blue-500/40 flex items-center justify-center text-xs font-bold shrink-0">
+                <div className="w-7 h-7 rounded-full bg-primary/20 text-emerald-400 border border-primary/30 flex items-center justify-center text-xs font-bold shrink-0">
                   {driver.name ? driver.name.charAt(0).toUpperCase() : 'D'}
                 </div>
                 <div className="hidden sm:flex flex-col text-left">
@@ -114,9 +114,9 @@ export const DriverNavbar = () => {
                   />
                   <div
                     role="menu"
-                    className="absolute right-0 top-full mt-2 w-56 rounded-lg bg-[#111A2E] border border-[#1F2A44] shadow-overlay p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100"
+                    className="absolute right-0 top-full mt-2 w-56 rounded-lg bg-[#18241F] border border-[#25382F] shadow-overlay p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100"
                   >
-                    <div className="px-3 py-2 border-b border-[#1F2A44] mb-1">
+                    <div className="px-3 py-2 border-b border-[#25382F] mb-1">
                       <p className="text-xs font-semibold text-white truncate">
                         {driver.name}
                       </p>
@@ -129,7 +129,7 @@ export const DriverNavbar = () => {
                       to="/driver/dashboard"
                       role="menuitem"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-[#25382F] rounded-md transition-colors"
                     >
                       <LayoutDashboard size={14} />
                       <span>Dashboard</span>
@@ -139,7 +139,7 @@ export const DriverNavbar = () => {
                       to="/driver/create-ride"
                       role="menuitem"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-[#25382F] rounded-md transition-colors"
                     >
                       <PlusCircle size={14} />
                       <span>Post a Ride</span>
@@ -149,7 +149,7 @@ export const DriverNavbar = () => {
                       to="/"
                       role="menuitem"
                       onClick={() => setProfileOpen(false)}
-                      className="sm:hidden flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                      className="sm:hidden flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-[#25382F] rounded-md transition-colors"
                     >
                       <Car size={14} />
                       <span>Passenger Portal</span>
@@ -178,7 +178,7 @@ export const DriverNavbar = () => {
               </Link>
               <Link
                 to="/driver/register"
-                className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-sm"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-primary text-white hover:bg-primary-hover transition-colors shadow-sm"
               >
                 Register
               </Link>
@@ -191,13 +191,13 @@ export const DriverNavbar = () => {
       {driver && (
         <nav
           aria-label="Driver Mobile Navigation"
-          className="md:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-[#0B1220]/95 backdrop-blur-md border-t border-[#1F2A44] flex items-center justify-around py-2 safe-area-bottom shadow-card text-slate-400"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-[#18241F]/95 backdrop-blur-md border-t border-[#25382F] flex items-center justify-around py-2 safe-area-bottom shadow-card text-slate-400"
         >
           <Link
             to="/driver/dashboard"
             className={`flex flex-col items-center gap-1 px-4 py-1 rounded-md text-xs font-semibold transition-colors ${
               pathname === '/driver/dashboard'
-                ? 'text-blue-400'
+                ? 'text-emerald-400'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -209,7 +209,7 @@ export const DriverNavbar = () => {
             to="/driver/create-ride"
             className={`flex flex-col items-center gap-1 px-4 py-1 rounded-md text-xs font-semibold transition-colors ${
               pathname === '/driver/create-ride'
-                ? 'text-blue-400'
+                ? 'text-emerald-400'
                 : 'text-slate-400 hover:text-white'
             }`}
           >

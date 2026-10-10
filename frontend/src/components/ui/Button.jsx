@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 
 const VARIANTS = {
   primary: 'bg-primary text-white hover:bg-primary-hover shadow-sm active:opacity-95',
-  secondary: 'bg-primary-subtle text-primary hover:bg-blue-100 dark:hover:bg-blue-900/40 active:opacity-95',
+  secondary: 'bg-primary-subtle text-primary hover:bg-[#C2E3D4] dark:hover:bg-[#1C362B] active:opacity-95',
   outline: 'bg-surface text-text-primary border border-border hover:bg-background active:opacity-95',
   ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-border-subtle active:opacity-95',
   destructive: 'bg-danger-subtle text-danger border border-red-200 dark:border-red-900/40 hover:bg-red-100 dark:hover:bg-red-900/60 active:opacity-95',

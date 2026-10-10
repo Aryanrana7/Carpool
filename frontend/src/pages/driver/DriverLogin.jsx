@@ -40,14 +40,14 @@ export const DriverLogin = () => {
   return (
     <div className="min-h-[calc(100vh-68px)] flex bg-background">
       {/* ── Left Branded Panel (Desktop) ───────────────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#0B1220] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#1F2A44] select-none">
+      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#25382F] select-none">
         <div className="relative z-10">
           <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
             <Car size={20} />
           </div>
 
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-primary-hover">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
               Driver Operations Console
             </span>
           </div>
@@ -56,7 +56,7 @@ export const DriverLogin = () => {
             Monetize empty seats on your daily commute routes.
           </h1>
 
-          <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-10">
+          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
             Accept on-demand broadcasts nearby or publish scheduled carpools. Control your route, pricing, and availability.
           </p>
 
@@ -76,7 +76,7 @@ export const DriverLogin = () => {
           </div>
         </div>
 
-        <div className="relative z-10 pt-6 border-t border-[#1F2A44] text-[11px] text-slate-400">
+        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
           CarPool Driver Operations · Partner Authentication
         </div>
       </div>

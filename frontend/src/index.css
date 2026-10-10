@@ -4,73 +4,73 @@
 
 @layer base {
   :root {
-    /* Brand & Ink Tokens */
-    --color-ink: #0B1220;
-    --color-primary: #2A4BE0; /* Cobalt */
-    --color-primary-hover: #2140C4;
-    --color-primary-subtle: #EEF2FF;
-    --color-accent: #F97316; /* Sunrise */
-    --color-accent-hover: #EA580C;
-    --color-accent-subtle: #FFF7ED;
-    --color-accent-text: #C2410C;
+    /* Brand & Ink Tokens — Original Emerald & Forest Identity */
+    --color-ink: #18241F; /* Deep forest charcoal */
+    --color-primary: #087F5B; /* Primary emerald */
+    --color-primary-hover: #066649;
+    --color-primary-subtle: #D9EEE4; /* Pale sage */
+    --color-accent: #E8A45B; /* Muted amber */
+    --color-accent-hover: #D99347;
+    --color-accent-subtle: #FDF6EC;
+    --color-accent-text: #A8651E;
 
     /* Light Canvas & Surfaces */
-    --color-background: #F6F8FB;
+    --color-background: #F6F4EC; /* Warm ivory */
     --color-surface: #FFFFFF;
     --color-surface-raised: #FFFFFF;
-    --color-border: #E3E8EF;
-    --color-border-subtle: #EEF2F6;
+    --color-border: #DCE4DE; /* Subtle borders */
+    --color-border-subtle: #EAF0EC;
 
     /* Typography */
-    --color-text-primary: #0B1220;
-    --color-text-secondary: #5B6678;
-    --color-text-muted: #8F9CAE;
+    --color-text-primary: #18241F; /* Deep forest charcoal */
+    --color-text-secondary: #66756D; /* Secondary text */
+    --color-text-muted: #8A9A92;
 
     /* Semantic Status */
-    --color-success: #16A34A;
-    --color-success-subtle: #F0FDF4;
-    --color-warning: #B45309;
+    --color-success: #087F5B;
+    --color-success-subtle: #D9EEE4;
+    --color-warning: #E8A45B;
     --color-warning-subtle: #FEF3C7;
-    --color-danger: #DC2626;
-    --color-danger-subtle: #FEF2F2;
-    --color-info: #2A4BE0;
-    --color-info-subtle: #EEF2FF;
+    --color-danger: #D32F2F;
+    --color-danger-subtle: #FDE8E8;
+    --color-info: #087F5B;
+    --color-info-subtle: #D9EEE4;
 
     --nav-height: 68px;
   }
 
   .dark {
     /* Dark Brand & Ink */
-    --color-ink: #F8FAFC;
-    --color-primary: #4D6DFA;
-    --color-primary-hover: #6B87FA;
-    --color-primary-subtle: rgba(77, 109, 250, 0.15);
-    --color-accent: #FB923C;
-    --color-accent-hover: #F97316;
-    --color-accent-subtle: rgba(249, 115, 22, 0.15);
-    --color-accent-text: #FDBA74;
+    --color-ink: #F6F4EC;
+    --color-primary: #12B886; /* Bright Emerald */
+    --color-primary-hover: #20C997;
+    --color-primary-subtle: rgba(18, 184, 134, 0.16);
+    --color-accent: #E8A45B;
+    --color-accent-hover: #F0B26D;
+    --color-accent-subtle: rgba(232, 164, 91, 0.15);
+    --color-accent-text: #F7C68F;
 
     /* Dark Canvas & Surfaces */
-    --color-background: #0B1220;
-    --color-surface: #111A2E;
-    --color-surface-raised: #18233C;
-    --color-border: #1F2A44;
-    --color-border-subtle: #162035;
+    --color-background: #0F1714;
+    --color-surface: #18241F; /* Deep forest charcoal */
+    --color-surface-raised: #21322B;
+    --color-border: #2B3D35;
+    --color-border-subtle: #1F2E28;
 
     /* Dark Typography */
-    --color-text-primary: #F8FAFC;
-    --color-text-secondary: #94A3B8;
-    --color-text-muted: #64748B;
+    --color-text-primary: #F6F4EC;
+    --color-text-secondary: #A3B5AC;
+    --color-text-muted: #6E8277;
 
     /* Dark Semantic Status */
-    --color-success: #22C55E;
-    --color-success-subtle: rgba(34, 197, 94, 0.15);
-    --color-warning: #F59E0B;
-    --color-warning-subtle: rgba(245, 158, 11, 0.15);
-    --color-danger: #EF4444;
-    --color-danger-subtle: rgba(239, 68, 68, 0.15);
-    --color-info: #4D6DFA;
-    --color-info-subtle: rgba(77, 109, 250, 0.15);
+    --color-success: #12B886;
+    --color-success-subtle: rgba(18, 184, 134, 0.16);
+    --color-warning: #E8A45B;
+    --color-warning-subtle: rgba(232, 164, 91, 0.16);
+    --color-danger: #EF5350;
+    --color-danger-subtle: rgba(239, 83, 80, 0.16);
+    --color-info: #12B886;
+    --color-info-subtle: rgba(18, 184, 134, 0.16);
   }
 
   * {
@@ -198,9 +198,9 @@
   transition: filter 0.25s ease;
 }
 
-/* Dark mode: sleek dark canvas map matching dark navy surfaces */
+/* Dark mode: sleek dark canvas map matching deep forest surfaces */
 .dark .leaflet-tile-pane {
-  filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35) brightness(0.75);
+  filter: brightness(0.65) invert(1) contrast(2.5) hue-rotate(110deg) saturate(0.25) brightness(0.75);
 }
 
 /* Custom scrollbars */

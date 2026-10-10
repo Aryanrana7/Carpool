@@ -46,13 +46,13 @@ export const Register = () => {
   return (
     <div className="min-h-[calc(100vh-68px)] flex bg-background">
       {/* ── Left Branded Panel (Desktop) ───────────────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#0B1220] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#1F2A44] select-none">
+      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#25382F] select-none">
         <div className="relative z-10">
           <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
             <Car size={20} />
           </div>
 
-          <span className="text-[11px] font-bold uppercase tracking-widest text-primary-hover mb-2 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-2 block">
             Join the Network
           </span>
 
@@ -60,7 +60,7 @@ export const Register = () => {
             Reliable shared travel with everyday community members.
           </h1>
 
-          <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-10">
+          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
             Create an account to book seats on scheduled intercity rides or request instant on-demand pickups in your city.
           </p>
 
@@ -80,7 +80,7 @@ export const Register = () => {
           </div>
         </div>
 
-        <div className="relative z-10 pt-6 border-t border-[#1F2A44] text-[11px] text-slate-400">
+        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
           CarPool Mobility Platform · Passenger Onboarding
         </div>
       </div>

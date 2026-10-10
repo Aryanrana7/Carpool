@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LocationInput from './LocationInput';
 import PricingPanel from './PricingPanel';
@@ -20,7 +20,6 @@ import {
   Car,
   Bike,
   Shield,
-  Sparkles,
   Navigation,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -127,59 +126,79 @@ export const HeroBookingSection = ({
   };
 
   return (
-    <section className="relative w-full bg-[#F5B716] dark:bg-[#E0A410] border-b border-[#D89F0A] py-10 sm:py-14 md:py-16 px-4 sm:px-6 lg:px-8 select-none transition-colors">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative w-full bg-[#18241F] text-[#F6F4EC] border-b border-[#21322B] py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 select-none overflow-hidden transition-colors">
+      {/* ── Signature Motif: Shared Journey Route Background ─ */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.07] flex items-center justify-center overflow-hidden" aria-hidden="true">
+        <svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Commuter 1 route line */}
+          <path d="M100 500 C 300 450, 400 350, 600 300" stroke="#087F5B" strokeWidth="3" strokeDasharray="6 6" />
+          {/* Commuter 2 route line */}
+          <path d="M1100 500 C 900 450, 800 350, 600 300" stroke="#D9EEE4" strokeWidth="3" strokeDasharray="6 6" />
+          {/* Combined shared journey highway */}
+          <path d="M600 300 C 600 200, 600 150, 600 60" stroke="#087F5B" strokeWidth="4" />
+          {/* Shared destination hub */}
+          <circle cx="600" cy="300" r="14" fill="#087F5B" />
+          <circle cx="600" cy="300" r="6" fill="#F6F4EC" />
+          <circle cx="100" cy="500" r="8" fill="#087F5B" />
+          <circle cx="1100" cy="500" r="8" fill="#D9EEE4" />
+          <circle cx="600" cy="60" r="10" fill="#E8A45B" />
+        </svg>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto">
         {/* ── 1. Top Centered Headline & Context ─────────── */}
-        <div className="text-center space-y-2.5 mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/10 text-[#0B1220] text-xs font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+        <div className="text-center space-y-3 mb-8">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#087F5B]/15 text-[#D9EEE4] border border-[#087F5B]/30 text-xs font-semibold uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-[#087F5B] animate-pulse" />
             <span>Verified Mobility Platform</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-[#0B1220] font-heading">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-[#F6F4EC] font-heading">
             Your Journey. Shared.
           </h1>
 
-          <p className="text-[#1F2937] text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-            Find verified scheduled carpools or request instant on-demand rides. Share fuel costs, reduce traffic, and travel comfortably.
+          <p className="text-[#A3B5AC] text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
+            Connect with verified daily carpools or dispatch instant on-demand rides. Share travel costs, reduce road congestion, and commute with confidence.
           </p>
         </div>
 
-        {/* ── 2. Quick Ride Inspired Category Pills ──────── */}
-        <div className="flex items-center justify-center gap-2.5 sm:gap-3.5 mb-6">
-          <button
-            type="button"
-            onClick={() => onModeChange('scheduled')}
-            className={`
-              flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer
-              ${mode === 'scheduled'
-                ? 'bg-[#0B1220] text-white ring-2 ring-black/20 scale-105 shadow-md'
-                : 'bg-black/10 text-[#0B1220] hover:bg-black/20'
-              }
-            `}
-          >
-            <Calendar size={16} />
-            <span>Scheduled Carpools</span>
-          </button>
+        {/* ── 2. Refined Emerald Ride-Mode Segmented Control ─ */}
+        <div className="flex items-center justify-center mb-7">
+          <div className="inline-flex items-center p-1 rounded-xl bg-[#0F1714] border border-[#2B3D35] shadow-inner gap-1">
+            <button
+              type="button"
+              onClick={() => onModeChange('scheduled')}
+              className={`
+                flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer
+                ${mode === 'scheduled'
+                  ? 'bg-[#087F5B] text-white shadow-sm ring-1 ring-[#087F5B]/50'
+                  : 'text-[#A3B5AC] hover:text-[#F6F4EC] hover:bg-white/5'
+                }
+              `}
+            >
+              <Calendar size={15} />
+              <span>Scheduled Carpools</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => onModeChange('on_demand')}
-            className={`
-              flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer
-              ${mode === 'on_demand'
-                ? 'bg-[#0B1220] text-white ring-2 ring-black/20 scale-105 shadow-md'
-                : 'bg-black/10 text-[#0B1220] hover:bg-black/20'
-              }
-            `}
-          >
-            <Zap size={16} />
-            <span>Instant On-Demand</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => onModeChange('on_demand')}
+              className={`
+                flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer
+                ${mode === 'on_demand'
+                  ? 'bg-[#087F5B] text-white shadow-sm ring-1 ring-[#087F5B]/50'
+                  : 'text-[#A3B5AC] hover:text-[#F6F4EC] hover:bg-white/5'
+                }
+              `}
+            >
+              <Zap size={15} />
+              <span>Instant On-Demand</span>
+            </button>
+          </div>
         </div>
 
-        {/* ── 3. Elevated Grounded Booking Card ──────────── */}
-        <div className="bg-surface text-text-primary rounded-2xl shadow-2xl p-4 sm:p-6 border border-border max-w-5xl mx-auto transition-colors">
+        {/* ── 3. Elevated Grounded Booking Card (White Surface) ── */}
+        <div className="bg-white dark:bg-[#15201B] text-[#18241F] dark:text-[#F6F4EC] rounded-2xl shadow-2xl p-5 sm:p-6 border border-[#DCE4DE] dark:border-[#2B3D35] max-w-5xl mx-auto transition-colors">
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'scheduled' ? (
               /* Scheduled Carpools Horizontal / Responsive Grid */
@@ -187,14 +206,14 @@ export const HeroBookingSection = ({
                 {/* Pickup Field */}
                 <div className="md:col-span-3">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC]">
                       Pickup Point
                     </label>
                     <button
                       type="button"
                       onClick={handleGeolocate}
                       disabled={geolocating}
-                      className="text-[11px] text-primary hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                      className="text-[11px] text-[#087F5B] hover:text-[#066649] font-semibold flex items-center gap-1 cursor-pointer"
                       title="Use current GPS location"
                     >
                       <LocateFixed size={12} className={geolocating ? 'animate-spin' : ''} />
@@ -204,18 +223,18 @@ export const HeroBookingSection = ({
                   <LocationInput
                     placeholder="Enter pickup city or area"
                     icon={MapPin}
-                    iconColor="text-primary"
+                    iconColor="text-[#087F5B]"
                     initialValue={source?.address || ''}
                     onPlaceSelected={onSourceChange}
                   />
                 </div>
 
-                {/* Location Swap Button */}
+                {/* Signature Emerald Location-Swap Button */}
                 <div className="md:col-span-1 flex items-center justify-center pb-1">
                   <button
                     type="button"
                     onClick={handleSwap}
-                    className="w-10 h-10 rounded-full border border-border bg-background hover:bg-border-subtle flex items-center justify-center text-text-secondary hover:text-text-primary transition-all active:scale-95 shadow-sm cursor-pointer"
+                    className="w-10 h-10 rounded-xl bg-[#D9EEE4] text-[#087F5B] hover:bg-[#087F5B] hover:text-white border border-[#087F5B]/30 transition-all active:scale-95 shadow-sm flex items-center justify-center cursor-pointer"
                     title="Swap pickup and destination"
                     aria-label="Swap pickup and destination"
                   >
@@ -226,13 +245,13 @@ export const HeroBookingSection = ({
 
                 {/* Destination Field */}
                 <div className="md:col-span-3">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1">
                     Drop Location
                   </label>
                   <LocationInput
                     placeholder="Enter destination"
                     icon={MapPin}
-                    iconColor="text-text-muted"
+                    iconColor="text-[#66756D]"
                     initialValue={destination?.address || ''}
                     onPlaceSelected={onDestinationChange}
                   />
@@ -240,7 +259,7 @@ export const HeroBookingSection = ({
 
                 {/* Date & Time Field */}
                 <div className="md:col-span-2">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1">
                     Departure Date
                   </label>
                   <div className="relative">
@@ -249,40 +268,40 @@ export const HeroBookingSection = ({
                       min={localToday}
                       value={departureDate}
                       onChange={(e) => setDepartureDate(e.target.value)}
-                      className="w-full h-11 px-3 text-xs font-medium rounded-lg border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all cursor-pointer"
+                      className="w-full h-11 px-3 text-xs font-medium rounded-lg border border-[#DCE4DE] dark:border-[#2B3D35] bg-white dark:bg-[#18241F] text-[#18241F] dark:text-[#F6F4EC] focus:outline-none focus:ring-2 focus:ring-[#087F5B] transition-all cursor-pointer"
                     />
                   </div>
                 </div>
 
                 {/* Seats Stepper */}
                 <div className="md:col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1 text-center">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1 text-center">
                     Seats
                   </label>
-                  <div className="flex items-center justify-center border border-border rounded-lg h-11 bg-background px-2">
+                  <div className="flex items-center justify-center border border-[#DCE4DE] dark:border-[#2B3D35] rounded-lg h-11 bg-white dark:bg-[#18241F] px-2">
                     <button
                       type="button"
                       disabled={passengerCount <= 1}
                       onClick={() => setPassengerCount((p) => Math.max(1, p - 1))}
-                      className="text-text-secondary hover:text-text-primary disabled:opacity-30 font-bold px-1.5 cursor-pointer text-sm"
+                      className="text-[#66756D] hover:text-[#087F5B] disabled:opacity-30 font-bold px-1 cursor-pointer text-sm"
                     >
                       −
                     </button>
-                    <span className="font-bold text-xs tabular-nums text-text-primary px-2">
+                    <span className="font-bold text-xs tabular-nums px-2">
                       {passengerCount}
                     </span>
                     <button
                       type="button"
                       disabled={passengerCount >= 4}
                       onClick={() => setPassengerCount((p) => Math.min(4, p + 1))}
-                      className="text-text-secondary hover:text-text-primary disabled:opacity-30 font-bold px-1.5 cursor-pointer text-sm"
+                      className="text-[#66756D] hover:text-[#087F5B] disabled:opacity-30 font-bold px-1 cursor-pointer text-sm"
                     >
                       +
                     </button>
                   </div>
                 </div>
 
-                {/* Search Button */}
+                {/* Primary Emerald Search Action */}
                 <div className="md:col-span-2">
                   <Button
                     variant="primary"
@@ -291,7 +310,7 @@ export const HeroBookingSection = ({
                     fullWidth
                     leftIcon={Search}
                     disabled={loadingRides}
-                    className="h-11 bg-[#0B1220] hover:bg-black text-white font-bold text-xs uppercase tracking-wider shadow-md rounded-lg"
+                    className="h-11 bg-[#087F5B] hover:bg-[#066649] text-white font-bold text-xs uppercase tracking-wider shadow-md rounded-lg"
                   >
                     {loadingRides ? 'Searching…' : 'Find Carpools'}
                   </Button>
@@ -303,14 +322,14 @@ export const HeroBookingSection = ({
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                   <div className="md:col-span-4">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC]">
                         Pickup Location
                       </label>
                       <button
                         type="button"
                         onClick={handleGeolocate}
                         disabled={geolocating}
-                        className="text-[11px] text-primary hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] text-[#087F5B] hover:text-[#066649] font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         <LocateFixed size={12} className={geolocating ? 'animate-spin' : ''} />
                         <span>{geolocating ? 'Locating…' : 'My GPS'}</span>
@@ -319,7 +338,7 @@ export const HeroBookingSection = ({
                     <LocationInput
                       placeholder="Pickup address"
                       icon={MapPin}
-                      iconColor="text-primary"
+                      iconColor="text-[#087F5B]"
                       initialValue={source?.address || ''}
                       onPlaceSelected={onSourceChange}
                     />
@@ -329,7 +348,7 @@ export const HeroBookingSection = ({
                     <button
                       type="button"
                       onClick={handleSwap}
-                      className="w-10 h-10 rounded-full border border-border bg-background hover:bg-border-subtle flex items-center justify-center text-text-secondary transition-all cursor-pointer"
+                      className="w-10 h-10 rounded-xl bg-[#D9EEE4] text-[#087F5B] hover:bg-[#087F5B] hover:text-white border border-[#087F5B]/30 transition-all flex items-center justify-center cursor-pointer shadow-sm"
                     >
                       <ArrowRightLeft size={16} className="hidden md:block" />
                       <ArrowUpDown size={16} className="md:hidden" />
@@ -337,13 +356,13 @@ export const HeroBookingSection = ({
                   </div>
 
                   <div className="md:col-span-4">
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1">
                       Destination Address
                     </label>
                     <LocationInput
                       placeholder="Where do you need to go?"
                       icon={MapPin}
-                      iconColor="text-text-muted"
+                      iconColor="text-[#66756D]"
                       initialValue={destination?.address || ''}
                       onPlaceSelected={onDestinationChange}
                     />
@@ -357,7 +376,7 @@ export const HeroBookingSection = ({
                       fullWidth
                       leftIcon={Zap}
                       disabled={requestingOnDemand}
-                      className="h-11 bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider shadow-md rounded-lg"
+                      className="h-11 bg-[#087F5B] hover:bg-[#066649] text-white font-bold text-xs uppercase tracking-wider shadow-md rounded-lg"
                     >
                       {requestingOnDemand ? 'Requesting…' : 'Request Instant Ride'}
                     </Button>
@@ -366,7 +385,7 @@ export const HeroBookingSection = ({
 
                 {/* Embedded Pricing Estimator if locations set */}
                 {source && destination && (
-                  <div className="pt-2 border-t border-border">
+                  <div className="pt-2 border-t border-[#DCE4DE] dark:border-[#2B3D35]">
                     <PricingPanel
                       source={source}
                       destination={destination}
@@ -382,8 +401,8 @@ export const HeroBookingSection = ({
 
         {/* ── 4. Popular Destination Quick Chips ─────────── */}
         <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-2.5 mt-5">
-          <span className="text-xs font-bold text-[#0B1220] flex items-center gap-1.5 opacity-80">
-            <Navigation size={13} />
+          <span className="text-xs font-semibold text-[#A3B5AC] flex items-center gap-1.5">
+            <Navigation size={13} className="text-[#087F5B]" />
             <span>Popular Commutes:</span>
           </span>
           {POPULAR_DESTINATIONS.map((dest) => {
@@ -393,9 +412,9 @@ export const HeroBookingSection = ({
                 key={dest.name}
                 type="button"
                 onClick={() => handlePopularSelect(dest)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-black/10 hover:bg-black/20 text-[#0B1220] transition-all cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/15 text-[#F6F4EC] border border-white/10 transition-all cursor-pointer"
               >
-                <Icon size={12} className="opacity-70" />
+                <Icon size={12} className="opacity-70 text-[#D9EEE4]" />
                 <span>{dest.name}</span>
               </button>
             );

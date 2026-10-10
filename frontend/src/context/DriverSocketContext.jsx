@@ -47,11 +47,14 @@ export const DriverSocketProvider = ({ children }) => {
     };
   }, [driver?._id, driverToken]);
 
-  const startTracking = (bookingId) => {
+  const startTracking = (bookingId, requestId) => {
     if (!navigator.geolocation || !driver?._id) return;
+    if (locationIntervalRef.current) {
+      clearInterval(locationIntervalRef.current);
+    }
     setIsTracking(true);
 
-    locationIntervalRef.current = setInterval(() => {
+    const sendUpdate = () => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude: lat, longitude: lng } = pos.coords;
@@ -59,12 +62,28 @@ export const DriverSocketProvider = ({ children }) => {
             lat,
             lng,
             bookingId,
+            requestId,
           });
         },
         (err) => console.warn('Geolocation error:', err),
         { enableHighAccuracy: true, timeout: 3000 }
       );
-    }, 3000);
+    };
+
+    sendUpdate();
+    locationIntervalRef.current = setInterval(sendUpdate, 3000);
+  };
+
+  const updateLocationOnce = () => {
+    if (!navigator.geolocation || !driver?._id) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        socketRef.current?.emit('driver:locationUpdate', { lat, lng });
+      },
+      (err) => console.warn('Geolocation error:', err),
+      { enableHighAccuracy: true, timeout: 3000 }
+    );
   };
 
   return (
@@ -73,6 +92,7 @@ export const DriverSocketProvider = ({ children }) => {
       isTracking,
       startTracking,
       stopTracking,
+      updateLocationOnce,
     }}>
       {children}
     </DriverSocketContext.Provider>

@@ -4,7 +4,7 @@ const VARIANTS = {
   ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-border-subtle active:opacity-90',
   outline: 'bg-surface text-text-primary border border-border hover:bg-background active:opacity-90',
   primary: 'bg-primary text-white hover:bg-primary-hover active:opacity-90',
-  secondary: 'bg-primary-subtle text-primary hover:bg-blue-100 dark:hover:bg-blue-900/40 active:opacity-90',
+  secondary: 'bg-primary-subtle text-primary hover:bg-[#C2E3D4] dark:hover:bg-primary/20 active:opacity-90',
 };
 
 const SIZES = {

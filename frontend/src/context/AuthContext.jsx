@@ -8,6 +8,19 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setToken(null);
+    setUser(null);
+  };
+
+  const login = (userData, jwtToken) => {
+    localStorage.setItem('token', jwtToken);
+    setToken(jwtToken);
+    setUser(userData);
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       if (token) {
@@ -26,19 +39,6 @@ export const AuthProvider = ({ children }) => {
 
     fetchUser();
   }, [token]);
-
-  const login = (userData, jwtToken) => {
-    localStorage.setItem('token', jwtToken);
-    setToken(jwtToken);
-    setUser(userData);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
-    setUser(null);
-  };
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, logout }}>

@@ -13,6 +13,21 @@ export default {
       },
       colors: {
         ink: 'var(--color-ink)',
+        forest: {
+          DEFAULT: '#18241F',
+          dark: '#0F1714',
+          light: '#21322B',
+        },
+        ivory: {
+          DEFAULT: '#F6F4EC',
+          light: '#FAFAF5',
+          dark: '#EBE7D8',
+        },
+        sage: {
+          DEFAULT: '#D9EEE4',
+          subtle: '#EBF6F0',
+          dark: '#B8DBC9',
+        },
         primary: {
           DEFAULT: 'var(--color-primary)',
           hover: 'var(--color-primary-hover)',

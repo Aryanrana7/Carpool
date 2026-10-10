@@ -37,12 +37,20 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(false);
     });
 
-    instance.on('driver:locationUpdate', ({ lat, lng, driverId }) => {
-      setDriverLocation({ lat, lng, driverId, timestamp: Date.now() });
+    instance.on('driver:locationUpdate', ({ lat, lng, driverId, requestId, bookingId }) => {
+      setDriverLocation({ lat, lng, driverId, requestId, bookingId, timestamp: Date.now() });
     });
 
     instance.on('ride:statusUpdate', ({ bookingId, status }) => {
       setRideStatus({ bookingId, status, timestamp: Date.now() });
+    });
+
+    instance.on('request:driverAssigned', (payload) => {
+      setOnDemandAssignment({ ...payload, timestamp: Date.now() });
+    });
+
+    instance.on('request:statusUpdate', (payload) => {
+      setOnDemandStatus({ ...payload, timestamp: Date.now() });
     });
 
     return () => {
@@ -53,6 +61,9 @@ export const SocketProvider = ({ children }) => {
     };
   }, [user?._id, token]);
 
+  const [onDemandAssignment, setOnDemandAssignment] = useState(null);
+  const [onDemandStatus, setOnDemandStatus] = useState(null);
+
   return (
     <SocketContext.Provider value={{
       socket,
@@ -60,6 +71,10 @@ export const SocketProvider = ({ children }) => {
       driverLocation,
       rideStatus,
       setRideStatus,
+      onDemandAssignment,
+      setOnDemandAssignment,
+      onDemandStatus,
+      setOnDemandStatus,
     }}>
       {children}
     </SocketContext.Provider>

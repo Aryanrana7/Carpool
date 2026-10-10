@@ -4,7 +4,7 @@ import { Car, ShieldCheck, Heart, MapPin, Compass } from 'lucide-react';
 
 export const FooterSection = () => {
   return (
-    <footer className="w-full bg-[#0B1220] text-slate-400 text-xs border-t border-[#1F2A44] transition-colors select-none">
+    <footer className="w-full bg-[#18241F] text-slate-300 text-xs border-t border-[#25382F] transition-colors select-none">
       <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Brand Info */}
@@ -102,7 +102,7 @@ export const FooterSection = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-[#1F2A44] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+        <div className="pt-8 border-t border-[#25382F] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <p>© {new Date().getFullYear()} CarPool Mobility Platform. All rights reserved.</p>
           <p className="flex items-center gap-1">
             Built with React, Node.js & OpenStreetMap

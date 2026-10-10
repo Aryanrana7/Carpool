@@ -59,7 +59,7 @@ export const Login = () => {
   return (
     <div className="min-h-[calc(100vh-68px)] flex bg-background">
       {/* ── Left Branded Panel (Desktop) ───────────────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#0B1220] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#1F2A44] select-none">
+      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#25382F] select-none">
         {/* Abstract SVG Route Network Graphic */}
         <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
           <svg width="600" height="600" viewBox="0 0 600 600" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -79,7 +79,7 @@ export const Login = () => {
             <Car size={20} />
           </div>
 
-          <span className="text-[11px] font-bold uppercase tracking-widest text-primary-hover mb-2 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-2 block">
             Ride Sharing Platform
           </span>
 
@@ -87,7 +87,7 @@ export const Login = () => {
             Smart, coordinated rides on everyday routes.
           </h1>
 
-          <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-10">
+          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
             Connect with verified drivers already traveling your way. Enjoy transparent pricing, scheduled carpools, and live GPS tracking.
           </p>
 
@@ -107,7 +107,7 @@ export const Login = () => {
           </div>
         </div>
 
-        <div className="relative z-10 pt-6 border-t border-[#1F2A44] text-[11px] text-slate-400">
+        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
           Secure JWT authentication with role-separated portals.
         </div>
       </div>
