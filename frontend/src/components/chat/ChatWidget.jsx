@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, X, MessageSquare, Check, CheckCheck } from 'lucide-react';
+import { Send, X, MessageSquare, CheckCheck, User } from 'lucide-react';
 import api from '../../services/api';
+import IconButton from '../ui/IconButton';
+import { formatTime } from '../../utils/formatters';
 
-const ChatWidget = ({ bookingId, participantId, participantName, currentUserId, socket, onClose }) => {
+const ChatWidget = ({
+  bookingId,
+  participantId,
+  participantName,
+  currentUserId,
+  socket,
+  onClose,
+}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [chatId, setChatId] = useState(null);
@@ -21,11 +30,11 @@ const ChatWidget = ({ bookingId, participantId, participantName, currentUserId, 
         if (socket) {
           socket.emit('joinChat', data._id);
         }
-        
+
         const msgRes = await api.get(`/chat/${data._id}`);
-        setMessages(msgRes.data);
+        setMessages(msgRes.data || []);
       } catch (error) {
-        console.error('Error initializing chat:', error);
+        console.error('Error initializing chat room:', error);
       }
     };
     initChat();
@@ -54,7 +63,7 @@ const ChatWidget = ({ bookingId, participantId, participantName, currentUserId, 
     };
   }, [socket, chatId]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
@@ -74,7 +83,7 @@ const ChatWidget = ({ bookingId, participantId, participantName, currentUserId, 
     e.preventDefault();
     if (!newMessage.trim() || !chatId) return;
 
-    const text = newMessage;
+    const text = newMessage.trim();
     setNewMessage('');
     if (socket) socket.emit('stopTyping', chatId);
 
@@ -89,131 +98,111 @@ const ChatWidget = ({ bookingId, participantId, participantName, currentUserId, 
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      initial={{ opacity: 0, y: 24, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 30, scale: 0.95 }}
-      transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      className="fixed bottom-24 right-6 w-[360px] sm:w-[400px] rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col z-50 border border-white/20 dark:border-white/10"
-      style={{ 
-        height: '520px', 
-        maxHeight: 'calc(100vh - 120px)',
-        background: 'rgba(255, 255, 255, 0.85)',
-        backdropFilter: 'blur(32px) saturate(1.5)',
-      }}
+      exit={{ opacity: 0, y: 24, scale: 0.96 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-32px)] sm:w-[380px] h-[520px] max-h-[calc(100vh-100px)] rounded-2xl shadow-overlay overflow-hidden flex flex-col z-[1050] bg-surface border border-border"
     >
-      <div className="dark:hidden absolute inset-0 bg-white/40 pointer-events-none" />
-      <div className="hidden dark:block absolute inset-0 bg-[#0c0c0c]/85 pointer-events-none" />
-
       {/* ── Sticky Header ────────────────────────── */}
-      <div className="relative flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-white/5 z-10">
+      <div className="flex items-center justify-between p-4 border-b border-border z-10 flex-shrink-0 bg-surface">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-black text-lg shadow-inner">
-            {participantName?.charAt(0) || 'U'}
+          <div className="w-9 h-9 rounded-lg bg-primary-subtle text-primary flex items-center justify-center font-bold text-sm shrink-0">
+            {participantName?.charAt(0) || <User size={16} />}
           </div>
           <div>
-            <h3 className="font-bold text-[15px] text-gray-900 dark:text-white leading-tight">
-              {participantName || 'Driver'}
+            <h3 className="font-semibold text-sm text-text-primary leading-tight">
+              {participantName || 'Trip Participant'}
             </h3>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Online</span>
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span className="text-xs text-text-muted">Active</span>
             </div>
           </div>
         </div>
-        <button 
-          onClick={onClose} 
-          className="p-2.5 bg-gray-100/80 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 rounded-full transition-colors"
-        >
-          <X size={18} />
-        </button>
+
+        <IconButton
+          icon={X}
+          variant="ghost"
+          size="sm"
+          ariaLabel="Close chat"
+          onClick={onClose}
+        />
       </div>
 
       {/* ── Message List ─────────────────────────── */}
-      <div className="relative flex-1 overflow-y-auto p-5 space-y-5 scrollbar-none z-10">
-        <div className="flex justify-center mb-6">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-gray-100/50 dark:bg-white/5 px-3 py-1 rounded-full">
-            Today
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-background">
+        <div className="flex justify-center mb-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-text-muted bg-surface border border-border px-2.5 py-0.5 rounded-full">
+            Trip Messaging
           </span>
         </div>
+
+        {messages.length === 0 && (
+          <div className="py-12 text-center text-text-muted">
+            <MessageSquare size={22} className="mx-auto mb-2 text-text-muted" />
+            <p className="text-xs font-semibold text-text-primary">Start the conversation</p>
+            <p className="text-[11px] text-text-muted mt-0.5">Coordinate pickup details directly</p>
+          </div>
+        )}
 
         <AnimatePresence initial={false}>
           {messages.map((msg, i) => {
             const isMe = msg.sender === currentUserId;
-            const prevMsg = messages[i - 1];
-            const isConsecutive = prevMsg && prevMsg.sender === msg.sender;
 
             return (
               <motion.div
                 key={msg._id || i}
-                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} ${isConsecutive ? 'mt-1.5' : 'mt-5'}`}
+                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
               >
-                <div className="flex items-end gap-2 max-w-[80%]">
-                  {!isMe && !isConsecutive && (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0 mb-1">
-                      {participantName?.charAt(0) || 'U'}
-                    </div>
-                  )}
-                  {!isMe && isConsecutive && <div className="w-6 flex-shrink-0" />}
-
-                  <div
-                    className={`px-4 py-2.5 text-[14px] leading-relaxed shadow-sm relative ${
-                      isMe
-                        ? 'bg-gradient-to-tr from-indigo-600 to-violet-600 text-white'
-                        : 'bg-white dark:bg-[#222] text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-white/5'
-                    }`}
-                    style={{
-                      borderRadius: isMe 
-                        ? (isConsecutive ? '16px 4px 4px 16px' : '16px 16px 4px 16px')
-                        : (isConsecutive ? '4px 16px 16px 4px' : '16px 16px 16px 4px')
-                    }}
-                  >
-                    {msg.text}
-                  </div>
+                <div
+                  className={`px-3.5 py-2 text-xs leading-relaxed max-w-[82%] rounded-xl shadow-subtle ${
+                    isMe
+                      ? 'bg-primary text-white rounded-br-xs'
+                      : 'bg-surface text-text-primary border border-border rounded-bl-xs'
+                  }`}
+                >
+                  {msg.text}
                 </div>
 
-                <div className={`flex items-center gap-1 mt-1 px-1 text-[10px] text-gray-400 dark:text-gray-500 ${isMe ? 'mr-1' : 'ml-9'}`}>
-                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  {isMe && <CheckCheck size={12} className="text-indigo-500 ml-0.5" />}
+                <div className="flex items-center gap-1 mt-1 px-1 text-[10px] text-text-muted">
+                  <span>
+                    {msg.createdAt ? formatTime(msg.createdAt) : ''}
+                  </span>
+                  {isMe && <CheckCheck size={12} className="text-primary" />}
                 </div>
               </motion.div>
             );
           })}
         </AnimatePresence>
 
-        {/* Typing Indicator */}
+        {/* Typing indicator */}
         <AnimatePresence>
           {isTyping && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10, scale: 0.9 }} 
-              animate={{ opacity: 1, y: 0, scale: 1 }} 
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-end gap-2 mt-4"
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-2 text-xs text-text-muted italic pt-1"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0 mb-1">
-                {participantName?.charAt(0) || 'U'}
-              </div>
-              <div className="bg-white dark:bg-[#222] border border-gray-100 dark:border-white/5 px-4 py-3.5 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 w-16">
-                <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut" }} className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full" />
-                <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut", delay: 0.15 }} className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full" />
-                <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut", delay: 0.3 }} className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full" />
-              </div>
+              <span>{participantName} is typing…</span>
             </motion.div>
           )}
         </AnimatePresence>
+
         <div ref={messagesEndRef} className="h-2" />
       </div>
 
-      {/* ── Input Footer ─────────────────────────── */}
-      <div className="relative p-4 border-t border-gray-200/50 dark:border-white/5 z-10 bg-white/50 dark:bg-[#121212]/50">
-        <form 
-          onSubmit={handleSendMessage} 
-          className={`flex items-end gap-2 p-1.5 rounded-2xl transition-all duration-300 ${
-            inputFocused 
-              ? 'bg-white dark:bg-[#1e1e1e] shadow-[0_0_0_2px_rgba(99,102,241,0.5)]' 
-              : 'bg-gray-100 dark:bg-[#1a1a1a]'
+      {/* ── Message Composer ─────────────────────── */}
+      <div className="p-3 border-t border-border bg-surface flex-shrink-0">
+        <form
+          onSubmit={handleSendMessage}
+          className={`flex items-center gap-2 p-1 rounded-lg border transition-all ${
+            inputFocused
+              ? 'border-primary ring-2 ring-primary/20 bg-surface'
+              : 'border-border bg-background'
           }`}
         >
           <input
@@ -222,32 +211,18 @@ const ChatWidget = ({ bookingId, participantId, participantName, currentUserId, 
             onChange={handleTyping}
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}
-            placeholder="Message..."
-            className="flex-1 bg-transparent text-gray-900 dark:text-white text-[15px] px-3 py-2.5 focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            placeholder="Type a message…"
+            className="flex-1 bg-transparent text-text-primary text-xs px-2.5 py-1.5 focus:outline-none placeholder:text-text-muted"
           />
-          <AnimatePresence>
-            {newMessage.trim() ? (
-              <motion.button
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                whileTap={{ scale: 0.9 }}
-                type="submit"
-                className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-md flex-shrink-0 m-0.5"
-              >
-                <Send size={18} className="ml-0.5" />
-              </motion.button>
-            ) : (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                className="p-2.5 text-gray-400 m-0.5"
-              >
-                <MessageSquare size={18} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+
+          <button
+            type="submit"
+            disabled={!newMessage.trim()}
+            className="p-2 rounded-md bg-primary text-white hover:bg-primary-hover disabled:opacity-40 transition-colors flex-shrink-0"
+            aria-label="Send message"
+          >
+            <Send size={14} />
+          </button>
         </form>
       </div>
     </motion.div>
