@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Car, Compass, Calendar, LogOut, ArrowRight, User, ChevronDown, HelpCircle } from 'lucide-react';
+import { Car, Compass, Calendar, LogOut, ArrowRight, ChevronDown, HelpCircle } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { CarPoolLogo } from './ui/CarPoolLogo';
 
@@ -10,6 +10,34 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click or Escape key
+  useEffect(() => {
+    if (!profileOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [profileOpen]);
 
   const handleLogout = () => {
     setProfileOpen(false);
@@ -104,13 +132,14 @@ export const Navbar = () => {
 
           {/* User Account / Auth Actions */}
           {user ? (
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setProfileOpen((prev) => !prev)}
                 className="flex items-center gap-2 h-9 px-2 rounded-lg border border-border bg-white dark:bg-[#18241F] hover:bg-border-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer group"
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
+                aria-label="User profile menu"
               >
                 <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
                   {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
@@ -118,71 +147,67 @@ export const Navbar = () => {
                 <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[120px] truncate">
                   {user.name || user.email?.split('@')[0] || 'Account'}
                 </span>
-                <ChevronDown size={13} className="text-text-muted transition-transform group-hover:text-text-primary" />
+                <ChevronDown size={13} className={`text-text-muted transition-transform duration-150 group-hover:text-text-primary ${profileOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Profile Dropdown Menu */}
               {profileOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setProfileOpen(false)}
-                    aria-hidden="true"
-                  />
-                  <div
-                    role="menu"
-                    className="absolute right-0 top-full mt-2 w-52 rounded-lg bg-surface border border-border shadow-overlay p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100"
-                  >
-                    <div className="px-3 py-2 border-b border-border mb-1">
-                      <p className="text-xs font-semibold text-text-primary truncate">
-                        {user.name}
-                      </p>
-                      <p className="text-[11px] text-text-muted truncate">
-                        {user.email}
-                      </p>
-                    </div>
-
-                    <Link
-                      to="/my-rides"
-                      role="menuitem"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors"
-                    >
-                      <Calendar size={14} />
-                      <span>My Trips</span>
-                    </Link>
-
-                    <Link
-                      to="/help"
-                      role="menuitem"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors"
-                    >
-                      <HelpCircle size={14} />
-                      <span>Help & Support</span>
-                    </Link>
-
-                    <Link
-                      to="/driver/dashboard"
-                      role="menuitem"
-                      onClick={() => setProfileOpen(false)}
-                      className="sm:hidden flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors"
-                    >
-                      <Car size={14} />
-                      <span>Driver Portal</span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-danger hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-colors mt-1"
-                    >
-                      <LogOut size={14} />
-                      <span>Sign Out</span>
-                    </button>
+                <div
+                  role="menu"
+                  aria-label="User profile options"
+                  className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface border border-border shadow-overlay p-1.5 z-50 text-left transition-all"
+                >
+                  <div className="px-3.5 py-2.5 border-b border-border mb-1">
+                    <p className="text-xs font-bold text-text-primary truncate">
+                      {user.name || 'User'}
+                    </p>
+                    <p className="text-[11px] font-medium text-text-secondary truncate mt-0.5">
+                      {user.email}
+                    </p>
                   </div>
-                </>
+
+                  <Link
+                    to="/my-rides"
+                    role="menuitem"
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-primary rounded-lg transition-colors hover:bg-primary-subtle hover:text-primary"
+                  >
+                    <Calendar size={15} className="text-primary shrink-0" />
+                    <span>My Trips</span>
+                  </Link>
+
+                  <Link
+                    to="/help"
+                    role="menuitem"
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-primary rounded-lg transition-colors hover:bg-primary-subtle hover:text-primary"
+                  >
+                    <HelpCircle size={15} className="text-primary shrink-0" />
+                    <span>Help & Support</span>
+                  </Link>
+
+                  <Link
+                    to="/driver/dashboard"
+                    role="menuitem"
+                    onClick={() => setProfileOpen(false)}
+                    className="sm:hidden flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-primary rounded-lg transition-colors hover:bg-primary-subtle hover:text-primary"
+                  >
+                    <Car size={15} className="text-primary shrink-0" />
+                    <span>Driver Portal</span>
+                  </Link>
+
+                  <div className="my-1 border-t border-border" />
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-danger hover:bg-danger-subtle rounded-lg transition-colors text-left cursor-pointer"
+                  >
+                    <LogOut size={15} className="text-danger shrink-0" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
               )}
             </div>
           ) : (
