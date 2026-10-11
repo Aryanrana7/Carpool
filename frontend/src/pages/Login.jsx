@@ -2,12 +2,13 @@ import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
-import { Mail, Car, ArrowRight, ShieldCheck, CheckCircle2, Navigation } from 'lucide-react';
+import { Mail, ArrowRight } from 'lucide-react';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import DemoLoginSection from '../components/DemoLoginSection';
 import Input from '../components/ui/Input';
 import PasswordInput from '../components/ui/PasswordInput';
 import Button from '../components/ui/Button';
+import AuthPromoPanel from '../components/auth/AuthPromoPanel';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -57,63 +58,15 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-68px)] flex bg-background">
-      {/* ── Left Branded Panel (Desktop) ───────────────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#25382F] select-none">
-        {/* Abstract SVG Route Network Graphic */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
-          <svg width="600" height="600" viewBox="0 0 600 600" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="150" cy="150" r="8" fill="currentColor" />
-            <circle cx="450" cy="180" r="8" fill="currentColor" />
-            <circle cx="300" cy="380" r="8" fill="currentColor" />
-            <circle cx="480" cy="480" r="8" fill="currentColor" />
-            <path d="M150 150 Q 300 120 450 180" strokeDasharray="4 4" />
-            <path d="M150 150 Q 200 300 300 380" />
-            <path d="M450 180 Q 400 300 300 380" strokeDasharray="6 6" />
-            <path d="M300 380 Q 400 450 480 480" />
-          </svg>
-        </div>
+    <div className="min-h-[calc(100vh-68px)] flex flex-col lg:flex-row bg-background">
+      {/* ── Left Branded Promotional Panel (Desktop: Left, Mobile: Secondary) ── */}
+      <AuthPromoPanel
+        role="passenger"
+        className="order-2 lg:order-1 lg:border-r border-[#25382F]"
+      />
 
-        <div className="relative z-10">
-          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
-            <Car size={20} />
-          </div>
-
-          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-2 block">
-            Ride Sharing Platform
-          </span>
-
-          <h1 className="text-3xl font-bold tracking-tight text-white leading-tight mb-4">
-            Smart, coordinated rides on everyday routes.
-          </h1>
-
-          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
-            Connect with verified drivers already traveling your way. Enjoy transparent pricing, scheduled carpools, and live GPS tracking.
-          </p>
-
-          <div className="space-y-3.5">
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <CheckCircle2 size={16} className="text-primary shrink-0" />
-              <span>Transparent seat pricing with zero hidden surcharges</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <Navigation size={16} className="text-primary shrink-0" />
-              <span>Real-time trip tracking with live vehicle telemetry</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <ShieldCheck size={16} className="text-primary shrink-0" />
-              <span>Verified community members and ratings</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
-          Secure JWT authentication with role-separated portals.
-        </div>
-      </div>
-
-      {/* ── Right Form Container ─────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+      {/* ── Right Form Container (Desktop: Right, Mobile: Primary Top) ───────── */}
+      <div className="order-1 lg:order-2 flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
         <div className="w-full max-w-[400px]">
           {/* Role Segmented Switcher */}
           <div className="flex rounded-md p-1 bg-border-subtle border border-border mb-6">

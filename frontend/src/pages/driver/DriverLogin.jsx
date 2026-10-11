@@ -1,11 +1,12 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DriverAuthContext } from '../../context/DriverAuthContext';
-import { Mail, Car, ArrowRight, ShieldCheck, CheckCircle2, IndianRupee } from 'lucide-react';
+import { Mail, ArrowRight } from 'lucide-react';
 import DemoLoginSection from '../../components/DemoLoginSection';
 import Input from '../../components/ui/Input';
 import PasswordInput from '../../components/ui/PasswordInput';
 import Button from '../../components/ui/Button';
+import AuthPromoPanel from '../../components/auth/AuthPromoPanel';
 
 export const DriverLogin = () => {
   const [email, setEmail] = useState('');
@@ -38,51 +39,9 @@ export const DriverLogin = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-68px)] flex bg-background">
-      {/* ── Left Branded Panel (Desktop) ───────────────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#25382F] select-none">
-        <div className="relative z-10">
-          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
-            <Car size={20} />
-          </div>
-
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-              Driver Operations Console
-            </span>
-          </div>
-
-          <h1 className="text-3xl font-bold tracking-tight text-white leading-tight mb-4">
-            Monetize empty seats on your daily commute routes.
-          </h1>
-
-          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
-            Accept on-demand broadcasts nearby or publish scheduled carpools. Control your route, pricing, and availability.
-          </p>
-
-          <div className="space-y-3.5">
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <IndianRupee size={16} className="text-primary shrink-0" />
-              <span>Full control over your seat prices and scheduled routes</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <CheckCircle2 size={16} className="text-primary shrink-0" />
-              <span>Instant on-demand matching broadcasts within your area</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <ShieldCheck size={16} className="text-primary shrink-0" />
-              <span>Verified passenger accounts and real-time navigation telemetry</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
-          CarPool Driver Operations · Partner Authentication
-        </div>
-      </div>
-
-      {/* ── Right Form Container ─────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+    <div className="min-h-[calc(100vh-68px)] flex flex-col lg:flex-row bg-background">
+      {/* ── Left Form Container (Desktop: Left, Mobile: Primary Top) ───────── */}
+      <div className="order-1 lg:order-1 flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
         <div className="w-full max-w-[400px]">
           {/* Role Segmented Switcher */}
           <div className="flex rounded-md p-1 bg-border-subtle border border-border mb-6">
@@ -159,17 +118,23 @@ export const DriverLogin = () => {
           {/* Driver Demo Shortcuts */}
           <DemoLoginSection type="driver" onSelectFill={handleDemoFill} />
 
-          {/* Driver Registration Link */}
-          <p className="mt-5 text-center text-xs text-text-secondary">
-            New driver partner?{' '}
-            <Link to="/driver/register" className="font-semibold text-primary hover:underline">
-              Register as Driver
-            </Link>
-          </p>
+            {/* Driver Registration Link */}
+            <p className="mt-5 text-center text-xs text-text-secondary">
+              New driver partner?{' '}
+              <Link to="/driver/register" className="font-semibold text-primary hover:underline">
+                Register as Driver
+              </Link>
+            </p>
+          </div>
         </div>
+
+        {/* ── Right Branded Promotional Panel (Desktop: Right, Mobile: Secondary) ── */}
+        <AuthPromoPanel
+          role="driver"
+          className="order-2 lg:order-2 lg:border-l border-[#25382F]"
+        />
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default DriverLogin;
