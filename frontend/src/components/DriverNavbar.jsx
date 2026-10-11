@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { DriverAuthContext } from '../context/DriverAuthContext';
 import { Car, LayoutDashboard, PlusCircle, LogOut, ArrowLeft } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import { CarPoolLogo } from './ui/CarPoolLogo';
 
 export const DriverNavbar = () => {
   const { driver, logoutDriver } = useContext(DriverAuthContext);
@@ -20,12 +21,14 @@ export const DriverNavbar = () => {
     <>
       <header className="fixed top-0 left-0 right-0 z-[1000] h-[68px] flex items-center px-4 sm:px-8 bg-[#18241F] border-b border-[#25382F] text-white transition-colors">
         {/* Brand & Driver Badge */}
-        <Link to="/driver/dashboard" className="flex items-center gap-2.5 mr-8 shrink-0 group">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-            <Car size={18} />
-          </div>
+        <Link
+          to="/driver/dashboard"
+          aria-label="CarPool Driver Dashboard"
+          className="flex items-center gap-[10px] mr-6 sm:mr-8 shrink-0 transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg py-1 select-none"
+        >
+          <CarPoolLogo className="h-7 sm:h-8 w-auto shrink-0" />
           <div className="flex items-center gap-2">
-            <span className="text-base font-bold tracking-tight text-white leading-tight">
+            <span className="text-lg sm:text-[20px] font-heading font-bold text-white leading-none tracking-tight">
               CarPool
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-emerald-400 border border-primary/30 px-1.5 py-0.5 rounded">

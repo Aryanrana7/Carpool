@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Car, ShieldCheck, Heart, MapPin, Compass } from 'lucide-react';
+import { ShieldCheck, Heart, MapPin, Compass } from 'lucide-react';
+import { CarPoolLogo } from './ui/CarPoolLogo';
 
 export const FooterSection = () => {
   return (
@@ -9,11 +10,9 @@ export const FooterSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Brand Info */}
           <div className="md:col-span-4 space-y-4">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-                <Car size={18} />
-              </div>
-              <span className="text-base font-bold tracking-tight text-white">
+            <Link to="/" aria-label="CarPool home" className="flex items-center gap-[10px] group w-fit">
+              <CarPoolLogo className="h-7 w-auto shrink-0" />
+              <span className="text-lg font-heading font-bold tracking-tight text-white">
                 CarPool
               </span>
             </Link>

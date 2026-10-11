@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Car, Compass, Calendar, LogOut, ArrowRight, User, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import { CarPoolLogo } from './ui/CarPoolLogo';
 
 export const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -19,22 +20,16 @@ export const Navbar = () => {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-[1100] h-[68px] flex items-center px-4 sm:px-8 bg-white/95 dark:bg-[#18241F]/95 backdrop-blur-md border-b border-border shadow-xs transition-colors">
-        {/* Brand Logo with Mobility mark */}
-        <Link to="/" className="flex items-center gap-2.5 mr-8 shrink-0 group">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-            <Car size={18} />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-baseline gap-1 leading-none">
-              <span className="text-base font-extrabold tracking-tight text-ink font-heading">
-                CarPool
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-text-muted leading-none mt-0.5">
-              Mobility
-            </span>
-          </div>
+        {/* Brand Lockup: Two-person logo icon + CarPool wordmark */}
+        <Link
+          to="/"
+          aria-label="CarPool home"
+          className="flex items-center gap-[10px] mr-6 sm:mr-8 shrink-0 transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg py-1 select-none"
+        >
+          <CarPoolLogo className="h-7 sm:h-8 w-auto shrink-0" />
+          <span className="text-lg sm:text-[20px] font-heading font-bold text-ink dark:text-white leading-none tracking-tight">
+            CarPool
+          </span>
         </Link>
 
         {/* Desktop Navigation Links — Accessible & Commercial */}
