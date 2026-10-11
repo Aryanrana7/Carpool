@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DriverNavbar from './components/DriverNavbar';
 import DriverProtectedRoute from './components/DriverProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
+import FooterSection from './components/FooterSection';
 
 // Lazy loaded route pages for optimal production bundle splitting
 const Home = React.lazy(() => import('./pages/Home'));
@@ -24,6 +25,13 @@ const DriverLogin = React.lazy(() => import('./pages/driver/DriverLogin'));
 const DriverRegister = React.lazy(() => import('./pages/driver/DriverRegister'));
 const DriverDashboard = React.lazy(() => import('./pages/driver/DriverDashboard'));
 const CreateRide = React.lazy(() => import('./pages/driver/CreateRide'));
+
+// Support & Help Center Pages
+const ContactUs = React.lazy(() => import('./pages/support/ContactUs'));
+const HelpFaq = React.lazy(() => import('./pages/support/HelpFaq'));
+const ReportProblem = React.lazy(() => import('./pages/support/ReportProblem'));
+const SafetyHelp = React.lazy(() => import('./pages/support/SafetyHelp'));
+const FeedbackPage = React.lazy(() => import('./pages/support/FeedbackPage'));
 
 // Accessible skeleton fallback
 const PageFallback = () => (
@@ -47,6 +55,7 @@ const Layout = () => {
           <Outlet />
         </Suspense>
       </main>
+      <FooterSection />
     </div>
   );
 };
@@ -97,6 +106,14 @@ function App() {
                         <Route path="/driver/dashboard" element={<DriverDashboard />} />
                         <Route path="/driver/create-ride" element={<CreateRide />} />
                       </Route>
+
+                      {/* Contact & Support System Routes (Accessible to all users) */}
+                      <Route path="/contact" element={<ContactUs />} />
+                      <Route path="/help" element={<HelpFaq />} />
+                      <Route path="/faq" element={<HelpFaq />} />
+                      <Route path="/report-problem" element={<ReportProblem />} />
+                      <Route path="/safety" element={<SafetyHelp />} />
+                      <Route path="/feedback" element={<FeedbackPage />} />
                     </Route>
                   </Routes>
                 </Router>

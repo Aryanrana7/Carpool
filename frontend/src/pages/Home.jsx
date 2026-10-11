@@ -6,7 +6,6 @@ import RideResultsSection from '../components/RideResultsSection';
 import HowItWorksSection from '../components/HowItWorksSection';
 import WhyChooseSection from '../components/WhyChooseSection';
 import DriverCtaBanner from '../components/DriverCtaBanner';
-import FooterSection from '../components/FooterSection';
 import OnDemandRideTracker from '../components/overlay/OnDemandRideTracker';
 import ChatWidget from '../components/chat/ChatWidget';
 import RatingModal from '../components/RatingModal';
@@ -374,9 +373,6 @@ const Home = () => {
 
       {/* ── 5. Driver Partner Call-To-Action Banner ───────── */}
       <DriverCtaBanner />
-
-      {/* ── 6. Full Commercial Footer ────────────────────── */}
-      <FooterSection />
 
       {/* ── Active On-Demand Tracker Overlay ────────────── */}
       <AnimatePresence>

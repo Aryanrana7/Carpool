@@ -75,4 +75,29 @@ const authEither = async (req, res, next) => {
   return res.status(401).json({ message: 'Not authorized, no token' });
 };
 
-module.exports = { protect, protectDriver, authEither };
+const optionalAuth = async (req, res, next) => {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      const user = await User.findById(decoded.id).select('-password');
+      if (user) {
+        req.user = user;
+        return next();
+      }
+
+      const driver = await Driver.findById(decoded.id).select('-password');
+      if (driver) {
+        req.driver = driver;
+        return next();
+      }
+    } catch {
+      // Gracefully continue as guest if token is missing/invalid
+    }
+  }
+  return next();
+};
+
+module.exports = { protect, protectDriver, authEither, optionalAuth };
+

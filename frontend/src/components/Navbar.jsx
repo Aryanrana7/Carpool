@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Car, Compass, Calendar, LogOut, ArrowRight, User, ChevronDown } from 'lucide-react';
+import { Car, Compass, Calendar, LogOut, ArrowRight, User, ChevronDown, HelpCircle } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { CarPoolLogo } from './ui/CarPoolLogo';
 
@@ -33,7 +33,7 @@ export const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation Links — Accessible & Commercial */}
-        <nav className="hidden md:flex items-center gap-2" aria-label="Main Navigation">
+        <nav className="hidden md:flex items-center gap-1.5" aria-label="Main Navigation">
           <Link
             to="/"
             className={`
@@ -70,6 +70,20 @@ export const Navbar = () => {
           >
             <Car size={15} />
             <span>Offer a Ride</span>
+          </Link>
+
+          <Link
+            to="/help"
+            className={`
+              px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5
+              ${pathname.startsWith('/help') || pathname.startsWith('/contact') || pathname.startsWith('/safety') || pathname.startsWith('/report-problem') || pathname.startsWith('/feedback')
+                ? 'bg-primary-subtle text-primary font-bold shadow-xs'
+                : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
+              }
+            `}
+          >
+            <HelpCircle size={15} />
+            <span>Help</span>
           </Link>
         </nav>
 
@@ -136,6 +150,16 @@ export const Navbar = () => {
                     >
                       <Calendar size={14} />
                       <span>My Trips</span>
+                    </Link>
+
+                    <Link
+                      to="/help"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-background rounded-md transition-colors"
+                    >
+                      <HelpCircle size={14} />
+                      <span>Help & Support</span>
                     </Link>
 
                     <Link
