@@ -6,15 +6,25 @@ const createApp = require('./app');
 const { setupRealtime } = require('./realtime');
 
 dotenv.config();
+
+// Ensure JWT secret is secure
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'carpoolsecret') {
+  console.error('CRITICAL: JWT_SECRET is missing or insecure. Refusing to boot.');
+  process.exit(1);
+}
+
 connectDB();
 
 const app = createApp();
 const server = http.createServer(app);
 
+const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: allowedOrigin,
     methods: ['GET', 'POST'],
+    credentials: true
   },
 });
 

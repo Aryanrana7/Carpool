@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Driver = require('./models/Driver');
 const User = require('./models/User');
 const Booking = require('./models/Booking');
+const RideRequest = require('./models/RideRequest');
 const Chat = require('./models/Chat');
 const Message = require('./models/Message');
 
@@ -50,18 +51,51 @@ const setupRealtime = (io, { driverSockets, userSockets }) => {
     const sockets = actor.type === 'driver' ? driverSockets : userSockets;
     sockets.set(actor.id.toString(), socket.id);
 
-    socket.on('driver:locationUpdate', async ({ bookingId, lat, lng }) => {
+    socket.on('driver:locationUpdate', async ({ bookingId, requestId, lat, lng }) => {
       try {
         if (actor.type !== 'driver' || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
 
-        const booking = await getAuthorizedBookingForDriver(bookingId, actor.id);
-        if (!booking || !['confirmed', 'in_progress'].includes(booking.status)) return;
+        // Persist driver's latest coordinates and timestamp for matching
+        await Driver.findByIdAndUpdate(actor.id, {
+          currentLocation: { lat, lng },
+          locationUpdatedAt: new Date(),
+        });
 
-        await Driver.findByIdAndUpdate(actor.id, { currentLocation: { lat, lng } });
-        const passengerSocket = userSockets.get(booking.user.toString());
-        if (passengerSocket) {
-          io.to(passengerSocket).emit('driver:locationUpdate', { lat, lng, driverId: actor.id.toString() });
+        // 1. If associated with an on-demand RideRequest
+        if (requestId) {
+          const rideReq = await RideRequest.findOne({
+            _id: requestId,
+            driver: actor.id,
+            status: { $in: ['accepted', 'driver_arriving', 'in_progress'] },
+          });
+          if (rideReq) {
+            const paxSocket = userSockets.get(rideReq.user.toString());
+            if (paxSocket) {
+              io.to(paxSocket).emit('driver:locationUpdate', {
+                lat,
+                lng,
+                driverId: actor.id.toString(),
+                requestId,
+              });
+            }
+          }
+        }
+
+        // 2. If associated with a scheduled Booking
+        if (bookingId) {
+          const booking = await getAuthorizedBookingForDriver(bookingId, actor.id);
+          if (booking && ['confirmed', 'in_progress'].includes(booking.status)) {
+            const passengerSocket = userSockets.get(booking.user.toString());
+            if (passengerSocket) {
+              io.to(passengerSocket).emit('driver:locationUpdate', {
+                lat,
+                lng,
+                driverId: actor.id.toString(),
+                bookingId,
+              });
+            }
+          }
         }
       } catch (error) {
         console.error('[Socket] Location update error:', error.message);
