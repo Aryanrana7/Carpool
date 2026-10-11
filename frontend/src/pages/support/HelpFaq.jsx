@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { SupportNav } from '../../components/support/SupportNav';
 import { FAQ_CATEGORIES, FAQ_ITEMS } from '../../data/faqData';
@@ -12,7 +12,6 @@ import {
   MessageCircle,
   AlertTriangle,
   X,
-  Compass,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
@@ -87,7 +86,7 @@ export const HelpFaq = () => {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-text-muted hover:text-text-primary"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-text-muted hover:text-text-primary cursor-pointer"
                 aria-label="Clear search input"
               >
                 <X size={16} />
@@ -96,11 +95,11 @@ export const HelpFaq = () => {
           </div>
         </div>
 
-        {/* Category Pills */}
+        {/* Category Filter Chips — Responsive wrapping layout without horizontal scrollbar */}
         <div
           role="tablist"
           aria-label="FAQ Categories"
-          className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1"
+          className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-4xl mx-auto py-1"
         >
           {FAQ_CATEGORIES.map(({ id, label }) => {
             const isSelected = selectedCategory === id;
@@ -108,14 +107,27 @@ export const HelpFaq = () => {
               <button
                 key={id}
                 role="tab"
+                id={`faq-tab-${id}`}
                 aria-selected={isSelected}
+                aria-controls="faq-list-heading"
                 type="button"
                 onClick={() => setSelectedCategory(id)}
+                style={
+                  isSelected
+                    ? {
+                        backgroundColor: 'var(--color-primary)',
+                        borderColor: 'var(--color-primary)',
+                        color: '#FFFFFF',
+                      }
+                    : undefined
+                }
                 className={`
-                  px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer
-                  ${isSelected
-                    ? 'bg-primary text-white shadow-xs'
-                    : 'bg-surface dark:bg-[#18241F] text-text-secondary border border-border hover:border-primary/50 hover:text-text-primary'
+                  px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-[13px] font-semibold transition-all duration-150 cursor-pointer select-none
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0F1714]
+                  ${
+                    isSelected
+                      ? '!bg-primary !text-white !border-primary shadow-xs font-bold'
+                      : 'bg-white dark:bg-[#18241F] text-text-primary dark:text-[#F6F4EC] border border-border dark:border-[#2B3D35] hover:bg-primary-subtle dark:hover:bg-primary/20 hover:text-primary dark:hover:text-emerald-300 hover:border-primary/50'
                   }
                 `}
               >
