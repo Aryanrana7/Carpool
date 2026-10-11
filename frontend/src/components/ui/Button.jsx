@@ -27,22 +27,49 @@ export const Button = React.forwardRef(({
   rightIcon: RightIcon,
   className = '',
   type = 'button',
+  style = {},
   ...props
 }, ref) => {
-  const variantClass = VARIANTS[variant] || VARIANTS.primary;
   const sizeClass = SIZES[size] || SIZES.md;
-  const isDisabled = disabled || loading;
+  const isActionDisabled = disabled || loading;
+
+  // Resolve state-specific styling to guarantee high contrast across all states
+  let stateClasses;
+  let inlineStyles = { ...style };
+
+  if (loading) {
+    if (variant === 'primary') {
+      stateClasses = 'bg-primary text-white cursor-wait opacity-90 shadow-sm';
+      inlineStyles = { backgroundColor: 'var(--color-primary)', color: '#FFFFFF', ...inlineStyles };
+    } else {
+      stateClasses = 'bg-surface text-text-muted border border-border cursor-wait opacity-90';
+    }
+  } else if (disabled) {
+    if (variant === 'primary') {
+      // Intentionally muted background with readable dark text and clear border (never white on cream)
+      stateClasses = 'bg-[#DCE4DE] dark:bg-[#25382F] text-[#4E6157] dark:text-[#8A9A92] border border-[#CBD6CE] dark:border-[#2F443A] cursor-not-allowed shadow-none';
+    } else {
+      stateClasses = 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed shadow-none';
+    }
+  } else {
+    // Enabled state: standard variant
+    stateClasses = VARIANTS[variant] || VARIANTS.primary;
+    if (variant === 'primary') {
+      inlineStyles = { backgroundColor: 'var(--color-primary)', color: '#FFFFFF', ...inlineStyles };
+    }
+  }
 
   return (
     <button
       ref={ref}
       type={type}
-      disabled={isDisabled}
+      disabled={isActionDisabled}
+      aria-busy={loading}
+      style={inlineStyles}
       className={`
         inline-flex items-center justify-center font-semibold transition-colors duration-150
-        select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
-        disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-600 dark:disabled:text-slate-400 disabled:border disabled:border-slate-200 dark:disabled:border-slate-700 disabled:shadow-none disabled:cursor-not-allowed disabled:opacity-100
-        ${variantClass}
+        select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+        ${stateClasses}
         ${sizeClass}
         ${fullWidth ? 'w-full' : ''}
         ${className}
@@ -50,13 +77,13 @@ export const Button = React.forwardRef(({
       {...props}
     >
       {loading ? (
-        <Loader2 className="animate-spin shrink-0" size={size === 'sm' ? 14 : 18} />
+        <Loader2 className="animate-spin shrink-0 text-current" size={size === 'sm' ? 14 : 18} />
       ) : LeftIcon ? (
-        <LeftIcon className="shrink-0" size={size === 'sm' ? 14 : 18} />
+        <LeftIcon className="shrink-0 text-current" size={size === 'sm' ? 14 : 18} />
       ) : null}
       <span>{children}</span>
       {!loading && RightIcon && (
-        <RightIcon className="shrink-0" size={size === 'sm' ? 14 : 18} />
+        <RightIcon className="shrink-0 text-current" size={size === 'sm' ? 14 : 18} />
       )}
     </button>
   );

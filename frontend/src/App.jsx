@@ -16,12 +16,11 @@ import FooterSection from './components/FooterSection';
 
 // Lazy loaded route pages for optimal production bundle splitting
 const Home = React.lazy(() => import('./pages/Home'));
-const Login = React.lazy(() => import('./pages/Login'));
+const AuthPortal = React.lazy(() => import('./components/auth/AuthPortal'));
 const Register = React.lazy(() => import('./pages/Register'));
 const Payment = React.lazy(() => import('./pages/Payment'));
 const MyRides = React.lazy(() => import('./pages/MyRides'));
 const Booking = React.lazy(() => import('./pages/Booking'));
-const DriverLogin = React.lazy(() => import('./pages/driver/DriverLogin'));
 const DriverRegister = React.lazy(() => import('./pages/driver/DriverRegister'));
 const DriverDashboard = React.lazy(() => import('./pages/driver/DriverDashboard'));
 const CreateRide = React.lazy(() => import('./pages/driver/CreateRide'));
@@ -91,8 +90,8 @@ function App() {
                   />
                   <Routes>
                     <Route element={<Layout />}>
-                      {/* Passenger Routes */}
-                      <Route path="/login" element={<Login />} />
+                      {/* Passenger & Driver Split-Screen Animated Portals */}
+                      <Route path="/login" element={<AuthPortal />} />
                       <Route path="/register" element={<Register />} />
 
                       <Route element={<ProtectedRoute />}>
@@ -103,7 +102,7 @@ function App() {
                       </Route>
 
                       {/* Driver Routes */}
-                      <Route path="/driver/login" element={<DriverLogin />} />
+                      <Route path="/driver/login" element={<AuthPortal />} />
                       <Route path="/driver/register" element={<DriverRegister />} />
 
                       <Route element={<DriverProtectedRoute />}>

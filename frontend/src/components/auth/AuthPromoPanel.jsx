@@ -11,10 +11,13 @@ import { getRotatingVariant } from '../../data/authPromoData';
  * - Exact approved CarPool design tokens: Forest dark ink (#18241F), emerald (#087F5B / #12B886), cream accents
  */
 export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, className = '' }) => {
-  // Select once on mount; stable across re-renders in current session
-  const [variant] = useState(() => getRotatingVariant(role));
+  // Stably initialize each role's variant once per session; stable across re-renders
+  const [passengerVariant] = useState(() => getRotatingVariant('passenger'));
+  const [driverVariant] = useState(() => getRotatingVariant('driver'));
 
   const isDriver = role === 'driver';
+  const variant = isDriver ? driverVariant : passengerVariant;
+
   const defaultSecurityNote = isDriver
     ? 'CarPool Driver Operations · Partner Authentication'
     : 'Secure JWT authentication with role-separated portals.';
