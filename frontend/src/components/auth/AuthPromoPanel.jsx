@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Car, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { getRotatingVariant } from '../../data/authPromoData';
 
@@ -11,6 +12,8 @@ import { getRotatingVariant } from '../../data/authPromoData';
  * - Exact approved CarPool design tokens: Forest dark ink (#18241F), emerald (#087F5B / #12B886), cream accents
  */
 export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, className = '' }) => {
+  const shouldReduceMotion = useReducedMotion();
+
   // Stably initialize each role's variant once per session; stable across re-renders
   const [passengerVariant] = useState(() => getRotatingVariant('passenger'));
   const [driverVariant] = useState(() => getRotatingVariant('driver'));
@@ -27,7 +30,7 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
 
   return (
     <div
-      className={`w-full lg:w-[45%] bg-[#18241F] text-white p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden select-none border-[#25382F] ${className}`}
+      className={`w-full h-full bg-[#18241F] text-white p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden select-none ${className}`}
       data-testid={`auth-promo-panel-${role}`}
     >
       {/* Subtle background route grid backdrop */}
@@ -44,53 +47,64 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
         </svg>
       </div>
 
-      <div className="relative z-10">
-        {/* Brand/Role icon pill & Eyebrow */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white shadow-sm shrink-0">
-            {isDriver ? <Car size={20} /> : <Car size={20} />}
-          </div>
-          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-            {variant.eyebrow}
-          </span>
-        </div>
-
-        {/* Dynamic Headline */}
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight mb-3">
-          {variant.headline}
-        </h1>
-
-        {/* Dynamic Description */}
-        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-md mb-6">
-          {variant.description}
-        </p>
-
-        {/* Dedicated Themed Illustration (Reserved dimensions prevent layout shift) */}
-        <div className="w-full my-4 rounded-xl bg-[#14201B]/80 border border-[#25382F] p-3 shadow-inner overflow-hidden flex items-center justify-center">
-          {IllustrationComponent && <IllustrationComponent />}
-        </div>
-
-        {/* Benefit Points (3 bullets) */}
-        <div className="space-y-3 mt-6 mb-8">
-          {variant.benefits.map((point, index) => (
-            <div key={index} className="flex items-start gap-3 text-xs sm:text-[13px] text-slate-200">
-              <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-              <span className="leading-snug">{point}</span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={role}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+          className="relative z-10 flex-1 flex flex-col justify-between"
+        >
+          <div>
+            {/* Brand/Role icon pill & Eyebrow */}
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm shrink-0">
+                <Car size={20} />
+              </div>
+              <span className="text-[11px] font-bold tracking-wider text-emerald-400">
+                {variant.eyebrow}
+              </span>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Security Note / Console Badge Footer */}
-      <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400 flex items-center justify-between">
-        <span className="flex items-center gap-2">
-          <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
-          {securityNote}
-        </span>
-        <span className="text-[10px] text-slate-500 font-mono tracking-wider uppercase">
-          {role === 'driver' ? 'Driver Partner' : 'Passenger Portal'}
-        </span>
-      </div>
+            {/* Dynamic Headline */}
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight mb-3">
+              {variant.headline}
+            </h1>
+
+            {/* Dynamic Description */}
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-md mb-6">
+              {variant.description}
+            </p>
+
+            {/* Dedicated Themed Illustration (Reserved dimensions prevent layout shift) */}
+            <div className="w-full my-4 rounded-xl bg-[#14201B]/80 border border-[#25382F] p-3 shadow-inner overflow-hidden flex items-center justify-center min-h-[180px]">
+              {IllustrationComponent && <IllustrationComponent />}
+            </div>
+
+            {/* Benefit Points (3 bullets) */}
+            <div className="space-y-3 mt-6 mb-6">
+              {variant.benefits.map((point, index) => (
+                <div key={index} className="flex items-start gap-3 text-xs sm:text-[13px] text-slate-200">
+                  <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                  <span className="leading-snug">{point}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Security Note / Console Badge Footer */}
+          <div className="pt-6 border-t border-[#25382F] text-[11px] text-slate-400 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
+              {securityNote}
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono tracking-wider uppercase">
+              {isDriver ? 'Driver Partner' : 'Passenger Portal'}
+            </span>
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

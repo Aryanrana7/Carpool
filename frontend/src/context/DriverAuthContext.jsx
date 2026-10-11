@@ -47,11 +47,12 @@ export const DriverAuthProvider = ({ children }) => {
       const response = await api.post('/drivers/register', driverData);
       localStorage.setItem('driverToken', response.data.token);
       setDriver(response.data);
-      toast.success('Registration successful!');
-      return true;
+      toast.success('Registration successful! Welcome to CarPool Driver Partner.');
+      return { success: true };
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed');
-      return false;
+      const message = error.response?.data?.message || 'Registration failed';
+      toast.error(message);
+      return { success: false, error: message };
     }
   };
 

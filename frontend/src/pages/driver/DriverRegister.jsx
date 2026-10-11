@@ -23,60 +23,28 @@ export const DriverRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name || !formData.email || !formData.password || !formData.carModel || !formData.carNumber) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
     setError('');
     setLoading(true);
-    const success = await registerDriver(formData);
-    if (success) {
+    const result = await registerDriver(formData);
+    if (result?.success) {
       navigate('/driver/dashboard');
     } else {
-      setError('Driver registration failed. Please verify your details.');
+      setError(result?.error || 'Driver registration failed. Please verify your details.');
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-[calc(100vh-68px)] flex bg-background">
-      {/* ── Left Branded Panel (Desktop) ───────────────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-r border-[#25382F] select-none">
-        <div className="relative z-10">
-          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
-            <Car size={20} />
-          </div>
-
-          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-2 block">
-            Partner Program
-          </span>
-
-          <h1 className="text-3xl font-bold tracking-tight text-white leading-tight mb-4">
-            Earn flexibly by offering rides on your existing routes.
-          </h1>
-
-          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
-            Publish your daily commute or intercity schedule, choose your seat price, and get matched with verified riders.
-          </p>
-
-          <div className="space-y-3.5">
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <IndianRupee size={16} className="text-primary shrink-0" />
-              <span>Direct per-seat pricing with transparent settlements</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <CheckCircle2 size={16} className="text-primary shrink-0" />
-              <span>Full control over your schedule and accept/decline choices</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <ShieldCheck size={16} className="text-primary shrink-0" />
-              <span>Safe ride network with verified passengers</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
-          CarPool Mobility Platform · Driver Partner Registration
-        </div>
-      </div>
-
-      {/* ── Right Registration Form ──────────────────────── */}
+      {/* ── Left Registration Form (mirrors Driver Portal) ── */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
         <div className="w-full max-w-[420px]">
           {/* Role Segmented Switcher */}
@@ -203,6 +171,46 @@ export const DriverRegister = () => {
               Sign In
             </Link>
           </p>
+        </div>
+      </div>
+
+      {/* ── Right Branded Panel (mirrors Driver Portal) ────── */}
+      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-l border-[#25382F] select-none">
+        <div className="relative z-10">
+          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
+            <Car size={20} />
+          </div>
+
+          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-2 block">
+            Partner Program
+          </span>
+
+          <h1 className="text-3xl font-bold tracking-tight text-white leading-tight mb-4">
+            Earn flexibly by offering rides on your existing routes.
+          </h1>
+
+          <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-10">
+            Publish your daily commute or intercity schedule, choose your seat price, and get matched with verified riders.
+          </p>
+
+          <div className="space-y-3.5">
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <IndianRupee size={16} className="text-primary shrink-0" />
+              <span>Direct per-seat pricing with transparent settlements</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <CheckCircle2 size={16} className="text-primary shrink-0" />
+              <span>Full control over your schedule and accept/decline choices</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-300">
+              <ShieldCheck size={16} className="text-primary shrink-0" />
+              <span>Safe ride network with verified passengers</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
+          CarPool Mobility Platform · Driver Partner Registration
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import { User, Mail, ArrowRight, ShieldCheck, CheckCircle2, Navigation, Car } from 'lucide-react';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import Input from '../components/ui/Input';
@@ -19,10 +20,15 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
       const { data } = await api.post('/users', { name, email, password });
+      toast.success('Account created successfully! Welcome to CarPool.');
       login(
         { name: data.name, email: data.email, _id: data._id, role: data.role, picture: data.picture },
         data.token
@@ -122,20 +128,6 @@ export const Register = () => {
             </div>
           )}
 
-          {/* Google Sign-Up */}
-          <div className="mb-4">
-            <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={setError} text="Sign up with Google" />
-          </div>
-
-          {/* Divider */}
-          <div className="relative flex py-2 items-center mb-4">
-            <div className="flex-grow border-t border-border" />
-            <span className="shrink mx-3 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-              or with email
-            </span>
-            <div className="flex-grow border-t border-border" />
-          </div>
-
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <Input
@@ -186,6 +178,20 @@ export const Register = () => {
               Create Account
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="relative flex py-2 items-center my-4">
+            <div className="flex-grow border-t border-border" />
+            <span className="shrink mx-3 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+              OR
+            </span>
+            <div className="flex-grow border-t border-border" />
+          </div>
+
+          {/* Google Sign-Up */}
+          <div className="mb-4">
+            <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={setError} text="Sign up with Google" />
+          </div>
 
           {/* Sign in link */}
           <p className="mt-5 text-center text-xs text-text-secondary">

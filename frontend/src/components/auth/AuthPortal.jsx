@@ -116,10 +116,10 @@ export const AuthPortal = () => {
     }
   };
 
-  // Directional Animation Transition settings
+  // Directional Animation Transition settings (400ms, cubic-bezier(0.22, 1, 0.36, 1))
   const layoutTransition = shouldReduceMotion
     ? { duration: 0 }
-    : { duration: 0.42, ease: [0.22, 1, 0.36, 1] };
+    : { duration: 0.4, ease: [0.22, 1, 0.36, 1] };
 
   // Promotional Panel Node
   const promoPanelNode = (
@@ -127,8 +127,8 @@ export const AuthPortal = () => {
       key="auth-promo-panel-wrapper"
       layout="position"
       transition={layoutTransition}
-      className={`w-full lg:w-[45%] shrink-0 flex flex-col order-2 ${
-        isDriver ? 'lg:order-2 lg:border-l border-[#25382F]' : 'lg:order-1 lg:border-r border-[#25382F]'
+      className={`w-full lg:w-[45%] shrink-0 flex flex-col self-stretch min-h-[calc(100vh-68px)] order-2 lg:order-none ${
+        isDriver ? 'lg:border-l lg:border-t-0 border-t border-[#25382F]' : 'lg:border-r lg:border-t-0 border-t border-[#25382F]'
       }`}
     >
       <AuthPromoPanel role={isDriver ? 'driver' : 'passenger'} />
@@ -141,24 +141,27 @@ export const AuthPortal = () => {
       key="auth-form-panel-wrapper"
       layout="position"
       transition={layoutTransition}
-      className={`flex-1 w-full lg:w-[55%] flex items-center justify-center p-6 sm:p-10 lg:p-12 overflow-y-auto order-1 ${
-        isDriver ? 'lg:order-1' : 'lg:order-2'
-      }`}
+      className="flex-1 w-full lg:w-[55%] flex items-center justify-center self-stretch min-h-[calc(100vh-68px)] p-6 sm:p-10 lg:p-12 overflow-y-auto order-1 lg:order-none"
     >
       <div className="w-full max-w-[400px]">
-        {/* Role Segmented Switcher */}
-        <div className="flex rounded-md p-1 bg-border-subtle border border-border mb-6">
+        {/* Role Segmented Switcher with sliding animated pill */}
+        <div className="relative flex rounded-lg p-1 bg-border-subtle border border-border mb-6 select-none">
           <button
             type="button"
             onClick={() => {
               if (isDriver) navigate('/login');
             }}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded text-center transition-all cursor-pointer ${
-              !isDriver
-                ? 'bg-surface text-text-primary shadow-subtle border border-border/40'
-                : 'text-text-secondary hover:text-text-primary'
+            className={`relative flex-1 py-2 text-xs font-bold rounded-md text-center transition-colors cursor-pointer z-10 ${
+              !isDriver ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
             }`}
           >
+            {!isDriver && (
+              <motion.div
+                layoutId="active-role-pill"
+                className="absolute inset-0 bg-surface rounded-md shadow-sm border border-border/50 -z-10"
+                transition={layoutTransition}
+              />
+            )}
             Passenger
           </button>
           <button
@@ -166,18 +169,23 @@ export const AuthPortal = () => {
             onClick={() => {
               if (!isDriver) navigate('/driver/login');
             }}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded text-center transition-all cursor-pointer ${
-              isDriver
-                ? 'bg-surface text-text-primary shadow-subtle border border-border/40'
-                : 'text-text-secondary hover:text-text-primary'
+            className={`relative flex-1 py-2 text-xs font-bold rounded-md text-center transition-colors cursor-pointer z-10 ${
+              isDriver ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
             }`}
           >
+            {isDriver && (
+              <motion.div
+                layoutId="active-role-pill"
+                className="absolute inset-0 bg-surface rounded-md shadow-sm border border-border/50 -z-10"
+                transition={layoutTransition}
+              />
+            )}
             Driver Partner
           </button>
         </div>
 
         {/* Dynamic Form Content with smooth cross-fade */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           {!isDriver ? (
             <motion.div
               key="passenger-form-content"
@@ -203,20 +211,6 @@ export const AuthPortal = () => {
                   {passengerError}
                 </div>
               )}
-
-              {/* Google Sign-In */}
-              <div className="mb-4">
-                <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={setPassengerError} text="Continue with Google" />
-              </div>
-
-              {/* Divider */}
-              <div className="relative flex py-2 items-center mb-4">
-                <div className="flex-grow border-t border-border" />
-                <span className="shrink mx-3 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-                  or with email
-                </span>
-                <div className="flex-grow border-t border-border" />
-              </div>
 
               {/* Passenger Credentials Form */}
               <form onSubmit={handlePassengerSubmit} className="space-y-3.5">
@@ -255,6 +249,20 @@ export const AuthPortal = () => {
                   Sign In
                 </Button>
               </form>
+
+              {/* Divider labelled OR */}
+              <div className="relative flex py-2 items-center my-4">
+                <div className="flex-grow border-t border-border" />
+                <span className="shrink mx-3 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+                  OR
+                </span>
+                <div className="flex-grow border-t border-border" />
+              </div>
+
+              {/* Google Sign-In */}
+              <div className="mb-4">
+                <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={setPassengerError} text="Continue with Google" />
+              </div>
 
               {/* Demo Shortcuts */}
               <DemoLoginSection type="passenger" onSelectFill={handlePassengerDemoFill} />

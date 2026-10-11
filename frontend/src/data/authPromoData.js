@@ -20,9 +20,9 @@ import {
 export const PASSENGER_VARIANTS = [
   {
     id: 'passenger-1',
-    eyebrow: 'RIDE SHARING PLATFORM',
+    eyebrow: 'Ride Sharing Platform',
     headline: 'Your Journey. Shared.',
-    description: 'Connect with people heading your way. Share rides, split travel costs, and make everyday commuting easier.',
+    description: 'Connect with people heading your way. Share rides, split travel costs, and simplify your daily commute.',
     benefits: [
       'Share travel costs with fellow commuters',
       'Find rides that match your route',
@@ -33,9 +33,9 @@ export const PASSENGER_VARIANTS = [
   },
   {
     id: 'passenger-2',
-    eyebrow: 'INTELLIGENT ROUTING',
+    eyebrow: 'Intelligent Routing',
     headline: 'Better Routes. Smarter Rides.',
-    description: 'Find rides that fit your route and schedule, without making your daily commute more complicated.',
+    description: 'Find available rides that fit your route and schedule, without complicating your everyday travel.',
     benefits: [
       'Explore available routes',
       'Compare matching ride options',
@@ -46,9 +46,9 @@ export const PASSENGER_VARIANTS = [
   },
   {
     id: 'passenger-3',
-    eyebrow: 'COMMUNITY & FAIR PRICING',
+    eyebrow: 'Community & Fair Pricing',
     headline: 'Good Company. Shared Costs.',
-    description: 'Turn an everyday journey into a shared experience while splitting eligible travel expenses.',
+    description: 'Make everyday journeys more collaborative while sharing eligible travel expenses.',
     benefits: [
       'Connect with fellow travellers',
       'Share eligible travel expenses',
@@ -59,7 +59,7 @@ export const PASSENGER_VARIANTS = [
   },
   {
     id: 'passenger-4',
-    eyebrow: 'FLEXIBLE SCHEDULING',
+    eyebrow: 'Flexible Scheduling',
     headline: 'Your Schedule, Your Ride.',
     description: 'Explore scheduled carpools and plan your next journey around the time that works for you.',
     benefits: [
@@ -72,9 +72,9 @@ export const PASSENGER_VARIANTS = [
   },
   {
     id: 'passenger-5',
-    eyebrow: 'LIVE TRIP TELEMETRY',
+    eyebrow: 'Live Trip Telemetry',
     headline: 'Know Your Route. Enjoy the Ride.',
-    description: 'Keep track of your journey with available trip updates and live tracking features.',
+    description: 'Stay informed with available trip updates and live tracking features.',
     benefits: [
       'Access available trip updates',
       'Follow your trip when tracking is enabled',
@@ -85,7 +85,7 @@ export const PASSENGER_VARIANTS = [
   },
   {
     id: 'passenger-6',
-    eyebrow: 'COLLABORATIVE COMMUTE',
+    eyebrow: 'Collaborative Commute',
     headline: 'Every Commute Connects Us.',
     description: 'Discover a more collaborative way to travel, one shared journey at a time.',
     benefits: [
@@ -105,9 +105,9 @@ export const PASSENGER_VARIANTS = [
 export const DRIVER_VARIANTS = [
   {
     id: 'driver-1',
-    eyebrow: 'DRIVER OPERATIONS CONSOLE',
+    eyebrow: 'Driver Operations Console',
     headline: 'Your Route. Your Rules.',
-    description: 'Share your journey with passengers heading in the same direction and make better use of your available seats.',
+    description: 'Share your journey with passengers heading in the same direction and make better use of available seats.',
     benefits: [
       'Offer available seats on your journey',
       'Manage your ride availability',
@@ -118,9 +118,9 @@ export const DRIVER_VARIANTS = [
   },
   {
     id: 'driver-2',
-    eyebrow: 'SEAT UTILIZATION',
+    eyebrow: 'Seat Utilization',
     headline: 'Empty Seats. Shared Journeys.',
-    description: 'Turn spare seats into opportunities to connect with fellow commuters along your route.',
+    description: 'Connect with fellow commuters and make your existing journeys more collaborative.',
     benefits: [
       'Publish your available seats',
       'Coordinate shared journeys',
@@ -131,9 +131,9 @@ export const DRIVER_VARIANTS = [
   },
   {
     id: 'driver-3',
-    eyebrow: 'ADVANCE DISPATCH',
+    eyebrow: 'Advance Dispatch',
     headline: 'Plan Ahead. Drive Smarter.',
-    description: 'Publish scheduled carpools, set your departure details, and manage your ride availability.',
+    description: 'Publish scheduled carpools, set departure details, and manage your ride availability.',
     benefits: [
       'Create scheduled rides',
       'Set route and departure details',
@@ -144,7 +144,7 @@ export const DRIVER_VARIANTS = [
   },
   {
     id: 'driver-4',
-    eyebrow: 'COMMUTER CORRIDORS',
+    eyebrow: 'Commuter Corridors',
     headline: 'Your Route Has Room for More.',
     description: 'Connect with passengers whose journeys align with yours and coordinate trips more efficiently.',
     benefits: [
@@ -157,9 +157,9 @@ export const DRIVER_VARIANTS = [
   },
   {
     id: 'driver-5',
-    eyebrow: 'CONSOLE MANAGEMENT',
+    eyebrow: 'Console Management',
     headline: 'Stay in Control of Every Ride.',
-    description: 'Manage your routes, seat availability, and ride requests from your CarPool driver portal.',
+    description: 'Manage your routes, available seats, and ride requests through your CarPool driver portal.',
     benefits: [
       'Manage your published rides',
       'Review ride and booking status',
@@ -170,9 +170,9 @@ export const DRIVER_VARIANTS = [
   },
   {
     id: 'driver-6',
-    eyebrow: 'COLLABORATIVE TRANSIT',
+    eyebrow: 'Collaborative Transit',
     headline: 'Drive Together. Go Further.',
-    description: 'Make everyday travel more collaborative by bringing people with similar destinations together.',
+    description: 'Bring people with similar destinations together and make everyday travel more collaborative.',
     benefits: [
       'Connect with fellow commuters',
       'Share your journey with others',
