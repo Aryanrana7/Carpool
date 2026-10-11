@@ -136,7 +136,7 @@ export const Navbar = () => {
               <button
                 type="button"
                 onClick={() => setProfileOpen((prev) => !prev)}
-                className="flex items-center gap-2 h-9 px-2 rounded-lg border border-border bg-white dark:bg-[#18241F] hover:bg-border-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer group"
+                className="flex items-center gap-2 h-9 px-2.5 rounded-lg border border-[#DCE4DE] dark:border-[#2B3D35] bg-white dark:bg-[#18241F] hover:bg-[#FAF9F5] dark:hover:bg-[#21322B] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer group"
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
                 aria-label="User profile menu"
@@ -144,7 +144,7 @@ export const Navbar = () => {
                 <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
                   {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
                 </div>
-                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[120px] truncate">
+                <span className="text-xs font-semibold text-[#18241F] dark:text-white max-w-[120px] truncate">
                   {user.name || user.email?.split('@')[0] || 'Account'}
                 </span>
                 <ChevronDown size={13} className={`text-text-muted transition-transform duration-150 group-hover:text-text-primary ${profileOpen ? 'rotate-180' : ''}`} />
@@ -155,13 +155,16 @@ export const Navbar = () => {
                 <div
                   role="menu"
                   aria-label="User profile options"
-                  className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface border border-border shadow-overlay p-1.5 z-50 text-left transition-all"
+                  className="absolute right-0 top-full mt-2 w-60 rounded-xl bg-white dark:bg-[#18241F] border border-[#DCE4DE] dark:border-[#2B3D35] shadow-xl shadow-black/10 dark:shadow-black/50 p-1.5 z-[1200] text-left opacity-100 transition-all"
+                  style={{
+                    backgroundColor: 'var(--color-surface, #FFFFFF)',
+                  }}
                 >
-                  <div className="px-3.5 py-2.5 border-b border-border mb-1">
-                    <p className="text-xs font-bold text-text-primary truncate">
+                  <div className="px-3.5 py-2.5 border-b border-[#DCE4DE] dark:border-[#2B3D35] mb-1">
+                    <p className="text-xs font-bold text-[#18241F] dark:text-white truncate">
                       {user.name || 'User'}
                     </p>
-                    <p className="text-[11px] font-medium text-text-secondary truncate mt-0.5">
+                    <p className="text-[11px] font-medium text-[#66756D] dark:text-[#A3B5AC] truncate mt-0.5">
                       {user.email}
                     </p>
                   </div>
@@ -170,9 +173,9 @@ export const Navbar = () => {
                     to="/my-rides"
                     role="menuitem"
                     onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-primary rounded-lg transition-colors hover:bg-primary-subtle hover:text-primary"
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#18241F] dark:text-[#F6F4EC] rounded-lg transition-colors hover:bg-[#E8F5EF] dark:hover:bg-[#12B886]/15 hover:text-[#087F5B] dark:hover:text-[#20C997]"
                   >
-                    <Calendar size={15} className="text-primary shrink-0" />
+                    <Calendar size={15} className="text-[#087F5B] dark:text-[#12B886] shrink-0" />
                     <span>My Trips</span>
                   </Link>
 
@@ -180,9 +183,9 @@ export const Navbar = () => {
                     to="/help"
                     role="menuitem"
                     onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-primary rounded-lg transition-colors hover:bg-primary-subtle hover:text-primary"
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#18241F] dark:text-[#F6F4EC] rounded-lg transition-colors hover:bg-[#E8F5EF] dark:hover:bg-[#12B886]/15 hover:text-[#087F5B] dark:hover:text-[#20C997]"
                   >
-                    <HelpCircle size={15} className="text-primary shrink-0" />
+                    <HelpCircle size={15} className="text-[#087F5B] dark:text-[#12B886] shrink-0" />
                     <span>Help & Support</span>
                   </Link>
 
@@ -190,21 +193,21 @@ export const Navbar = () => {
                     to="/driver/dashboard"
                     role="menuitem"
                     onClick={() => setProfileOpen(false)}
-                    className="sm:hidden flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-primary rounded-lg transition-colors hover:bg-primary-subtle hover:text-primary"
+                    className="sm:hidden flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#18241F] dark:text-[#F6F4EC] rounded-lg transition-colors hover:bg-[#E8F5EF] dark:hover:bg-[#12B886]/15 hover:text-[#087F5B] dark:hover:text-[#20C997]"
                   >
-                    <Car size={15} className="text-primary shrink-0" />
+                    <Car size={15} className="text-[#087F5B] dark:text-[#12B886] shrink-0" />
                     <span>Driver Portal</span>
                   </Link>
 
-                  <div className="my-1 border-t border-border" />
+                  <div className="my-1 border-t border-[#DCE4DE] dark:border-[#2B3D35]" />
 
                   <button
                     type="button"
                     role="menuitem"
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-danger hover:bg-danger-subtle rounded-lg transition-colors text-left cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#D32F2F] dark:text-[#EF5350] hover:bg-[#FDE8E8] dark:hover:bg-[#EF5350]/15 rounded-lg transition-colors text-left cursor-pointer"
                   >
-                    <LogOut size={15} className="text-danger shrink-0" />
+                    <LogOut size={15} className="text-[#D32F2F] dark:text-[#EF5350] shrink-0" />
                     <span>Sign Out</span>
                   </button>
                 </div>
