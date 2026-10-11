@@ -55,6 +55,7 @@ export const VerticalRideCard = React.memo(({
 
   const handleCardClick = (e) => {
     e.stopPropagation();
+    if (isSoldOut) return;
     if (onSelect) onSelect(ride);
   };
 
@@ -64,7 +65,8 @@ export const VerticalRideCard = React.memo(({
       onMouseEnter={() => onHoverIn?.(ride)}
       onMouseLeave={() => onHoverOut?.(null)}
       role="button"
-      tabIndex={0}
+      tabIndex={isSoldOut ? -1 : 0}
+      aria-disabled={isSoldOut}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -72,11 +74,13 @@ export const VerticalRideCard = React.memo(({
         }
       }}
       className={`
-        group relative w-full rounded-2xl p-5 sm:p-5.5 text-left transition-all duration-200 cursor-pointer
+        group relative w-full rounded-2xl p-5 sm:p-5.5 text-left transition-all duration-200
         border bg-white dark:bg-[#18241F] flex flex-col justify-between
-        ${selected
-          ? 'border-primary bg-primary-subtle/25 ring-2 ring-primary/25 shadow-card'
-          : 'border-border hover:border-primary/50 hover:shadow-card hover:-translate-y-0.5 shadow-subtle'
+        ${isSoldOut
+          ? 'border-border/80 opacity-80 cursor-default shadow-subtle'
+          : selected
+            ? 'border-primary bg-primary-subtle/25 ring-2 ring-primary/25 shadow-card cursor-pointer'
+            : 'border-border hover:border-primary/50 hover:shadow-card hover:-translate-y-0.5 shadow-subtle cursor-pointer'
         }
       `}
     >
@@ -150,17 +154,25 @@ export const VerticalRideCard = React.memo(({
         <button
           type="button"
           onClick={handleCardClick}
+          disabled={isSoldOut}
+          aria-disabled={isSoldOut}
           className={`
-            inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-extrabold transition-all duration-150 cursor-pointer shadow-sm
-            ${selected
-              ? 'bg-[#066649] text-white ring-2 ring-[#087F5B] ring-offset-2'
-              : 'bg-[#087F5B] hover:bg-[#066649] text-white group-hover:bg-[#066649]'
+            inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-extrabold transition-all duration-150 shadow-sm
+            ${isSoldOut
+              ? 'bg-border-subtle text-text-muted cursor-not-allowed opacity-75 border border-border'
+              : selected
+                ? 'bg-[#066649] text-white ring-2 ring-[#087F5B] ring-offset-2 cursor-pointer'
+                : 'bg-[#087F5B] hover:bg-[#066649] text-white group-hover:bg-[#066649] cursor-pointer'
             }
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F5B] focus-visible:ring-offset-2
           `}
         >
-          <span className="text-white tracking-wide">{selected ? 'Selected' : 'Select Ride'}</span>
-          <ArrowRight size={13} className="text-white transition-transform group-hover:translate-x-0.5" />
+          <span className="tracking-wide">
+            {isSoldOut ? 'Sold Out' : selected ? 'Selected' : 'Select Ride'}
+          </span>
+          {!isSoldOut && (
+            <ArrowRight size={13} className="text-white transition-transform group-hover:translate-x-0.5" />
+          )}
         </button>
       </div>
     </div>

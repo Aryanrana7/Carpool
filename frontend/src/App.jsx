@@ -44,7 +44,8 @@ const PageFallback = () => (
 
 const Layout = () => {
   const location = useLocation();
-  const isDriverRoute = location.pathname.startsWith('/driver');
+  // Keep shared Navbar stable during authentication portal switching (/login and /driver/login)
+  const isDriverRoute = location.pathname.startsWith('/driver') && location.pathname !== '/driver/login';
 
   useEffect(() => {
     document.title = 'CarPool';

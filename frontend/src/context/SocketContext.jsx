@@ -15,6 +15,8 @@ export const SocketProvider = ({ children }) => {
   const [driverLocation, setDriverLocation] = useState(null);
   const [rideStatus, setRideStatus] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [onDemandAssignment, setOnDemandAssignment] = useState(null);
+  const [onDemandStatus, setOnDemandStatus] = useState(null);
 
   useEffect(() => {
     if (!user?._id || !token) {
@@ -60,9 +62,6 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(false);
     };
   }, [user?._id, token]);
-
-  const [onDemandAssignment, setOnDemandAssignment] = useState(null);
-  const [onDemandStatus, setOnDemandStatus] = useState(null);
 
   return (
     <SocketContext.Provider value={{

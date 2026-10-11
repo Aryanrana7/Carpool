@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
+import { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { DriverSocketContext } from '../../context/DriverSocketContext';
@@ -191,28 +191,29 @@ const DriverDashboard = () => {
           <div className="flex items-center gap-3 flex-wrap">
             {/* HERO CONTROL: Online / Offline status toggle */}
             <button
+              type="button"
               onClick={handleToggleOnline}
               className={`
-                h-11 px-5 rounded-lg font-semibold text-sm flex items-center gap-2.5 transition-all shadow-subtle
+                h-11 px-4 sm:px-5 rounded-lg font-semibold text-sm inline-flex items-center gap-2.5 transition-all shadow-subtle shrink-0 select-none cursor-pointer
                 ${
                   isOnline
                     ? 'bg-success text-white hover:bg-success/90 ring-4 ring-success/20'
-                    : 'bg-surface text-text-muted border border-border hover:bg-background'
+                    : 'bg-surface text-text-muted border border-border hover:bg-background hover:text-text-primary'
                 }
               `}
-              aria-label={isOnline ? 'Go offline' : 'Go online'}
+              aria-label={isOnline ? 'Switch to offline' : 'Switch to online'}
             >
               {isOnline ? (
                 <>
-                  <Wifi size={16} />
-                  <span>Online & Ready</span>
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <Wifi size={16} className="shrink-0" />
+                  <span>Online</span>
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse shrink-0 ml-0.5" />
                 </>
               ) : (
                 <>
-                  <WifiOff size={16} />
-                  <span>Go Online</span>
-                  <span className="w-2 h-2 rounded-full bg-text-muted" />
+                  <WifiOff size={16} className="shrink-0 text-text-muted" />
+                  <span>Offline</span>
+                  <span className="w-2 h-2 rounded-full bg-text-muted shrink-0 ml-0.5" />
                 </>
               )}
             </button>
@@ -220,10 +221,10 @@ const DriverDashboard = () => {
             {/* Secondary Action: Post Scheduled Ride */}
             <Button
               variant="secondary"
+              leftIcon={PlusCircle}
               onClick={() => navigate('/driver/create-ride')}
-              className="h-11 text-xs"
+              className="h-11 px-4 rounded-lg font-semibold text-sm whitespace-nowrap shadow-subtle shrink-0"
             >
-              <PlusCircle size={15} className="mr-1.5" />
               Post Scheduled Ride
             </Button>
 
@@ -231,10 +232,9 @@ const DriverDashboard = () => {
             <IconButton
               icon={RefreshCw}
               variant="secondary"
-              size="md"
               ariaLabel="Refresh console"
               onClick={handleRefresh}
-              className={refreshing ? 'animate-spin' : ''}
+              className={`h-11 w-11 !min-h-[44px] !min-w-[44px] rounded-lg shadow-subtle shrink-0 ${refreshing ? 'animate-spin' : ''}`}
             />
           </div>
         </div>

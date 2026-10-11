@@ -18,6 +18,7 @@ const STATUS_MAP = {
 };
 
 const BookingRequestsPanel = ({ bookings, loading, onUpdateStatus }) => {
+  const [confirmRejectId, setConfirmRejectId] = React.useState(null);
   const pendingCount = bookings.filter((b) => b.status === 'pending').length;
 
   return (
@@ -108,24 +109,51 @@ const BookingRequestsPanel = ({ bookings, loading, onUpdateStatus }) => {
                   {/* Action controls */}
                   <div className="flex gap-2 pt-1">
                     {booking.status === 'pending' && (
-                      <>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="flex-1 bg-success hover:bg-success/90"
-                          onClick={() => onUpdateStatus(booking, 'confirmed')}
-                        >
-                          <Check size={14} className="mr-1" /> Accept
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => onUpdateStatus(booking, 'rejected')}
-                        >
-                          <X size={14} className="mr-1" /> Reject
-                        </Button>
-                      </>
+                      confirmRejectId === booking._id ? (
+                        <div className="flex flex-col gap-1.5 w-full bg-danger-subtle/50 p-2 rounded-lg border border-red-200 dark:border-red-900/40">
+                          <p className="text-[11px] font-semibold text-danger">Reject this passenger reservation?</p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => {
+                                setConfirmRejectId(null);
+                                onUpdateStatus(booking, 'rejected');
+                              }}
+                            >
+                              <X size={14} className="mr-1" /> Confirm Reject
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => setConfirmRejectId(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="flex-1 bg-success hover:bg-success/90"
+                            onClick={() => onUpdateStatus(booking, 'confirmed')}
+                          >
+                            <Check size={14} className="mr-1" /> Accept
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setConfirmRejectId(booking._id)}
+                          >
+                            <X size={14} className="mr-1" /> Reject
+                          </Button>
+                        </>
+                      )
                     )}
                     {booking.status === 'confirmed' && (
                       <Button
