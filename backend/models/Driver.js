@@ -11,6 +11,8 @@ const driverSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -31,6 +33,10 @@ const driverSchema = new mongoose.Schema(
     currentLocation: {
       lat: { type: Number, default: null },
       lng: { type: Number, default: null },
+    },
+    locationUpdatedAt: {
+      type: Date,
+      default: Date.now,
     },
     averageRating: {
       type: Number,
