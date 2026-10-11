@@ -13,9 +13,22 @@ router.get('/calculate', async (req, res) => {
     return res.status(400).json({ message: 'Source and destination coordinates are required' });
   }
 
+  const lat1 = parseFloat(srcLat);
+  const lng1 = parseFloat(srcLng);
+  const lat2 = parseFloat(dstLat);
+  const lng2 = parseFloat(dstLng);
+
+  if (
+    Number.isNaN(lat1) || Number.isNaN(lng1) || Number.isNaN(lat2) || Number.isNaN(lng2) ||
+    lat1 < -90 || lat1 > 90 || lat2 < -90 || lat2 > 90 ||
+    lng1 < -180 || lng1 > 180 || lng2 < -180 || lng2 > 180
+  ) {
+    return res.status(400).json({ message: 'Invalid source or destination coordinates' });
+  }
+
   try {
     // Query OSRM for real distance and duration
-    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${srcLng},${srcLat};${dstLng},${dstLat}?overview=false`;
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${lng1},${lat1};${lng2},${lat2}?overview=false`;
     const osrmRes = await axios.get(osrmUrl);
 
     if (osrmRes.data.code !== 'Ok' || !osrmRes.data.routes[0]) {
@@ -36,7 +49,7 @@ router.get('/calculate', async (req, res) => {
     });
   } catch (error) {
     console.error('Pricing error:', error.message);
-    res.status(500).json({ message: 'Failed to calculate pricing', error: error.message });
+    res.status(500).json({ message: 'Failed to calculate pricing' });
   }
 });
 

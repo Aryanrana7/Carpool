@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Ride = require('../models/Ride');
+const Review = require('../models/Review');
 const {
   ACTIVE_BOOKING_STATUSES,
   canDriverTransition,
@@ -34,7 +35,7 @@ const createBooking = async (req, res) => {
     const ride = await Ride.findOneAndUpdate(
       { _id: rideId, seats: { $gt: 0 }, status: 'active', time: { $gte: new Date() } },
       { $inc: { seats: -1 } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!ride) {
@@ -50,6 +51,7 @@ const createBooking = async (req, res) => {
         user: req.user._id,
         ride: rideId,
         status: 'pending',
+        paymentStatus: 'simulated_paid',
       });
       await syncRideStatus(rideId);
       return res.status(201).json(booking);
@@ -70,15 +72,24 @@ const getUserBookings = async (req, res) => {
     const bookings = await Booking.find({ user: req.user._id })
       .populate({
         path: 'ride',
-        select: 'source destination time price carType driver seats status',
+        select: 'source destination time price carType driver seats status sourceCoords destCoords',
         populate: {
           path: 'driver',
-          select: 'name email carModel carNumber averageRating totalReviews',
+          select: 'name email carModel carNumber averageRating totalReviews currentLocation',
         },
       })
       .sort({ createdAt: -1 });
 
-    res.json(bookings);
+    const reviews = await Review.find({ user: req.user._id, reviewerType: 'user' });
+    const reviewMap = new Map(reviews.map((r) => [r.booking.toString(), r]));
+
+    const bookingsWithReviews = bookings.map((b) => {
+      const obj = b.toObject();
+      obj.review = reviewMap.get(b._id.toString()) || null;
+      return obj;
+    });
+
+    res.json(bookingsWithReviews);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -114,7 +125,7 @@ const updateBookingStatus = async (req, res) => {
     const updatedBooking = await Booking.findOneAndUpdate(
       { _id: booking._id, user: req.user._id, status: previousStatus },
       { $set: { status } },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!updatedBooking) {
       return res.status(409).json({ message: 'Booking status changed; refresh and try again' });
@@ -173,7 +184,7 @@ const updateBookingStatusDriver = async (req, res) => {
     const updatedBooking = await Booking.findOneAndUpdate(
       { _id: booking._id, status: previousStatus },
       { $set: { status } },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!updatedBooking) {
       return res.status(409).json({ message: 'Booking status changed; refresh and try again' });
@@ -219,9 +230,44 @@ const getDriverStats = async (req, res) => {
   }
 };
 
+const getBookingById = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate({
+        path: 'ride',
+        select: 'source destination time price carType driver seats status sourceCoords destCoords',
+        populate: {
+          path: 'driver',
+          select: 'name email carModel carNumber averageRating totalReviews currentLocation',
+        },
+      })
+      .populate('user', 'name email');
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const isPassenger = req.user && booking.user._id.equals(req.user._id);
+    const isDriver = req.driver && booking.ride?.driver?._id?.equals(req.driver._id);
+
+    if (!isPassenger && !isDriver) {
+      return res.status(403).json({ message: 'Not authorized to view this booking' });
+    }
+
+    const review = await Review.findOne({ booking: booking._id, reviewerType: 'user' });
+    const bookingObj = booking.toObject();
+    bookingObj.review = review || null;
+
+    res.json(bookingObj);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   createBooking,
   getUserBookings,
+  getBookingById,
   updateBookingStatus,
   getDriverBookings,
   updateBookingStatusDriver,

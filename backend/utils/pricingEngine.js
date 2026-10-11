@@ -14,13 +14,7 @@ const RIDE_TYPES = {
 const getSurgeMultiplier = () => {
   const hour = new Date().getHours();
   const isPeakHour = (hour >= 8 && hour <= 10) || (hour >= 18 && hour <= 21);
-  
-  if (isPeakHour) {
-    // Surge between 1.3x and 2.0x during peak hours
-    return parseFloat((1.3 + Math.random() * 0.7).toFixed(2));
-  }
-  // Off-peak: light random surge between 1.0x and 1.2x
-  return parseFloat((1.0 + Math.random() * 0.2).toFixed(2));
+  return isPeakHour ? 1.5 : 1.0;
 };
 
 /**
