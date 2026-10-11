@@ -115,3 +115,25 @@ The repository does not document the original rationale.
 ## Consequences
 - Keeps the system self-contained without external dependencies.
 - Passwords must be securely hashed and stored in the application's database.
+
+---
+
+# Decision: Authentication Storage (Phase 6)
+
+## Status
+Decided
+
+## Context
+Phase 6 production readiness requires deciding between `localStorage` (susceptible to XSS) and `httpOnly` cookies (susceptible to CSRF, complex for Socket.io cross-origin) for JWT storage.
+
+## Decision
+Retain `localStorage` for the MVP/Portfolio stage with short-lived tokens (Phase 6), rather than adding the overhead of a full OAuth2/Refresh-Token flow with `httpOnly` cookies.
+
+## Reason
+- The application does not handle real financial data (payments are simulated).
+- Integrating `httpOnly` cookies requires significant rework of the `Socket.io` handshake mechanism (from headers to cookie parsing) which adds unnecessary complexity for a portfolio demonstration.
+- To mitigate XSS risks, the backend forces strict CORS policies, rate limiting, and `helmet` for robust headers (implemented in Phase 6).
+
+## Consequences
+- Tokens remain accessible to client-side scripts.
+- Eliminates the need for complex CSRF tokens.
