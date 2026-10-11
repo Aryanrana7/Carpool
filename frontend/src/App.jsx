@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { DriverAuthProvider } from './context/DriverAuthContext';
@@ -46,6 +46,10 @@ const PageFallback = () => (
 const Layout = () => {
   const location = useLocation();
   const isDriverRoute = location.pathname.startsWith('/driver');
+
+  useEffect(() => {
+    document.title = 'CarPool';
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col font-sans text-text-primary bg-background transition-colors duration-200">
