@@ -7,8 +7,17 @@ const generateToken = require('../utils/generateToken');
 const registerDriver = async (req, res) => {
   const { name, email, password, carModel, carNumber } = req.body;
 
+  if (!name || !email || !password || !carModel || !carNumber) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+
   try {
-    const driverExists = await Driver.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+    const driverExists = await Driver.findOne({ email: normalizedEmail });
 
     if (driverExists) {
       return res.status(400).json({ message: 'Driver already exists' });
@@ -16,7 +25,7 @@ const registerDriver = async (req, res) => {
 
     const driver = await Driver.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
       carModel,
       carNumber,
@@ -36,7 +45,8 @@ const registerDriver = async (req, res) => {
       res.status(400).json({ message: 'Invalid driver data' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Driver registration error:', error.message);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -46,8 +56,13 @@ const registerDriver = async (req, res) => {
 const loginDriver = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
   try {
-    const driver = await Driver.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+    const driver = await Driver.findOne({ email: normalizedEmail });
 
     if (driver && (await driver.matchPassword(password))) {
       res.json({
@@ -63,7 +78,8 @@ const loginDriver = async (req, res) => {
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Driver login error:', error.message);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -87,7 +103,55 @@ const getDriverProfile = async (req, res) => {
       res.status(404).json({ message: 'Driver not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Driver profile error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Update driver availability (online/offline)
+// @route   PUT /api/drivers/availability
+// @access  Private/Driver
+const updateDriverAvailability = async (req, res) => {
+  try {
+    const { isAvailable } = req.body;
+    const driver = await Driver.findByIdAndUpdate(
+      req.driver._id,
+      { isAvailable: Boolean(isAvailable) },
+      { new: true }
+    );
+    res.json({ isAvailable: driver.isAvailable });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Update driver current location
+// @route   PUT /api/drivers/location
+// @access  Private/Driver
+const updateDriverLocation = async (req, res) => {
+  try {
+    const { lat, lng } = req.body;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return res.status(400).json({ message: 'Invalid coordinates' });
+    }
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ message: 'Coordinates out of bounds' });
+    }
+
+    const driver = await Driver.findByIdAndUpdate(
+      req.driver._id,
+      {
+        currentLocation: { lat, lng },
+        locationUpdatedAt: new Date(),
+      },
+      { new: true }
+    );
+    res.json({
+      currentLocation: driver.currentLocation,
+      locationUpdatedAt: driver.locationUpdatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -95,4 +159,6 @@ module.exports = {
   registerDriver,
   loginDriver,
   getDriverProfile,
+  updateDriverAvailability,
+  updateDriverLocation,
 };

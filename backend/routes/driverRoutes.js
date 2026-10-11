@@ -1,14 +1,25 @@
 const express = require('express');
-const router = express.Router();
 const {
   registerDriver,
   loginDriver,
   getDriverProfile,
+  updateDriverAvailability,
+  updateDriverLocation,
 } = require('../controllers/driverController');
 const { protectDriver } = require('../middleware/authMiddleware');
 
-router.post('/register', registerDriver);
-router.post('/login', loginDriver);
-router.route('/profile').get(protectDriver, getDriverProfile);
+const createDriverRoutes = (authLimiter) => {
+  const router = express.Router();
+  const authMiddleware = authLimiter || ((req, res, next) => next());
 
-module.exports = router;
+  router.post('/register', authMiddleware, registerDriver);
+  router.post('/login', authMiddleware, loginDriver);
+  router.route('/profile').get(protectDriver, getDriverProfile);
+  router.route('/availability').put(protectDriver, updateDriverAvailability);
+  router.route('/location').put(protectDriver, updateDriverLocation);
+
+  return router;
+};
+
+module.exports = createDriverRoutes;
+

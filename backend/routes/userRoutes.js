@@ -1,8 +1,17 @@
 const express = require('express');
-const router = express.Router();
-const { authUser, registerUser } = require('../controllers/userController');
+const { authUser, registerUser, googleAuth, linkGoogleAccount } = require('../controllers/userController');
+const { protect } = require('../middleware/authMiddleware');
 
-router.route('/').post(registerUser);
-router.post('/login', authUser);
+const createUserRoutes = (authLimiter) => {
+  const router = express.Router();
+  const authMiddleware = authLimiter || ((req, res, next) => next());
 
-module.exports = router;
+  router.route('/').post(authMiddleware, registerUser);
+  router.post('/login', authMiddleware, authUser);
+  router.post('/google', authMiddleware, googleAuth);
+  router.post('/link-google', protect, linkGoogleAccount);
+
+  return router;
+};
+
+module.exports = createUserRoutes;
