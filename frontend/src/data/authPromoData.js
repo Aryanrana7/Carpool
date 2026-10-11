@@ -183,12 +183,7 @@ export const DRIVER_VARIANTS = [
   }
 ];
 
-/**
- * Stable, refresh-based content rotation helper.
- * Selects a variant on full page refresh and avoids consecutive repeats using sessionStorage.
- * Completely stable during the current React session.
- */
-export const getRotatingVariant = (role) => {
+export const getRotatingVariantIndex = (role) => {
   const list = role === 'driver' ? DRIVER_VARIANTS : PASSENGER_VARIANTS;
   const storageKey = `carpool_promo_${role}_variant_index`;
 
@@ -219,8 +214,20 @@ export const getRotatingVariant = (role) => {
       window.sessionStorage.setItem(storageKey, nextIndex.toString());
     }
 
-    return list[nextIndex] || list[0];
+    return nextIndex >= 0 && nextIndex < list.length ? nextIndex : 0;
   } catch {
-    return list[0];
+    return 0;
   }
 };
+
+/**
+ * Stable, refresh-based content rotation helper.
+ * Selects a variant on full page refresh and avoids consecutive repeats using sessionStorage.
+ * Completely stable during the current React session.
+ */
+export const getRotatingVariant = (role) => {
+  const list = role === 'driver' ? DRIVER_VARIANTS : PASSENGER_VARIANTS;
+  const index = getRotatingVariantIndex(role);
+  return list[index] || list[0];
+};
+

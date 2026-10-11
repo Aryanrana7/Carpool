@@ -236,3 +236,41 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-text-muted);
 }
+
+/* Auth Promotional Panel Mobility Animations */
+@keyframes dashFlow {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-dash-flow {
+  animation: dashFlow 2s linear infinite;
+}
+
+@keyframes waypointGlow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.12);
+  }
+}
+
+.animate-waypoint-glow {
+  transform-origin: center;
+  animation: waypointGlow 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-dash-flow,
+  .animate-waypoint-glow {
+    animation: none !important;
+  }
+}
+
