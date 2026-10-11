@@ -147,12 +147,7 @@ export const HeroBookingSection = ({
 
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* ── 1. Top Centered Headline & Context ─────────── */}
-        <div className="text-center space-y-3 mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#087F5B]/20 text-[#D9EEE4] border border-[#087F5B]/35 text-xs font-bold uppercase tracking-wider shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-[#087F5B] animate-pulse" />
-            <span>Verified Mobility Platform</span>
-          </div>
-
+        <div className="text-center space-y-3.5 mb-8">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white font-heading">
             Your Journey. Shared.
           </h1>
