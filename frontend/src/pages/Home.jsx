@@ -72,8 +72,13 @@ const Home = () => {
         const { data } = await api.get('/rides');
         if (Array.isArray(data)) {
           const now = new Date();
-          const valid = data.filter((r) => r.status === 'active' && r.seats > 0 && new Date(r.time) >= now);
-          setFeaturedRides(valid);
+          // Filter active rides that still have seats available
+          const activeWithSeats = data.filter((r) => r.status === 'active' && (r.seats || 0) > 0);
+          const upcoming = activeWithSeats.filter((r) => new Date(r.time) >= now);
+          // Prioritize upcoming departures; fallback to all active rides if seed timestamps are past
+          const candidates = upcoming.length > 0 ? upcoming : activeWithSeats;
+          const sorted = [...candidates].sort((a, b) => new Date(a.time) - new Date(b.time));
+          setFeaturedRides(sorted);
         }
       } catch {
         // silent

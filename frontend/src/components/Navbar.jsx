@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Car, Compass, Calendar, LogOut, ArrowRight, User } from 'lucide-react';
+import { Car, Compass, Calendar, LogOut, ArrowRight, User, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 export const Navbar = () => {
@@ -18,15 +18,21 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[1000] h-[68px] flex items-center px-4 sm:px-8 bg-surface/95 backdrop-blur-md border-b border-border transition-colors">
-        {/* Brand Logo */}
+      <header className="fixed top-0 left-0 right-0 z-[1100] h-[68px] flex items-center px-4 sm:px-8 bg-surface/98 backdrop-blur-md border-b border-border shadow-xs transition-colors">
+        {/* Brand Logo with Mobility mark */}
         <Link to="/" className="flex items-center gap-2.5 mr-8 shrink-0 group">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
             <Car size={18} />
           </div>
           <div className="flex flex-col">
-            <span className="text-base font-bold tracking-tight text-ink leading-tight">
-              CarPool
+            <div className="flex items-baseline gap-1 leading-none">
+              <span className="text-base font-extrabold tracking-tight text-ink font-heading">
+                CarPool
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-text-muted leading-none mt-0.5">
+              Mobility
             </span>
           </div>
         </Link>
@@ -36,9 +42,9 @@ export const Navbar = () => {
           <Link
             to="/"
             className={`
-              px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
+              px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2
               ${pathname === '/'
-                ? 'bg-primary-subtle text-primary'
+                ? 'bg-primary-subtle text-primary font-bold shadow-xs'
                 : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
               }
             `}
@@ -51,9 +57,9 @@ export const Navbar = () => {
             <Link
               to="/my-rides"
               className={`
-                px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2
+                px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2
                 ${pathname === '/my-rides'
-                  ? 'bg-primary-subtle text-primary'
+                  ? 'bg-primary-subtle text-primary font-bold shadow-xs'
                   : 'text-text-secondary hover:text-text-primary hover:bg-border-subtle'
                 }
               `}
@@ -65,7 +71,7 @@ export const Navbar = () => {
 
           <Link
             to="/driver/dashboard"
-            className="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-2 text-text-secondary hover:text-text-primary hover:bg-border-subtle"
+            className="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 text-text-secondary hover:text-text-primary hover:bg-border-subtle"
           >
             <Car size={15} />
             <span>Offer a Ride</span>
@@ -73,15 +79,15 @@ export const Navbar = () => {
         </nav>
 
         {/* Right Actions */}
-        <div className="ml-auto flex items-center gap-2.5">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {/* Switch to Driver Portal Button */}
           <Link
             to="/driver/dashboard"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-border bg-surface hover:bg-background text-text-secondary hover:text-text-primary transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-primary/25 bg-primary-subtle/40 hover:bg-primary-subtle text-primary transition-all duration-150 shadow-xs"
           >
             <Car size={14} className="text-primary" />
             <span>Driver Portal</span>
-            <ArrowRight size={12} className="text-text-muted" />
+            <ArrowRight size={12} className="opacity-70" />
           </Link>
 
           {/* Theme Toggle */}
@@ -93,16 +99,17 @@ export const Navbar = () => {
               <button
                 type="button"
                 onClick={() => setProfileOpen((prev) => !prev)}
-                className="flex items-center gap-2 p-1 pl-2 rounded-md hover:bg-border-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-lg border border-border bg-surface hover:bg-border-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer group"
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
               >
-                <div className="w-7 h-7 rounded-full bg-primary-subtle text-primary border border-primary/20 flex items-center justify-center text-xs font-bold shrink-0">
-                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                <div className="w-7 h-7 rounded-full bg-primary-subtle text-primary border border-primary/30 flex items-center justify-center text-xs font-bold shrink-0">
+                  {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
                 </div>
-                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[100px] truncate">
-                  {user.name}
+                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[110px] truncate">
+                  {user.name || user.email?.split('@')[0] || 'Account'}
                 </span>
+                <ChevronDown size={13} className="text-text-muted transition-transform group-hover:text-text-primary" />
               </button>
 
               {/* Profile Dropdown Menu */}
@@ -182,7 +189,7 @@ export const Navbar = () => {
       {user && (
         <nav
           aria-label="Mobile Navigation"
-          className="md:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-surface/95 backdrop-blur-md border-t border-border flex items-center justify-around py-2 safe-area-bottom shadow-card"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[1100] bg-surface/98 backdrop-blur-md border-t border-border flex items-center justify-around py-2 safe-area-bottom shadow-card"
         >
           <Link
             to="/"

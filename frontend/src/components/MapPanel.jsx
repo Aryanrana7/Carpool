@@ -224,7 +224,7 @@ export const MapPanel = ({
   const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
-    <div className="w-full h-full relative z-0 overflow-hidden bg-background">
+    <div className="w-full h-full relative z-0 overflow-hidden bg-background isolate">
       <MapContainer
         center={
           source && source.lat
@@ -404,7 +404,7 @@ export const MapPanel = ({
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 50, opacity: 0 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-ink text-white px-5 py-2.5 rounded-full shadow-overlay flex items-center gap-2.5 font-semibold text-xs border border-white/10"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[500] bg-ink text-white px-5 py-2.5 rounded-full shadow-overlay flex items-center gap-2.5 font-semibold text-xs border border-white/10"
             role="status"
             aria-live="polite"
           >

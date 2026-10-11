@@ -42,7 +42,7 @@ const Layout = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans text-text-primary bg-background transition-colors duration-200">
       {isDriverRoute ? <DriverNavbar /> : <Navbar />}
-      <main className="flex-1 flex flex-col relative pt-[68px]">
+      <main className="flex-1 flex flex-col relative pt-[68px] isolate">
         <Suspense fallback={<PageFallback />}>
           <Outlet />
         </Suspense>
