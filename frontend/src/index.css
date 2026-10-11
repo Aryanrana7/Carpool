@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Brand & Ink Tokens — Original Emerald & Forest Identity */
+    /* Brand & Ink Tokens — Authoritative Brand Palette */
     --color-ink: #18241F; /* Deep forest charcoal */
     --color-primary: #087F5B; /* Primary emerald */
     --color-primary-hover: #066649;
@@ -37,6 +37,15 @@
     --color-info-subtle: #D9EEE4;
 
     --nav-height: 68px;
+
+    /* Derived Lighter Surfaces & Canvas Tokens (1-2 shades lighter variations) */
+    --color-bg-canvas: #FAF9F5; /* Fresh, luminous warm ivory canvas */
+    --color-hero-bg: #1F3028; /* Lighter, welcoming forest green derived from --color-ink */
+    --color-hero-surface: #273D33;
+    --color-hero-border: #324C40;
+    --color-card-surface: #FFFFFF;
+    --color-card-border: #DCE4DE;
+    --color-pill-bg: #EBF4F0;
   }
 
   .dark {
@@ -71,6 +80,15 @@
     --color-danger-subtle: rgba(239, 83, 80, 0.16);
     --color-info: #12B886;
     --color-info-subtle: rgba(18, 184, 134, 0.16);
+
+    /* Derived Dark Surfaces & Canvas Tokens */
+    --color-bg-canvas: #0F1714;
+    --color-hero-bg: #14221B;
+    --color-hero-surface: #1B2C24;
+    --color-hero-border: #253D32;
+    --color-card-surface: #18241F;
+    --color-card-border: #2B3D35;
+    --color-pill-bg: #1B2923;
   }
 
   * {

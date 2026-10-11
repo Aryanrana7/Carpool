@@ -24,16 +24,16 @@ export const RouteConnector = ({
         {/* Responsive timeline dots & flex connecting line */}
         <div className="flex flex-col items-center justify-between shrink-0 py-0.5 select-none" aria-hidden="true">
           {/* Pickup node (Emerald) */}
-          <div className="w-3.5 h-3.5 rounded-full border-2 border-primary flex items-center justify-center bg-surface shrink-0 shadow-xs">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <div className="w-3.5 h-3.5 rounded-full border-2 border-[#087F5B] flex items-center justify-center bg-white dark:bg-[#18241F] shrink-0 shadow-xs">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#087F5B]" />
           </div>
 
           {/* Flexible connecting line */}
           <div className="w-0.5 flex-1 min-h-[24px] my-1 border-l-2 border-dashed border-border" />
 
           {/* Destination node (Forest Charcoal) */}
-          <div className="w-3.5 h-3.5 rounded-sm bg-ink dark:bg-primary-subtle border border-ink dark:border-primary flex items-center justify-center shrink-0 shadow-xs">
-            <div className="w-1.5 h-1.5 bg-white dark:bg-primary rounded-[1px]" />
+          <div className="w-3.5 h-3.5 rounded-sm bg-[#18241F] dark:bg-[#087F5B] border border-[#18241F] dark:border-[#087F5B] flex items-center justify-center shrink-0 shadow-xs">
+            <div className="w-1.5 h-1.5 bg-white rounded-[1px]" />
           </div>
         </div>
 

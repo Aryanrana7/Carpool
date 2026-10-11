@@ -323,7 +323,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-68px)] w-full bg-background flex flex-col font-sans transition-colors">
+    <div className="min-h-[calc(100vh-68px)] w-full bg-[#FAF9F5] dark:bg-[#0F1714] flex flex-col font-sans transition-colors">
       {/* ── 1. Bold, Full-Width Booking Hero (Centerpiece) ── */}
       <HeroBookingSection
         source={source}

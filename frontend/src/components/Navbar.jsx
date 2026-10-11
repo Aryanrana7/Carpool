@@ -18,7 +18,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[1100] h-[68px] flex items-center px-4 sm:px-8 bg-surface/98 backdrop-blur-md border-b border-border shadow-xs transition-colors">
+      <header className="fixed top-0 left-0 right-0 z-[1100] h-[68px] flex items-center px-4 sm:px-8 bg-white/95 dark:bg-[#18241F]/95 backdrop-blur-md border-b border-border shadow-xs transition-colors">
         {/* Brand Logo with Mobility mark */}
         <Link to="/" className="flex items-center gap-2.5 mr-8 shrink-0 group">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
@@ -83,7 +83,7 @@ export const Navbar = () => {
           {/* Switch to Driver Portal Button */}
           <Link
             to="/driver/dashboard"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-primary/25 bg-primary-subtle/40 hover:bg-primary-subtle text-primary transition-all duration-150 shadow-xs"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/30 bg-[#E8F5EF] dark:bg-[#1C362B] hover:bg-primary-subtle text-primary transition-all duration-150 shadow-xs"
           >
             <Car size={14} className="text-primary" />
             <span>Driver Portal</span>
@@ -99,14 +99,14 @@ export const Navbar = () => {
               <button
                 type="button"
                 onClick={() => setProfileOpen((prev) => !prev)}
-                className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-lg border border-border bg-surface hover:bg-border-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer group"
+                className="flex items-center gap-2 h-9 px-2 rounded-lg border border-border bg-white dark:bg-[#18241F] hover:bg-border-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer group"
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
               >
-                <div className="w-7 h-7 rounded-full bg-primary-subtle text-primary border border-primary/30 flex items-center justify-center text-xs font-bold shrink-0">
+                <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-xs">
                   {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
                 </div>
-                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[110px] truncate">
+                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[120px] truncate">
                   {user.name || user.email?.split('@')[0] || 'Account'}
                 </span>
                 <ChevronDown size={13} className="text-text-muted transition-transform group-hover:text-text-primary" />
@@ -189,7 +189,7 @@ export const Navbar = () => {
       {user && (
         <nav
           aria-label="Mobile Navigation"
-          className="md:hidden fixed bottom-0 left-0 right-0 z-[1100] bg-surface/98 backdrop-blur-md border-t border-border flex items-center justify-around py-2 safe-area-bottom shadow-card"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[1100] bg-white/95 dark:bg-[#18241F]/95 backdrop-blur-md border-t border-border flex items-center justify-around py-2 safe-area-bottom shadow-card"
         >
           <Link
             to="/"

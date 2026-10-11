@@ -78,7 +78,7 @@ export const RideResultsSection = ({
   }, [featuredRides, selectedCorridorFilter]);
 
   return (
-    <section id="results-section" className="w-full py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background border-b border-border transition-colors">
+    <section id="results-section" className="w-full py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF9F5] dark:bg-[#0F1714] border-b border-border transition-colors">
       <div className="max-w-7xl mx-auto space-y-10">
         {hasSearched ? (
           /* ── Case A: Active Search Results View ──────────────── */

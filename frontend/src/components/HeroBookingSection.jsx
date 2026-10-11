@@ -126,9 +126,9 @@ export const HeroBookingSection = ({
   };
 
   return (
-    <section className="relative w-full bg-[#18241F] text-[#F6F4EC] border-b border-[#21322B] py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 select-none overflow-hidden transition-colors">
+    <section className="relative w-full bg-gradient-to-b from-[#1C2E25] via-[#22382D] to-[#1C2E25] text-[#FAF9F5] border-b border-[#2D4538] py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors">
       {/* ── Signature Motif: Shared Journey Route Background ─ */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.07] flex items-center justify-center overflow-hidden" aria-hidden="true">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.08] flex items-center justify-center overflow-hidden" aria-hidden="true">
         <svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
           {/* Commuter 1 route line */}
           <path d="M100 500 C 300 450, 400 350, 600 300" stroke="#087F5B" strokeWidth="3" strokeDasharray="6 6" />
@@ -148,23 +148,23 @@ export const HeroBookingSection = ({
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* ── 1. Top Centered Headline & Context ─────────── */}
         <div className="text-center space-y-3 mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#087F5B]/15 text-[#D9EEE4] border border-[#087F5B]/30 text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#087F5B]/20 text-[#D9EEE4] border border-[#087F5B]/35 text-xs font-bold uppercase tracking-wider shadow-xs">
             <span className="w-2 h-2 rounded-full bg-[#087F5B] animate-pulse" />
             <span>Verified Mobility Platform</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-[#F6F4EC] font-heading">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white font-heading">
             Your Journey. Shared.
           </h1>
 
-          <p className="text-[#A3B5AC] text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-[#C2D4CB] text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
             Connect with verified daily carpools or dispatch instant on-demand rides. Share travel costs, reduce road congestion, and commute with confidence.
           </p>
         </div>
 
         {/* ── 2. Refined Emerald Ride-Mode Segmented Control ─ */}
         <div className="flex items-center justify-center mb-7">
-          <div className="inline-flex items-center p-1 rounded-xl bg-[#0F1714] border border-[#2B3D35] shadow-inner gap-1">
+          <div className="inline-flex items-center p-1 rounded-xl bg-[#14211A] border border-[#2B4034] shadow-inner gap-1">
             <button
               type="button"
               onClick={() => onModeChange('scheduled')}
@@ -172,7 +172,7 @@ export const HeroBookingSection = ({
                 flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer
                 ${mode === 'scheduled'
                   ? 'bg-[#087F5B] text-white shadow-sm ring-1 ring-[#087F5B]/50'
-                  : 'text-[#A3B5AC] hover:text-[#F6F4EC] hover:bg-white/5'
+                  : 'text-[#C2D4CB] hover:text-white hover:bg-white/5'
                 }
               `}
             >
@@ -187,7 +187,7 @@ export const HeroBookingSection = ({
                 flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer
                 ${mode === 'on_demand'
                   ? 'bg-[#087F5B] text-white shadow-sm ring-1 ring-[#087F5B]/50'
-                  : 'text-[#A3B5AC] hover:text-[#F6F4EC] hover:bg-white/5'
+                  : 'text-[#C2D4CB] hover:text-white hover:bg-white/5'
                 }
               `}
             >
@@ -198,7 +198,7 @@ export const HeroBookingSection = ({
         </div>
 
         {/* ── 3. Elevated Grounded Booking Card (White Surface) ── */}
-        <div className="bg-white dark:bg-[#15201B] text-[#18241F] dark:text-[#F6F4EC] rounded-2xl shadow-2xl p-5 sm:p-6 border border-[#DCE4DE] dark:border-[#2B3D35] max-w-5xl mx-auto transition-colors">
+        <div className="bg-white dark:bg-[#15201B] text-[#18241F] dark:text-[#F6F4EC] rounded-2xl shadow-xl p-5 sm:p-6 border border-[#DCE4DE] dark:border-[#2B3D35] max-w-5xl mx-auto transition-colors">
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'scheduled' ? (
               /* Scheduled Carpools Horizontal / Responsive Grid */
@@ -234,7 +234,7 @@ export const HeroBookingSection = ({
                   <button
                     type="button"
                     onClick={handleSwap}
-                    className="w-10 h-10 rounded-xl bg-[#D9EEE4] text-[#087F5B] hover:bg-[#087F5B] hover:text-white border border-[#087F5B]/30 transition-all active:scale-95 shadow-sm flex items-center justify-center cursor-pointer"
+                    className="w-10 h-10 rounded-xl bg-[#E8F5EF] text-[#087F5B] hover:bg-[#087F5B] hover:text-white border border-[#087F5B]/25 transition-all active:scale-95 shadow-xs flex items-center justify-center cursor-pointer"
                     title="Swap pickup and destination"
                     aria-label="Swap pickup and destination"
                   >
@@ -401,7 +401,7 @@ export const HeroBookingSection = ({
 
         {/* ── 4. Popular Destination Quick Chips ─────────── */}
         <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-2.5 mt-5">
-          <span className="text-xs font-semibold text-[#A3B5AC] flex items-center gap-1.5">
+          <span className="text-xs font-semibold text-[#C2D4CB] flex items-center gap-1.5">
             <Navigation size={13} className="text-[#087F5B]" />
             <span>Popular Commutes:</span>
           </span>
@@ -412,9 +412,9 @@ export const HeroBookingSection = ({
                 key={dest.name}
                 type="button"
                 onClick={() => handlePopularSelect(dest)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/15 text-[#F6F4EC] border border-white/10 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/15 text-[#FAF9F5] border border-white/15 transition-all cursor-pointer shadow-xs"
               >
-                <Icon size={12} className="opacity-70 text-[#D9EEE4]" />
+                <Icon size={12} className="opacity-80 text-[#D9EEE4]" />
                 <span>{dest.name}</span>
               </button>
             );

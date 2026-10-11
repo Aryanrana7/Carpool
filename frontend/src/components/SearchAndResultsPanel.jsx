@@ -153,14 +153,24 @@ const VerticalRideCard = React.memo(({
       </div>
 
       {/* 5. Select CTA Row */}
-      <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between text-xs">
-        <span className="text-text-muted font-medium">
+      <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between gap-3 text-xs">
+        <span className="text-text-muted font-medium truncate">
           Vehicle: <strong className="text-text-primary">{ride.carType || ride.driver?.carModel || 'Sedan'}</strong>
         </span>
-        <span className="inline-flex items-center gap-1 font-semibold text-primary group">
-          <span>{selected ? 'Viewing Details' : 'Select Ride'}</span>
-          <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-        </span>
+        <button
+          type="button"
+          onClick={() => onSelect(ride)}
+          className={`
+            inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer shadow-sm shrink-0
+            ${selected
+              ? 'bg-[#066649] text-white ring-2 ring-[#087F5B] ring-offset-1'
+              : 'bg-[#087F5B] hover:bg-[#066649] text-white'
+            }
+          `}
+        >
+          <span className="text-white">{selected ? 'Viewing Details' : 'Select Ride'}</span>
+          <ArrowRight size={13} className="text-white transition-transform group-hover:translate-x-0.5" />
+        </button>
       </div>
     </motion.div>
   );

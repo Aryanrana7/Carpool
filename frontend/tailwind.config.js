@@ -40,6 +40,13 @@ export default {
           text: 'var(--color-accent-text)',
         },
         background: 'var(--color-background)',
+        canvas: 'var(--color-bg-canvas)',
+        'hero-bg': 'var(--color-hero-bg)',
+        'hero-surface': 'var(--color-hero-surface)',
+        'hero-border': 'var(--color-hero-border)',
+        'card-surface': 'var(--color-card-surface)',
+        'card-border': 'var(--color-card-border)',
+        'pill-bg': 'var(--color-pill-bg)',
         surface: {
           DEFAULT: 'var(--color-surface)',
           raised: 'var(--color-surface-raised)',
