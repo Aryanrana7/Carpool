@@ -52,6 +52,13 @@ export const GoogleSignInButton = ({ onSuccess, onError, disabled = false, text 
     }
   }, [onError, onSuccess]);
 
+  const handleGoogleResponseRef = useRef(handleGoogleResponse);
+  useEffect(() => {
+    handleGoogleResponseRef.current = handleGoogleResponse;
+  }, [handleGoogleResponse]);
+
+  const initializedClientIdRef = useRef(null);
+
   useEffect(() => {
     if (!isConfigured) return;
 
@@ -60,12 +67,19 @@ export const GoogleSignInButton = ({ onSuccess, onError, disabled = false, text 
     const initializeGoogle = () => {
       if (!isMounted || !window.google?.accounts?.id || !buttonRef.current) return;
       try {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleGoogleResponse,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-        });
+        if (initializedClientIdRef.current !== clientId) {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (response) => {
+              if (handleGoogleResponseRef.current) {
+                handleGoogleResponseRef.current(response);
+              }
+            },
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+          initializedClientIdRef.current = clientId;
+        }
 
         if (buttonRef.current) {
           buttonRef.current.innerHTML = '';
@@ -101,7 +115,7 @@ export const GoogleSignInButton = ({ onSuccess, onError, disabled = false, text 
     return () => {
       isMounted = false;
     };
-  }, [clientId, handleGoogleResponse, isConfigured]);
+  }, [clientId, isConfigured]);
 
   const handleCustomClick = () => {
     if (!isConfigured) {
