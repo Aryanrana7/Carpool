@@ -88,15 +88,20 @@ const Home = () => {
     fetchUpcomingRides();
   }, []);
 
-  // Check for active on-demand request on mount
+  // Check for active on-demand request on mount or user change
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setOnDemandRequest(null);
+      return;
+    }
     const fetchActive = async () => {
       try {
         const { data } = await api.get('/ride-requests/active');
         if (data.activeRequest) {
           setOnDemandRequest(data.activeRequest);
           setSearchMode('on_demand');
+        } else {
+          setOnDemandRequest(null);
         }
       } catch {
         // silent
@@ -133,6 +138,10 @@ const Home = () => {
           toast.success('Ride completed! Please rate your driver.');
         } else if (onDemandStatus.status === 'cancelled') {
           toast.error('Ride was cancelled.');
+          setOnDemandRequest(null);
+        } else if (onDemandStatus.status === 'expired') {
+          toast('Ride request expired.', { icon: '⏱️' });
+          setOnDemandRequest(null);
         }
       }
     }

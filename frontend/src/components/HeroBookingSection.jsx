@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import LocationInput from './LocationInput';
 import PricingPanel from './PricingPanel';
 import Button from './ui/Button';
+import UnifiedSearchBar from './ui/UnifiedSearchBar';
 import {
   MapPin,
   Calendar,
@@ -126,48 +126,40 @@ export const HeroBookingSection = ({
   };
 
   return (
-    <section className="relative w-full bg-gradient-to-b from-[#1C2E25] via-[#22382D] to-[#1C2E25] text-[#FAF9F5] border-b border-[#2D4538] py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors">
-      {/* ── Signature Motif: Shared Journey Route Background ─ */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.08] flex items-center justify-center overflow-hidden" aria-hidden="true">
-        <svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Commuter 1 route line */}
-          <path d="M100 500 C 300 450, 400 350, 600 300" stroke="#087F5B" strokeWidth="3" strokeDasharray="6 6" />
-          {/* Commuter 2 route line */}
-          <path d="M1100 500 C 900 450, 800 350, 600 300" stroke="#D9EEE4" strokeWidth="3" strokeDasharray="6 6" />
-          {/* Combined shared journey highway */}
-          <path d="M600 300 C 600 200, 600 150, 600 60" stroke="#087F5B" strokeWidth="4" />
-          {/* Shared destination hub */}
-          <circle cx="600" cy="300" r="14" fill="#087F5B" />
-          <circle cx="600" cy="300" r="6" fill="#F6F4EC" />
-          <circle cx="100" cy="500" r="8" fill="#087F5B" />
-          <circle cx="1100" cy="500" r="8" fill="#D9EEE4" />
-          <circle cx="600" cy="60" r="10" fill="#E8A45B" />
+    <section className="relative w-full bg-[#EDF5F0] dark:bg-[#111C16] text-text-primary border-b border-border py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors">
+      {/* ── Soft Rolling Hills / Topographic Waves Motif ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden dark:opacity-15" aria-hidden="true">
+        <svg className="absolute inset-0 w-full h-full object-cover" viewBox="0 0 1440 560" fill="none" preserveAspectRatio="none">
+          <path d="M0 220 C320 140 680 320 1440 160 L1440 560 L0 560 Z" fill="#E0EDE4" opacity="0.45" />
+          <path d="M0 290 C420 200 860 380 1440 240 L1440 560 L0 560 Z" fill="#E6F2EA" opacity="0.65" />
+          <path d="M0 360 C520 270 980 410 1440 310 L1440 560 L0 560 Z" fill="#EEF6F1" opacity="0.85" />
+          <path d="M0 430 C600 350 1100 460 1440 380 L1440 560 L0 560 Z" fill="#F7FAF8" opacity="0.95" />
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto">
+      <div className="relative z-10 max-w-6xl mx-auto isolate">
         {/* ── 1. Top Centered Headline & Context ─────────── */}
         <div className="text-center space-y-3.5 mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white font-heading">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-primary font-heading antialiased">
             Your Journey. Shared.
           </h1>
 
-          <p className="text-[#C2D4CB] text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-text-secondary text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
             Connect with verified daily carpools or dispatch instant on-demand rides. Share travel costs, reduce road congestion, and commute with confidence.
           </p>
         </div>
 
-        {/* ── 2. Refined Emerald Ride-Mode Segmented Control ─ */}
+        {/* ── 2. Pine Green Ride-Mode Segmented Control ─── */}
         <div className="flex items-center justify-center mb-7">
-          <div className="inline-flex items-center p-1 rounded-xl bg-[#14211A] border border-[#2B4034] shadow-inner gap-1">
+          <div className="inline-flex items-center p-1 rounded-xl bg-[#DFECE4] dark:bg-[#1D2D24] border border-[#D2E2D8] dark:border-[#24382D] shadow-inner gap-1">
             <button
               type="button"
               onClick={() => onModeChange('scheduled')}
               className={`
                 flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer
                 ${mode === 'scheduled'
-                  ? 'bg-[#087F5B] text-white shadow-sm ring-1 ring-[#087F5B]/50'
-                  : 'text-[#C2D4CB] hover:text-white hover:bg-white/5'
+                  ? 'bg-primary text-white shadow-sm ring-1 ring-primary/50'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-white/50 dark:hover:bg-white/5'
                 }
               `}
             >
@@ -181,8 +173,8 @@ export const HeroBookingSection = ({
               className={`
                 flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer
                 ${mode === 'on_demand'
-                  ? 'bg-[#087F5B] text-white shadow-sm ring-1 ring-[#087F5B]/50'
-                  : 'text-[#C2D4CB] hover:text-white hover:bg-white/5'
+                  ? 'bg-primary text-white shadow-sm ring-1 ring-primary/50'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-white/50 dark:hover:bg-white/5'
                 }
               `}
             >
@@ -192,212 +184,112 @@ export const HeroBookingSection = ({
           </div>
         </div>
 
-        {/* ── 3. Elevated Grounded Booking Card (White Surface) ── */}
-        <div className="bg-white dark:bg-[#15201B] text-[#18241F] dark:text-[#F6F4EC] rounded-2xl shadow-xl p-5 sm:p-6 border border-[#DCE4DE] dark:border-[#2B3D35] max-w-5xl mx-auto transition-colors">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'scheduled' ? (
-              /* Scheduled Carpools Horizontal / Responsive Grid */
+        {/* ── 3. Unified BlaBlaCar-Style Search Bar (Scheduled) OR On-Demand Card ── */}
+        {mode === 'scheduled' ? (
+          <UnifiedSearchBar
+            source={source}
+            destination={destination}
+            onSourceChange={onSourceChange}
+            onDestinationChange={onDestinationChange}
+            departureDate={departureDate}
+            onDepartureDateChange={setDepartureDate}
+            passengerCount={passengerCount}
+            onPassengerCountChange={setPassengerCount}
+            onSwap={handleSwap}
+            onGeolocate={handleGeolocate}
+            geolocating={geolocating}
+            onSubmit={handleSubmit}
+            loading={loadingRides}
+            buttonText="Search"
+            buttonIcon={Search}
+          />
+        ) : (
+          /* Instant On-Demand Mode Form */
+          <div className="bg-surface text-text-primary rounded-2xl shadow-card p-5 sm:p-6 border border-border max-w-5xl mx-auto transition-colors">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                {/* Pickup Field */}
-                <div className="md:col-span-3">
+                <div className="md:col-span-4">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC]">
-                      Pickup Point
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">
+                      Pickup Location
                     </label>
                     <button
                       type="button"
                       onClick={handleGeolocate}
                       disabled={geolocating}
-                      className="text-[11px] text-[#087F5B] hover:text-[#066649] font-semibold flex items-center gap-1 cursor-pointer"
-                      title="Use current GPS location"
+                      className="text-[11px] text-primary hover:text-primary-hover font-semibold flex items-center gap-1 cursor-pointer"
                     >
                       <LocateFixed size={12} className={geolocating ? 'animate-spin' : ''} />
                       <span>{geolocating ? 'Locating…' : 'My GPS'}</span>
                     </button>
                   </div>
                   <LocationInput
-                    placeholder="Enter pickup city or area"
+                    placeholder="Pickup address"
                     icon={MapPin}
-                    iconColor="text-[#087F5B]"
+                    iconColor="text-primary"
                     initialValue={source?.address || ''}
                     onPlaceSelected={onSourceChange}
                   />
                 </div>
 
-                {/* Signature Emerald Location-Swap Button */}
                 <div className="md:col-span-1 flex items-center justify-center pb-1">
                   <button
                     type="button"
                     onClick={handleSwap}
-                    className="w-10 h-10 rounded-xl bg-[#E8F5EF] text-[#087F5B] hover:bg-[#087F5B] hover:text-white border border-[#087F5B]/25 transition-all active:scale-95 shadow-xs flex items-center justify-center cursor-pointer"
-                    title="Swap pickup and destination"
-                    aria-label="Swap pickup and destination"
+                    className="w-10 h-10 rounded-xl bg-primary-subtle text-primary hover:bg-primary hover:text-white border border-border dark:border-[#24382D] transition-all flex items-center justify-center cursor-pointer shadow-xs"
                   >
                     <ArrowRightLeft size={16} className="hidden md:block" />
                     <ArrowUpDown size={16} className="md:hidden" />
                   </button>
                 </div>
 
-                {/* Destination Field */}
-                <div className="md:col-span-3">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1">
-                    Drop Location
+                <div className="md:col-span-4">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                    Destination Address
                   </label>
                   <LocationInput
-                    placeholder="Enter destination"
+                    placeholder="Where do you need to go?"
                     icon={MapPin}
-                    iconColor="text-[#66756D]"
+                    iconColor="text-text-secondary"
                     initialValue={destination?.address || ''}
                     onPlaceSelected={onDestinationChange}
                   />
                 </div>
 
-                {/* Date & Time Field */}
-                <div className="md:col-span-2">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1">
-                    Departure Date
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      min={localToday}
-                      value={departureDate}
-                      onChange={(e) => setDepartureDate(e.target.value)}
-                      className="w-full h-11 px-3 text-xs font-medium rounded-lg border border-[#DCE4DE] dark:border-[#2B3D35] bg-white dark:bg-[#18241F] text-[#18241F] dark:text-[#F6F4EC] focus:outline-none focus:ring-2 focus:ring-[#087F5B] transition-all cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                {/* Seats Stepper */}
-                <div className="md:col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1 text-center">
-                    Seats
-                  </label>
-                  <div className="flex items-center justify-center border border-[#DCE4DE] dark:border-[#2B3D35] rounded-lg h-11 bg-white dark:bg-[#18241F] px-2">
-                    <button
-                      type="button"
-                      disabled={passengerCount <= 1}
-                      onClick={() => setPassengerCount((p) => Math.max(1, p - 1))}
-                      className="text-[#66756D] hover:text-[#087F5B] disabled:opacity-30 font-bold px-1 cursor-pointer text-sm"
-                    >
-                      −
-                    </button>
-                    <span className="font-bold text-xs tabular-nums px-2">
-                      {passengerCount}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={passengerCount >= 4}
-                      onClick={() => setPassengerCount((p) => Math.min(4, p + 1))}
-                      className="text-[#66756D] hover:text-[#087F5B] disabled:opacity-30 font-bold px-1 cursor-pointer text-sm"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* Primary Emerald Search Action */}
-                <div className="md:col-span-2">
+                <div className="md:col-span-3">
                   <Button
                     variant="primary"
                     type="submit"
                     size="md"
                     fullWidth
-                    leftIcon={Search}
-                    disabled={loadingRides}
-                    className="h-11 bg-[#087F5B] hover:bg-[#066649] text-white font-bold text-xs uppercase tracking-wider shadow-md rounded-lg"
+                    leftIcon={Zap}
+                    disabled={requestingOnDemand}
+                    className="h-11 bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider shadow-sm rounded-xl transition-all"
                   >
-                    {loadingRides ? 'Searching…' : 'Find Carpools'}
+                    {requestingOnDemand ? 'Requesting…' : 'Request Instant Ride'}
                   </Button>
                 </div>
               </div>
-            ) : (
-              /* Instant On-Demand Mode Form */
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                  <div className="md:col-span-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC]">
-                        Pickup Location
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleGeolocate}
-                        disabled={geolocating}
-                        className="text-[11px] text-[#087F5B] hover:text-[#066649] font-semibold flex items-center gap-1 cursor-pointer"
-                      >
-                        <LocateFixed size={12} className={geolocating ? 'animate-spin' : ''} />
-                        <span>{geolocating ? 'Locating…' : 'My GPS'}</span>
-                      </button>
-                    </div>
-                    <LocationInput
-                      placeholder="Pickup address"
-                      icon={MapPin}
-                      iconColor="text-[#087F5B]"
-                      initialValue={source?.address || ''}
-                      onPlaceSelected={onSourceChange}
-                    />
-                  </div>
 
-                  <div className="md:col-span-1 flex items-center justify-center pb-1">
-                    <button
-                      type="button"
-                      onClick={handleSwap}
-                      className="w-10 h-10 rounded-xl bg-[#D9EEE4] text-[#087F5B] hover:bg-[#087F5B] hover:text-white border border-[#087F5B]/30 transition-all flex items-center justify-center cursor-pointer shadow-sm"
-                    >
-                      <ArrowRightLeft size={16} className="hidden md:block" />
-                      <ArrowUpDown size={16} className="md:hidden" />
-                    </button>
-                  </div>
-
-                  <div className="md:col-span-4">
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#66756D] dark:text-[#A3B5AC] mb-1">
-                      Destination Address
-                    </label>
-                    <LocationInput
-                      placeholder="Where do you need to go?"
-                      icon={MapPin}
-                      iconColor="text-[#66756D]"
-                      initialValue={destination?.address || ''}
-                      onPlaceSelected={onDestinationChange}
-                    />
-                  </div>
-
-                  <div className="md:col-span-3">
-                    <Button
-                      variant="primary"
-                      type="submit"
-                      size="md"
-                      fullWidth
-                      leftIcon={Zap}
-                      disabled={requestingOnDemand}
-                      className="h-11 bg-[#087F5B] hover:bg-[#066649] text-white font-bold text-xs uppercase tracking-wider shadow-md rounded-lg"
-                    >
-                      {requestingOnDemand ? 'Requesting…' : 'Request Instant Ride'}
-                    </Button>
-                  </div>
+              {/* Embedded Pricing Estimator if locations set */}
+              {source && destination && (
+                <div className="pt-2 border-t border-border">
+                  <PricingPanel
+                    source={source}
+                    destination={destination}
+                    selectedRideType={selectedRideType}
+                    onRideTypeSelect={onRideTypeSelect}
+                  />
                 </div>
-
-                {/* Embedded Pricing Estimator if locations set */}
-                {source && destination && (
-                  <div className="pt-2 border-t border-[#DCE4DE] dark:border-[#2B3D35]">
-                    <PricingPanel
-                      source={source}
-                      destination={destination}
-                      selectedRideType={selectedRideType}
-                      onRideTypeSelect={onRideTypeSelect}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </form>
-        </div>
+              )}
+            </form>
+          </div>
+        )}
 
         {/* ── 4. Popular Destination Quick Chips ─────────── */}
         <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-2.5 mt-5">
-          <span className="text-xs font-semibold text-[#C2D4CB] flex items-center gap-1.5">
-            <Navigation size={13} className="text-[#087F5B]" />
+          <span className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+            <Navigation size={13} className="text-primary" />
             <span>Popular Commutes:</span>
           </span>
           {POPULAR_DESTINATIONS.map((dest) => {
@@ -407,9 +299,9 @@ export const HeroBookingSection = ({
                 key={dest.name}
                 type="button"
                 onClick={() => handlePopularSelect(dest)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/15 text-[#FAF9F5] border border-white/15 transition-all cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-surface hover:bg-primary-subtle text-text-primary border border-border transition-all cursor-pointer shadow-xs"
               >
-                <Icon size={12} className="opacity-80 text-[#D9EEE4]" />
+                <Icon size={12} className="opacity-80 text-primary" />
                 <span>{dest.name}</span>
               </button>
             );

@@ -11,6 +11,8 @@ export const LocationInput = ({
   onPlaceSelected,
   initialValue,
   id,
+  variant = 'default', // 'default' | 'unified'
+  className = '',
 }) => {
   const [query, setQuery] = useState(initialValue || '');
   const [suggestions, setSuggestions] = useState([]);
@@ -88,28 +90,31 @@ export const LocationInput = ({
     }
   };
 
+  const isUnified = variant === 'unified';
+
   return (
-    <div className="w-full relative" ref={wrapperRef}>
+    <div className={`w-full relative ${className}`} ref={wrapperRef}>
       {label && (
         <label htmlFor={id} className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
           {label}
         </label>
       )}
 
-      <div className="relative flex items-center">
+      <div className="relative flex items-center w-full">
         {Icon && (
-          <div className="absolute left-3 text-text-muted pointer-events-none flex items-center">
-            <Icon size={16} className={isFocused ? 'text-primary' : iconColor || 'text-text-muted'} />
+          <div className={`text-text-muted pointer-events-none flex items-center ${isUnified ? 'absolute left-0' : 'absolute left-3'}`}>
+            <Icon size={isUnified ? 14 : 16} className={isFocused ? 'text-primary' : iconColor || 'text-text-muted'} />
           </div>
         )}
 
         <input
           id={id}
           type="text"
-          className={`
-            input-base text-sm ${Icon ? 'pl-9' : 'pl-3.5'} pr-8
-            ${isFocused ? 'border-primary ring-2 ring-primary/20' : 'border-border'}
-          `}
+          className={
+            isUnified
+              ? `w-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 p-0 text-xs sm:text-sm font-semibold text-text-primary placeholder:text-text-muted/70 truncate ${Icon ? 'pl-5 sm:pl-5.5' : ''} ${query ? 'pr-5' : ''}`
+              : `input-base text-sm ${Icon ? 'pl-9' : 'pl-3.5'} pr-8 ${isFocused ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`
+          }
           placeholder={placeholder}
           value={query}
           onKeyDown={handleKeyDown}
@@ -157,7 +162,9 @@ export const LocationInput = ({
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
             role="listbox"
-            className="absolute z-[600] w-full mt-1.5 rounded-lg shadow-overlay max-h-56 overflow-y-auto border border-border bg-surface text-text-primary"
+            className={`absolute z-[600] left-0 mt-2 rounded-xl shadow-overlay max-h-56 overflow-y-auto border border-border bg-surface text-text-primary ${
+              isUnified ? 'min-w-[280px] sm:min-w-[340px] w-auto max-w-[90vw]' : 'w-full'
+            }`}
           >
             {suggestions.map((place, index) => (
               <div
