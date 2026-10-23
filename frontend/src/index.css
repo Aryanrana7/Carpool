@@ -4,91 +4,91 @@
 
 @layer base {
   :root {
-    /* Brand & Ink Tokens — Authoritative Brand Palette */
-    --color-ink: #18241F; /* Deep forest charcoal */
-    --color-primary: #087F5B; /* Primary emerald */
-    --color-primary-hover: #066649;
-    --color-primary-subtle: #D9EEE4; /* Pale sage */
-    --color-accent: #E8A45B; /* Muted amber */
-    --color-accent-hover: #D99347;
-    --color-accent-subtle: #FDF6EC;
-    --color-accent-text: #A8651E;
+    /* Brand Tokens — Warm Sage & Pine Green Mobility Palette */
+    --color-ink: #192A20; /* Deep Forest Charcoal text */
+    --color-primary: #315B45; /* Deep Pine Green (Search CTA, Active tabs) */
+    --color-primary-hover: #264936; /* Deep Pine Hover */
+    --color-primary-subtle: #E7F2EB; /* Soft Mint tint for badges */
+    --color-accent: #DF8220; /* Warm Golden Amber for price highlights */
+    --color-accent-hover: #C77317;
+    --color-accent-subtle: #FEF3E6; /* Pale warm amber tint */
+    --color-accent-text: #DF8220;
 
     /* Light Canvas & Surfaces */
-    --color-background: #F6F4EC; /* Warm ivory */
-    --color-surface: #FFFFFF;
+    --color-background: #F7FAF8; /* Pale Mint Mist page background */
+    --color-surface: #FFFFFF; /* Crisp card background */
     --color-surface-raised: #FFFFFF;
-    --color-border: #DCE4DE; /* Subtle borders */
-    --color-border-subtle: #EAF0EC;
+    --color-border: #DFECE4; /* Subtle sage border */
+    --color-border-subtle: #EDF4F0; /* Muted surface / borders */
 
     /* Typography */
-    --color-text-primary: #18241F; /* Deep forest charcoal */
-    --color-text-secondary: #66756D; /* Secondary text */
-    --color-text-muted: #8A9A92;
+    --color-text-primary: #192A20; /* Deep Forest Charcoal headings */
+    --color-text-secondary: #546B5D; /* Slate Sage body text */
+    --color-text-muted: #849B8D; /* Muted sage text */
 
     /* Semantic Status */
-    --color-success: #087F5B;
-    --color-success-subtle: #D9EEE4;
-    --color-warning: #E8A45B;
+    --color-success: #2E7D52;
+    --color-success-subtle: #E3F2EC;
+    --color-warning: #B7791F;
     --color-warning-subtle: #FEF3C7;
-    --color-danger: #D32F2F;
+    --color-danger: #C24141;
     --color-danger-subtle: #FDE8E8;
-    --color-info: #087F5B;
-    --color-info-subtle: #D9EEE4;
+    --color-info: #315B45;
+    --color-info-subtle: #E7F2EB;
 
     --nav-height: 68px;
 
-    /* Derived Lighter Surfaces & Canvas Tokens (1-2 shades lighter variations) */
-    --color-bg-canvas: #FAF9F5; /* Fresh, luminous warm ivory canvas */
-    --color-hero-bg: #1F3028; /* Lighter, welcoming forest green derived from --color-ink */
-    --color-hero-surface: #273D33;
-    --color-hero-border: #324C40;
+    /* Derived Hero Surfaces & Canvas Tokens */
+    --color-bg-canvas: #F7FAF8;
+    --color-hero-bg: #EDF5F0; /* Soft Mint Hero canvas */
+    --color-hero-surface: #FFFFFF;
+    --color-hero-border: #DFECE4;
     --color-card-surface: #FFFFFF;
-    --color-card-border: #DCE4DE;
-    --color-pill-bg: #EBF4F0;
+    --color-card-border: #DFECE4;
+    --color-pill-bg: #E7F2EB;
   }
 
   .dark {
-    /* Dark Brand & Ink */
-    --color-ink: #F6F4EC;
-    --color-primary: #12B886; /* Bright Emerald */
-    --color-primary-hover: #20C997;
-    --color-primary-subtle: rgba(18, 184, 134, 0.16);
-    --color-accent: #E8A45B;
-    --color-accent-hover: #F0B26D;
-    --color-accent-subtle: rgba(232, 164, 91, 0.15);
-    --color-accent-text: #F7C68F;
+    /* Dark Brand Tokens */
+    --color-ink: #F2F7F4;
+    --color-primary: #4E9B73; /* Luminous Mint / Pine */
+    --color-primary-hover: #61AF86;
+    --color-primary-subtle: rgba(78, 155, 115, 0.18);
+    --color-accent: #E5933A; /* Luminous Amber */
+    --color-accent-hover: #F2A755;
+    --color-accent-subtle: rgba(229, 147, 58, 0.16);
+    --color-accent-text: #E5933A;
 
     /* Dark Canvas & Surfaces */
-    --color-background: #0F1714;
-    --color-surface: #18241F; /* Deep forest charcoal */
-    --color-surface-raised: #21322B;
-    --color-border: #2B3D35;
-    --color-border-subtle: #1F2E28;
+    --color-background: #0E1712; /* Deep forest midnight */
+    --color-surface: #16231C; /* Slate pine cards */
+    --color-surface-raised: #1D2D24;
+    --color-border: #24382D;
+    --color-border-subtle: #1D2D24;
 
     /* Dark Typography */
-    --color-text-primary: #F6F4EC;
-    --color-text-secondary: #A3B5AC;
-    --color-text-muted: #6E8277;
+    --color-text-primary: #F2F7F4;
+    --color-text-secondary: #9CB4A6;
+    --color-text-muted: #6D8677;
 
     /* Dark Semantic Status */
-    --color-success: #12B886;
-    --color-success-subtle: rgba(18, 184, 134, 0.16);
-    --color-warning: #E8A45B;
-    --color-warning-subtle: rgba(232, 164, 91, 0.16);
-    --color-danger: #EF5350;
-    --color-danger-subtle: rgba(239, 83, 80, 0.16);
-    --color-info: #12B886;
-    --color-info-subtle: rgba(18, 184, 134, 0.16);
+    --color-success: #38A96E;
+    --color-success-subtle: rgba(56, 169, 110, 0.16);
+    --color-warning: #D9933B;
+    --color-warning-subtle: rgba(217, 147, 59, 0.16);
+    --color-danger: #E05353;
+    --color-danger-subtle: rgba(224, 83, 83, 0.16);
+    --color-info: #4E9B73;
+    --color-info-subtle: rgba(78, 155, 115, 0.18);
 
     /* Derived Dark Surfaces & Canvas Tokens */
-    --color-bg-canvas: #0F1714;
-    --color-hero-bg: #14221B;
-    --color-hero-surface: #1B2C24;
-    --color-hero-border: #253D32;
-    --color-card-surface: #18241F;
-    --color-card-border: #2B3D35;
-    --color-pill-bg: #1B2923;
+    --color-bg-canvas: #0E1712;
+    --color-hero-bg: #111C16;
+    --color-hero-surface: #16231C;
+    --color-hero-border: #24382D;
+    --color-card-surface: #16231C;
+    --color-card-border: #24382D;
+    --color-pill-bg: #1D2D24;
   }
 
   * {

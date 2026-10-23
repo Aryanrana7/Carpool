@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * RouteConnector renders the CarPool signature route timeline motif:
- * Pickup node (Emerald #087F5B) -> Vertical connecting line -> Destination node (Forest Charcoal #18241F).
+ * Pickup node (Primary Blue #477DA8) -> Vertical connecting line -> Destination node (Navy #152B40).
  * 
  * Supports two modes:
  * 1. Full timeline card row (for ride cards, booking drawers, active trip trackers).
@@ -23,16 +23,16 @@ export const RouteConnector = ({
       <div className={`flex items-stretch gap-3 w-full text-xs ${className}`}>
         {/* Responsive timeline dots & flex connecting line */}
         <div className="flex flex-col items-center justify-between shrink-0 py-0.5 select-none" aria-hidden="true">
-          {/* Pickup node (Emerald) */}
-          <div className="w-3.5 h-3.5 rounded-full border-2 border-[#087F5B] flex items-center justify-center bg-white dark:bg-[#18241F] shrink-0 shadow-xs">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#087F5B]" />
+          {/* Pickup node (Primary Blue) */}
+          <div className="w-3.5 h-3.5 rounded-full border-2 border-primary flex items-center justify-center bg-surface shrink-0 shadow-xs">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
           </div>
 
           {/* Flexible connecting line */}
           <div className="w-0.5 flex-1 min-h-[24px] my-1 border-l-2 border-dashed border-border" />
 
-          {/* Destination node (Forest Charcoal) */}
-          <div className="w-3.5 h-3.5 rounded-sm bg-[#18241F] dark:bg-[#087F5B] border border-[#18241F] dark:border-[#087F5B] flex items-center justify-center shrink-0 shadow-xs">
+          {/* Destination node (Primary Dark Navy) */}
+          <div className="w-3.5 h-3.5 rounded-sm bg-text-primary dark:bg-primary border border-text-primary dark:border-primary flex items-center justify-center shrink-0 shadow-xs">
             <div className="w-1.5 h-1.5 bg-white rounded-[1px]" />
           </div>
         </div>

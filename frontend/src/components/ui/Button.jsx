@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 
 const VARIANTS = {
   primary: 'bg-primary text-white hover:bg-primary-hover shadow-sm active:opacity-95',
-  secondary: 'bg-primary-subtle text-primary hover:bg-[#C2E3D4] dark:hover:bg-[#1C362B] active:opacity-95',
+  secondary: 'bg-primary-subtle text-primary hover:bg-[#C2DCF2] dark:hover:bg-[#1E3A52] active:opacity-95',
   outline: 'bg-surface text-text-primary border border-border hover:bg-background active:opacity-95',
   ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-border-subtle active:opacity-95',
   destructive: 'bg-danger-subtle text-danger border border-red-200 dark:border-red-900/40 hover:bg-red-100 dark:hover:bg-red-900/60 active:opacity-95',
@@ -46,8 +46,8 @@ export const Button = React.forwardRef(({
     }
   } else if (disabled) {
     if (variant === 'primary') {
-      // Intentionally muted background with readable dark text and clear border (never white on cream)
-      stateClasses = 'bg-[#DCE4DE] dark:bg-[#25382F] text-[#4E6157] dark:text-[#8A9A92] border border-[#CBD6CE] dark:border-[#2F443A] cursor-not-allowed shadow-none';
+      // Intentionally muted background with readable dark text and clear border
+      stateClasses = 'bg-[#DFE8F0] dark:bg-[#1B2E42] text-[#8A9CB0] dark:text-[#6C8399] border border-[#CBDCE9] dark:border-[#22384E] cursor-not-allowed shadow-none';
     } else {
       stateClasses = 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed shadow-none';
     }

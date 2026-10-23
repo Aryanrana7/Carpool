@@ -13,20 +13,25 @@ export default {
       },
       colors: {
         ink: 'var(--color-ink)',
-        forest: {
-          DEFAULT: '#18241F',
-          dark: '#0F1714',
-          light: '#21322B',
+        pine: {
+          DEFAULT: '#315B45',
+          dark: '#264936',
+          light: '#E7F2EB',
         },
-        ivory: {
-          DEFAULT: '#F6F4EC',
-          light: '#FAFAF5',
-          dark: '#EBE7D8',
+        forest: {
+          DEFAULT: '#192A20',
+          dark: '#0E1712',
+          light: '#16231C',
         },
         sage: {
-          DEFAULT: '#D9EEE4',
-          subtle: '#EBF6F0',
-          dark: '#B8DBC9',
+          DEFAULT: '#546B5D',
+          subtle: '#E7F2EB',
+          light: '#F7FAF8',
+        },
+        amber: {
+          DEFAULT: '#DF8220',
+          light: '#FEF3E6',
+          dark: '#C77317',
         },
         primary: {
           DEFAULT: 'var(--color-primary)',

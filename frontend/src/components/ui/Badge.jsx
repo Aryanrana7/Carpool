@@ -8,7 +8,7 @@ const STATUS_CONFIGS = {
   },
   confirmed: {
     label: 'Confirmed',
-    style: 'bg-primary-subtle text-primary border-[#B8DBC9] dark:border-[#1E4D37]',
+    style: 'bg-primary-subtle text-primary border-[#B8D4EA] dark:border-[#1E3A52]',
     dot: 'bg-primary',
   },
   in_progress: {
@@ -53,12 +53,12 @@ const STATUS_CONFIGS = {
   },
   accepted: {
     label: 'Driver Assigned',
-    style: 'bg-primary-subtle text-primary border-[#B8DBC9] dark:border-[#1E4D37]',
+    style: 'bg-primary-subtle text-primary border-[#B8D4EA] dark:border-[#1E3A52]',
     dot: 'bg-primary',
   },
   driver_arriving: {
     label: 'Driver Arriving',
-    style: 'bg-primary-subtle text-primary border-[#B8DBC9] dark:border-[#1E4D37]',
+    style: 'bg-primary-subtle text-primary border-[#B8D4EA] dark:border-[#1E3A52]',
     dot: 'bg-primary animate-pulse',
   },
 };
