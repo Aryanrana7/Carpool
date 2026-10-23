@@ -9,6 +9,8 @@ const { getCorsOptions } = require('./config/corsOptions');
 const createApp = ({ io, driverSockets, userSockets, corsOptions: customCorsOptions } = {}) => {
   const app = express();
 
+  app.set('trust proxy', 1);
+
   app.use(cors(customCorsOptions || getCorsOptions()));
   
   app.use(helmet());
