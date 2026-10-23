@@ -18,13 +18,13 @@ connectDB();
 const app = createApp();
 const server = http.createServer(app);
 
-const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+const { getAllowedOrigins } = require('./config/corsOptions');
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigin,
+    origin: getAllowedOrigins(),
     methods: ['GET', 'POST'],
-    credentials: true
+    credentials: true,
   },
 });
 

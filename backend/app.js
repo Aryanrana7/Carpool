@@ -4,15 +4,12 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 
-const createApp = ({ io, driverSockets, userSockets } = {}) => {
+const { getCorsOptions } = require('./config/corsOptions');
+
+const createApp = ({ io, driverSockets, userSockets, corsOptions: customCorsOptions } = {}) => {
   const app = express();
 
-  const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
-  
-  app.use(cors({
-    origin: allowedOrigin,
-    credentials: true,
-  }));
+  app.use(cors(customCorsOptions || getCorsOptions()));
   
   app.use(helmet());
   app.use(cookieParser());
