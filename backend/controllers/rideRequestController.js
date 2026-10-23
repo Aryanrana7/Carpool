@@ -475,8 +475,48 @@ const cancelRideRequest = async (req, res) => {
       return res.status(404).json({ message: 'Ride request not found' });
     }
 
-    const isPassenger = req.user && request.user.equals(req.user._id);
-    const isDriver = req.driver && request.driver && request.driver.equals(req.driver._id);
+    // If request is already cancelled or expired, resolve gracefully with 200
+    if (request.status === 'cancelled' || request.status === 'expired') {
+      return res.json({
+        message: `Ride request is already ${request.status}`,
+        rideRequest: request,
+      });
+    }
+
+    // Auto-expire searching requests that are past deadline
+    if (
+      request.status === 'searching' &&
+      request.expiresAt &&
+      new Date(request.expiresAt).getTime() < Date.now()
+    ) {
+      request.status = 'expired';
+      await request.save();
+      return res.json({
+        message: 'Ride request has expired',
+        rideRequest: request,
+      });
+    }
+
+    const requestUserId = request.user?._id ? request.user._id.toString() : request.user?.toString();
+    const currentUserId = req.user?._id ? req.user._id.toString() : req.user?.toString();
+    const requestDriverId = request.driver?._id ? request.driver._id.toString() : request.driver?.toString();
+    const currentDriverId = req.driver?._id ? req.driver._id.toString() : req.driver?.toString();
+
+    let isPassenger = Boolean(currentUserId && requestUserId && requestUserId === currentUserId);
+    let isDriver = Boolean(currentDriverId && requestDriverId && requestDriverId === currentDriverId);
+
+    // If driver token was sent from the same person (matched email)
+    if (!isPassenger && req.driver && request.user) {
+      const passengerUser = await User.findById(request.user);
+      if (
+        passengerUser &&
+        req.driver.email &&
+        passengerUser.email &&
+        passengerUser.email.toLowerCase() === req.driver.email.toLowerCase()
+      ) {
+        isPassenger = true;
+      }
+    }
 
     if (!isPassenger && !isDriver) {
       return res.status(403).json({ message: 'Not authorized to cancel this ride request' });
@@ -519,6 +559,7 @@ const cancelRideRequest = async (req, res) => {
 
     res.json({ message: 'Ride request cancelled', rideRequest: request });
   } catch (error) {
+    console.error('Cancel ride request error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -537,9 +578,23 @@ const getRideRequestById = async (req, res) => {
       return res.status(404).json({ message: 'Ride request not found' });
     }
 
-    const isPassenger = req.user && request.user._id.equals(req.user._id);
-    const isAssignedDriver = req.driver && request.driver && request.driver._id.equals(req.driver._id);
-    const isNotifiedDriver = req.driver && request.notifiedDrivers?.some((d) => d.equals(req.driver._id));
+    const requestUserId = request.user?._id ? request.user._id.toString() : request.user?.toString();
+    const currentUserId = req.user?._id ? req.user._id.toString() : req.user?.toString();
+    const requestDriverId = request.driver?._id ? request.driver._id.toString() : request.driver?.toString();
+    const currentDriverId = req.driver?._id ? req.driver._id.toString() : req.driver?.toString();
+
+    let isPassenger = Boolean(currentUserId && requestUserId && requestUserId === currentUserId);
+    let isAssignedDriver = Boolean(currentDriverId && requestDriverId && requestDriverId === currentDriverId);
+    let isNotifiedDriver = Boolean(
+      currentDriverId &&
+      request.notifiedDrivers?.some((d) => (d?._id ? d._id.toString() : d?.toString()) === currentDriverId)
+    );
+
+    if (!isPassenger && req.driver && request.user?.email && req.driver.email) {
+      if (request.user.email.toLowerCase() === req.driver.email.toLowerCase()) {
+        isPassenger = true;
+      }
+    }
 
     if (!isPassenger && !isAssignedDriver && !isNotifiedDriver) {
       return res.status(403).json({ message: 'Not authorized to view this ride request' });
