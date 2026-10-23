@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Mail, ArrowRight } from 'lucide-react';
@@ -9,20 +9,74 @@ import GoogleSignInButton from '../GoogleSignInButton';
 import DemoLoginSection from '../DemoLoginSection';
 import Input from '../ui/Input';
 import PasswordInput from '../ui/PasswordInput';
-import Button from '../ui/Button';
-import AuthPromoPanel from './AuthPromoPanel';
+import AuthPromoBanner from './AuthPromoBanner';
+
+// Curated high-resolution dynamic backdrops for each portal that rotate on every refresh
+export const PASSENGER_BACKGROUNDS = [
+  {
+    url: '/images/auth-passenger-1.jpg',
+    title: 'Alpine Peak Highway',
+    subtitle: 'Expansive scenic journey towards mountain peaks',
+  },
+  {
+    url: '/images/auth-passenger-2.jpg',
+    title: 'Autumn Forest Scenic Route',
+    subtitle: 'Peaceful morning commute under golden maple canopies',
+  },
+  {
+    url: '/images/auth-passenger-3.jpg',
+    title: 'Red Rock Canyon Road Trip',
+    subtitle: 'Classic open-road travel through dramatic sandstone passes',
+  },
+  {
+    url: '/images/auth-passenger-4.jpg',
+    title: 'Highland Valley Pass',
+    subtitle: 'Misty sunrise vistas across lush emerald hills',
+  },
+];
+
+export const DRIVER_BACKGROUNDS = [
+  {
+    url: '/images/auth-driver-1.jpg',
+    title: 'Lake Tahoe Highway Drive',
+    subtitle: 'Behind the wheel with morning golden sun',
+  },
+  {
+    url: '/images/auth-driver-2.jpg',
+    title: 'Pacific Coast Bridge',
+    subtitle: 'Iconic scenic coastal bridge dispatch route',
+  },
+  {
+    url: '/images/auth-driver-3.jpg',
+    title: 'Autumn Alpine Valley Pass',
+    subtitle: 'Crisp mountain valley pass morning commute',
+  },
+];
 
 /**
- * Shared AuthPortal component for Passenger and Driver authentication.
- * Features:
- * - Fluid directional transition when switching between Passenger and Driver portals
- *   - Passenger → Driver: Promo panel slides from LEFT to RIGHT; Auth form slides from RIGHT to LEFT.
- *   - Driver → Passenger: Promo panel slides from RIGHT to LEFT; Auth form slides from LEFT to RIGHT.
- * - Easing: cubic-bezier(0.22, 1, 0.36, 1), duration ~420ms
- * - Zero horizontal scrollbars (overflow-x-hidden)
- * - Mobile responsive: compact stacked layout with auth form always top-accessible
- * - Respects prefers-reduced-motion
- * - High-contrast, non-glitchy button states
+ * Retrieves and increments the index on every page refresh using sessionStorage,
+ * ensuring the user sees a new background each time they refresh the portal.
+ */
+const getNextIndexOnLoad = (storageKey, total) => {
+  try {
+    const raw = sessionStorage.getItem(storageKey);
+    let next;
+    if (raw !== null) {
+      next = (parseInt(raw, 10) + 1) % total;
+    } else {
+      next = Math.floor(Math.random() * total);
+    }
+    sessionStorage.setItem(storageKey, next.toString());
+    return next;
+  } catch {
+    return Math.floor(Math.random() * total);
+  }
+};
+
+/**
+ * High-End Unified AuthPortal for Passenger and Driver Partner.
+ * Features automatic scenery rotation after every refresh, full-bleed panoramic backdrop,
+ * zero gaps, authentic hero matching user reference, and sleek glassmorphic login card.
  */
 export const AuthPortal = () => {
   const location = useLocation();
@@ -30,6 +84,28 @@ export const AuthPortal = () => {
   const shouldReduceMotion = useReducedMotion();
 
   const isDriver = location.pathname.startsWith('/driver');
+
+  // Dynamic Background State - Advances on every browser refresh
+  const [passengerBgIndex] = useState(() =>
+    getNextIndexOnLoad('carpool_auth_passenger_bg_idx', PASSENGER_BACKGROUNDS.length)
+  );
+
+  const [driverBgIndex] = useState(() =>
+    getNextIndexOnLoad('carpool_auth_driver_bg_idx', DRIVER_BACKGROUNDS.length)
+  );
+
+  // Prefetch all portal backdrops so switching and refreshing are instant
+  useEffect(() => {
+    const allImages = [...PASSENGER_BACKGROUNDS, ...DRIVER_BACKGROUNDS];
+    allImages.forEach((item) => {
+      const img = new Image();
+      img.src = item.url;
+    });
+  }, []);
+
+  const activeBgList = isDriver ? DRIVER_BACKGROUNDS : PASSENGER_BACKGROUNDS;
+  const activeBgIndex = isDriver ? driverBgIndex : passengerBgIndex;
+  const activeBgItem = activeBgList[activeBgIndex % activeBgList.length];
 
   // Passenger Auth State
   const [passengerEmail, setPassengerEmail] = useState('');
@@ -116,261 +192,282 @@ export const AuthPortal = () => {
     }
   };
 
-  // Directional Animation Transition settings (400ms, cubic-bezier(0.22, 1, 0.36, 1))
-  const layoutTransition = shouldReduceMotion
-    ? { duration: 0 }
-    : { duration: 0.4, ease: [0.22, 1, 0.36, 1] };
-
-  // Promotional Panel Node
-  const promoPanelNode = (
-    <motion.div
-      key="auth-promo-panel-wrapper"
-      layout="position"
-      transition={layoutTransition}
-      className={`w-full lg:w-[45%] shrink-0 flex flex-col self-stretch min-h-[calc(100vh-68px)] order-2 lg:order-none ${
-        isDriver ? 'lg:border-l lg:border-t-0 border-t border-[#25382F]' : 'lg:border-r lg:border-t-0 border-t border-[#25382F]'
-      }`}
-    >
-      <AuthPromoPanel role={isDriver ? 'driver' : 'passenger'} />
-    </motion.div>
-  );
-
-  // Authentication Form Panel Node
-  const authFormPanelNode = (
-    <motion.div
-      key="auth-form-panel-wrapper"
-      layout="position"
-      transition={layoutTransition}
-      className="flex-1 w-full lg:w-[55%] flex items-center justify-center self-stretch min-h-[calc(100vh-68px)] p-6 sm:p-10 lg:p-12 overflow-y-auto order-1 lg:order-none"
-    >
-      <div className="w-full max-w-[400px]">
-        {/* Role Segmented Switcher with sliding animated pill */}
-        <div className="relative flex rounded-lg p-1 bg-border-subtle border border-border mb-6 select-none">
-          <button
-            type="button"
-            onClick={() => {
-              if (isDriver) navigate('/login');
-            }}
-            className={`relative flex-1 py-2 text-xs font-bold rounded-md text-center transition-colors cursor-pointer z-10 ${
-              !isDriver ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            {!isDriver && (
-              <motion.div
-                layoutId="active-role-pill"
-                className="absolute inset-0 bg-surface rounded-md shadow-sm border border-border/50 -z-10"
-                transition={layoutTransition}
-              />
-            )}
-            Passenger
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!isDriver) navigate('/driver/login');
-            }}
-            className={`relative flex-1 py-2 text-xs font-bold rounded-md text-center transition-colors cursor-pointer z-10 ${
-              isDriver ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            {isDriver && (
-              <motion.div
-                layoutId="active-role-pill"
-                className="absolute inset-0 bg-surface rounded-md shadow-sm border border-border/50 -z-10"
-                transition={layoutTransition}
-              />
-            )}
-            Driver Partner
-          </button>
-        </div>
-
-        {/* Dynamic Form Content with smooth cross-fade */}
-        <AnimatePresence mode="wait" initial={false}>
-          {!isDriver ? (
-            <motion.div
-              key="passenger-form-content"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-            >
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold tracking-tight text-text-primary">
-                  Passenger Sign In
-                </h2>
-                <p className="text-text-secondary mt-1 text-xs">
-                  Enter your credentials to manage rides and bookings.
-                </p>
-              </div>
-
-              {passengerError && (
-                <div
-                  role="alert"
-                  className="mb-4 text-xs font-medium text-danger bg-danger-subtle border border-red-200 dark:border-red-900/40 p-3 rounded-md"
-                >
-                  {passengerError}
-                </div>
-              )}
-
-              {/* Passenger Credentials Form */}
-              <form onSubmit={handlePassengerSubmit} className="space-y-3.5">
-                <Input
-                  id="email"
-                  name="email"
-                  label="Email Address"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="name@example.com"
-                  leftIcon={Mail}
-                  value={passengerEmail}
-                  onChange={(e) => setPassengerEmail(e.target.value)}
-                  required
-                />
-
-                <PasswordInput
-                  id="password"
-                  name="password"
-                  label="Password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={passengerPassword}
-                  onChange={(e) => setPassengerPassword(e.target.value)}
-                  required
-                />
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  fullWidth
-                  loading={passengerLoading}
-                  rightIcon={ArrowRight}
-                  className="mt-2"
-                >
-                  Sign In
-                </Button>
-              </form>
-
-              {/* Divider labelled OR */}
-              <div className="relative flex py-2 items-center my-4">
-                <div className="flex-grow border-t border-border" />
-                <span className="shrink mx-3 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-                  OR
-                </span>
-                <div className="flex-grow border-t border-border" />
-              </div>
-
-              {/* Google Sign-In */}
-              <div className="mb-4">
-                <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={setPassengerError} text="Continue with Google" />
-              </div>
-
-              {/* Demo Shortcuts */}
-              <DemoLoginSection type="passenger" onSelectFill={handlePassengerDemoFill} />
-
-              {/* Registration Link */}
-              <p className="mt-5 text-center text-xs text-text-secondary">
-                Don't have an account?{' '}
-                <Link to="/register" className="font-semibold text-primary hover:underline">
-                  Create an account
-                </Link>
-              </p>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="driver-form-content"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-            >
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold tracking-tight text-text-primary">
-                  Driver Sign In
-                </h2>
-                <p className="text-text-secondary mt-1 text-xs">
-                  Access your driver console, live GPS dispatch, and rides.
-                </p>
-              </div>
-
-              {driverError && (
-                <div
-                  role="alert"
-                  className="mb-4 text-xs font-medium text-danger bg-danger-subtle border border-red-200 dark:border-red-900/40 p-3 rounded-md"
-                >
-                  {driverError}
-                </div>
-              )}
-
-              {/* Driver Credentials Form */}
-              <form onSubmit={handleDriverSubmit} className="space-y-3.5">
-                <Input
-                  id="driver-email"
-                  name="email"
-                  label="Driver Email Address"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="driver@example.com"
-                  leftIcon={Mail}
-                  value={driverEmail}
-                  onChange={(e) => setDriverEmail(e.target.value)}
-                  required
-                />
-
-                <PasswordInput
-                  id="driver-password"
-                  name="password"
-                  label="Password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={driverPassword}
-                  onChange={(e) => setDriverPassword(e.target.value)}
-                  required
-                />
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  fullWidth
-                  loading={driverLoading}
-                  rightIcon={ArrowRight}
-                  className="mt-2"
-                >
-                  Sign In to Console
-                </Button>
-              </form>
-
-              {/* Driver Demo Shortcuts */}
-              <DemoLoginSection type="driver" onSelectFill={handleDriverDemoFill} />
-
-              {/* Driver Registration Link */}
-              <p className="mt-5 text-center text-xs text-text-secondary">
-                New driver partner?{' '}
-                <Link to="/driver/register" className="font-semibold text-primary hover:underline">
-                  Register as Driver
-                </Link>
-              </p>
-            </motion.div>
-          )}
+  return (
+    <div className="min-h-[calc(100vh-68px)] lg:h-[calc(100vh-68px)] w-full flex flex-col lg:flex-row relative overflow-hidden bg-background">
+      {/* ── FULL-BLEED ROTATING SCENIC BACKGROUND (CHANGES EVERY REFRESH) ────── */}
+      <div className="absolute inset-0 bg-slate-900 overflow-hidden">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={activeBgItem.url}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: 'easeOut' }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${activeBgItem.url})` }}
+          />
         </AnimatePresence>
       </div>
-    </motion.div>
-  );
 
-  return (
-    <div className="min-h-[calc(100vh-68px)] w-full flex flex-col lg:flex-row bg-background overflow-x-hidden relative">
-      {/* On desktop: Passenger has Promo first (Left), Auth second (Right)
-                     Driver has Auth first (Left), Promo second (Right) */}
-      {!isDriver ? (
-        <>
-          {promoPanelNode}
-          {authFormPanelNode}
-        </>
-      ) : (
-        <>
-          {authFormPanelNode}
-          {promoPanelNode}
-        </>
-      )}
+      {/* ── BALANCED GRADIENT OVERLAYS FOR CRISP READABILITY ────── */}
+      {/* Left side daylight soft fade for hero text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent dark:from-[#0E1712]/95 dark:via-[#0E1712]/80 dark:to-transparent lg:w-[65%]" />
+      {/* Bottom and overall subtle tint */}
+      <div className="absolute inset-0 bg-black/10 dark:bg-black/40 pointer-events-none" />
+
+      {/* ── LEFT COLUMN: AUTH PROMO HERO (MATCHING USER REFERENCE) ────── */}
+      <div className="w-full lg:w-[58%] xl:w-[60%] flex flex-col self-stretch order-2 lg:order-1 relative z-10 overflow-y-auto lg:overflow-hidden">
+        <AuthPromoBanner
+          role={isDriver ? 'driver' : 'passenger'}
+          onRoleSwitch={(targetRole) => {
+            navigate(targetRole === 'driver' ? '/driver/login' : '/login');
+          }}
+        />
+      </div>
+
+      {/* ── RIGHT COLUMN: SLEEK GLASSMORPHIC LOGIN CARD ────── */}
+      <div className="w-full lg:w-[42%] xl:w-[40%] flex items-center justify-center self-stretch p-4 sm:p-6 lg:p-6 xl:p-8 relative z-20 order-1 lg:order-2 overflow-y-auto lg:overflow-hidden">
+        <div className="w-full max-w-[420px] backdrop-blur-2xl bg-white dark:bg-[#121f18] border border-slate-200/90 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.18)] rounded-3xl p-5 sm:p-6 text-text-primary transition-all duration-300">
+          {/* Role Segmented Switcher with smooth sliding active pill */}
+          <div className="relative flex rounded-xl p-1 bg-[#F1EFEA] dark:bg-[#1D2B22] border border-border/70 mb-3.5 select-none shadow-inner">
+            <button
+              type="button"
+              onClick={() => {
+                if (isDriver) navigate('/login');
+              }}
+              className={`relative flex-1 py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer z-10 ${
+                !isDriver
+                  ? 'text-[#133E2B] dark:text-white'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              {!isDriver && (
+                <motion.div
+                  layoutId="auth-active-role-pill"
+                  className="absolute inset-0 bg-white dark:bg-[#25392D] rounded-lg shadow-sm border border-border/50 -z-10"
+                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                />
+              )}
+              Passenger
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isDriver) navigate('/driver/login');
+              }}
+              className={`relative flex-1 py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer z-10 ${
+                isDriver
+                  ? 'text-[#133E2B] dark:text-white'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              {isDriver && (
+                <motion.div
+                  layoutId="auth-active-role-pill"
+                  className="absolute inset-0 bg-white dark:bg-[#25392D] rounded-lg shadow-sm border border-border/50 -z-10"
+                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                />
+              )}
+              Driver Partner
+            </button>
+          </div>
+
+          {/* Form Content with Smooth Cross-Fade */}
+          <AnimatePresence mode="wait" initial={false}>
+            {!isDriver ? (
+              <motion.div
+                key="passenger-form-content"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+              >
+                {/* Heading & Subtitle */}
+                <div className="mb-3">
+                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#112F21] dark:text-[#E8F2EC]">
+                    Passenger Sign In
+                  </h2>
+                  <p className="text-text-secondary mt-0.5 text-xs">
+                    Enter your credentials to book rides and track routes.
+                  </p>
+                </div>
+
+                {passengerError && (
+                  <div
+                    role="alert"
+                    className="mb-3 text-xs font-medium text-danger bg-danger-subtle border border-danger/20 p-2.5 rounded-xl"
+                  >
+                    {passengerError}
+                  </div>
+                )}
+
+                {/* Passenger Form */}
+                <form onSubmit={handlePassengerSubmit} className="space-y-2.5">
+                  <Input
+                    id="passenger-email"
+                    name="email"
+                    label="Email Address"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="name@example.com"
+                    leftIcon={Mail}
+                    value={passengerEmail}
+                    onChange={(e) => setPassengerEmail(e.target.value)}
+                    required
+                    className="h-10 bg-white/90 dark:bg-surface border-border rounded-xl text-xs sm:text-sm"
+                  />
+
+                  <PasswordInput
+                    id="passenger-password"
+                    name="password"
+                    label="Password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    value={passengerPassword}
+                    onChange={(e) => setPassengerPassword(e.target.value)}
+                    required
+                    className="h-10 bg-white/90 dark:bg-surface border-border rounded-xl text-xs sm:text-sm"
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={passengerLoading}
+                    className="w-full h-10 bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+                  >
+                    {passengerLoading ? (
+                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>Sign In</span>
+                        <ArrowRight size={15} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Divider labelled OR */}
+                <div className="relative flex py-0.5 items-center my-2">
+                  <div className="flex-grow border-t border-border/80" />
+                  <span className="shrink mx-3 text-[10px] font-bold text-text-muted uppercase tracking-widest">
+                    OR
+                  </span>
+                  <div className="flex-grow border-t border-border/80" />
+                </div>
+
+                {/* Google Sign-In */}
+                <div className="mb-2">
+                  <GoogleSignInButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={setPassengerError}
+                    text="Continue with Google"
+                  />
+                </div>
+
+                {/* Quick Demo Access (Compact) */}
+                <DemoLoginSection
+                  type="passenger"
+                  onSelectFill={handlePassengerDemoFill}
+                  compact={true}
+                />
+
+                {/* Registration Link */}
+                <p className="mt-3 text-center text-xs text-text-secondary">
+                  Don't have an account?{' '}
+                  <Link to="/register" className="font-bold text-[#134E35] dark:text-primary hover:underline">
+                    Create an account
+                  </Link>
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="driver-form-content"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+              >
+                {/* Driver Heading & Subtitle */}
+                <div className="mb-3">
+                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#112F21] dark:text-[#E8F2EC]">
+                    Driver Partner Sign In
+                  </h2>
+                  <p className="text-text-secondary mt-0.5 text-xs">
+                    Access your driver console, live dispatch, and empty seats.
+                  </p>
+                </div>
+
+                {driverError && (
+                  <div
+                    role="alert"
+                    className="mb-3 text-xs font-medium text-danger bg-danger-subtle border border-danger/20 p-2.5 rounded-xl"
+                  >
+                    {driverError}
+                  </div>
+                )}
+
+                {/* Driver Credentials Form */}
+                <form onSubmit={handleDriverSubmit} className="space-y-2.5">
+                  <Input
+                    id="driver-email"
+                    name="email"
+                    label="Driver Email Address"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="driver@example.com"
+                    leftIcon={Mail}
+                    value={driverEmail}
+                    onChange={(e) => setDriverEmail(e.target.value)}
+                    required
+                    className="h-10 bg-white/90 dark:bg-surface border-border rounded-xl text-xs sm:text-sm"
+                  />
+
+                  <PasswordInput
+                    id="driver-password"
+                    name="password"
+                    label="Password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    value={driverPassword}
+                    onChange={(e) => setDriverPassword(e.target.value)}
+                    required
+                    className="h-10 bg-white/90 dark:bg-surface border-border rounded-xl text-xs sm:text-sm"
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={driverLoading}
+                    className="w-full h-10 bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+                  >
+                    {driverLoading ? (
+                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>Sign In to Console</span>
+                        <ArrowRight size={15} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Driver Quick Demo Shortcuts (Compact) */}
+                <DemoLoginSection
+                  type="driver"
+                  onSelectFill={handleDriverDemoFill}
+                  compact={true}
+                />
+
+                {/* Driver Registration Link */}
+                <p className="mt-3 text-center text-xs text-text-secondary">
+                  New driver partner?{' '}
+                  <Link to="/driver/register" className="font-bold text-[#134E35] dark:text-primary hover:underline">
+                    Register as Driver
+                  </Link>
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 };

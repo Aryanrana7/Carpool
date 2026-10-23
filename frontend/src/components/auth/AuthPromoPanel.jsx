@@ -90,7 +90,7 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
 
   return (
     <div
-      className={`w-full h-full bg-[#18241F] text-white p-5 sm:p-8 lg:p-10 xl:p-12 flex flex-col justify-between relative overflow-hidden select-none ${className}`}
+      className={`w-full h-full bg-[#192A20] text-white p-5 sm:p-8 lg:p-10 xl:p-12 flex flex-col justify-between relative overflow-hidden select-none ${className}`}
       data-testid={`auth-promo-panel-${role}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -120,15 +120,15 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
         >
           <div className="flex flex-col">
             {/* Section A: Brand-Themed Eyebrow Pill */}
-            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-semibold tracking-wider uppercase mb-3 sm:mb-4 backdrop-blur-md self-start">
+            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-primary/20 border border-primary/40 text-[#D2E2D8] text-xs font-semibold tracking-wider uppercase mb-3 sm:mb-4 backdrop-blur-md self-start">
               <span className="relative flex h-2 w-2">
-                <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7EAA93] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              <span className="text-[11px] font-bold text-emerald-400 tracking-widest">
+              <span className="text-[11px] font-bold text-[#D2E2D8] tracking-widest">
                 {isDriver ? 'DRIVER OPERATIONS' : 'SHARED MOBILITY'}
               </span>
-              <span className="text-emerald-500/40 text-[10px]">•</span>
+              <span className="text-primary/50 text-[10px]">•</span>
               <span className="text-slate-300 text-xs font-medium tracking-normal normal-case">
                 {variant.eyebrow}
               </span>
@@ -143,14 +143,14 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
             </p>
 
             {/* Section C: Large Hero Visual Scene */}
-            <div className="w-full rounded-2xl bg-gradient-to-b from-[#13221B]/95 via-[#1A2E24]/85 to-[#111D17]/95 border border-[#274033] shadow-xl relative overflow-hidden flex flex-col justify-between my-2 sm:my-3 p-3.5 sm:p-5 min-h-[240px] sm:min-h-[270px] lg:min-h-[290px]">
+            <div className="w-full rounded-2xl bg-gradient-to-b from-[#16231C]/95 via-[#121E17]/90 to-[#0E1712]/95 border border-[#24382D] shadow-xl relative overflow-hidden flex flex-col justify-between my-2 sm:my-3 p-3.5 sm:p-5 min-h-[240px] sm:min-h-[270px] lg:min-h-[290px]">
               {/* Contextual Status Badges */}
               <div className="w-full flex items-center justify-between z-10 mb-1">
-                <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#18241F]/85 border border-emerald-500/25 text-[11px] font-semibold text-emerald-300 backdrop-blur-md shadow-sm">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isDriver ? 'bg-amber-400' : 'bg-emerald-400'} animate-pulse`} />
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#192A20]/85 border border-primary/35 text-[11px] font-semibold text-[#D2E2D8] backdrop-blur-md shadow-sm">
+                  <span className={`w-1.5 h-1.5 rounded-full ${isDriver ? 'bg-accent' : 'bg-[#7EAA93]'} animate-pulse`} />
                   {isDriver ? 'Active Dispatch Hub' : 'Live Shared Corridor'}
                 </div>
-                <div className="px-2.5 py-1 rounded-full bg-[#18241F]/85 border border-white/10 text-[10px] font-mono tracking-wider text-slate-300 backdrop-blur-md">
+                <div className="px-2.5 py-1 rounded-full bg-[#192A20]/85 border border-white/10 text-[10px] font-mono tracking-wider text-slate-300 backdrop-blur-md">
                   {isDriver ? 'DRIVER CONSOLE · READY' : 'CO-COMMUTE · OPTIMIZED'}
                 </div>
               </div>
@@ -174,7 +174,7 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
                       aria-label={`Switch to concept ${idx + 1}`}
                       className={`h-1.5 rounded-full transition-all duration-300 ${
                         idx === currentIndex
-                          ? 'w-5 bg-emerald-400 shadow-sm shadow-emerald-500/50'
+                          ? 'w-5 bg-primary shadow-sm shadow-primary/50'
                           : 'w-1.5 bg-white/20 hover:bg-white/40'
                       }`}
                     />
@@ -188,9 +188,9 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
               {variant.benefits.map((point, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/[0.035] hover:bg-white/[0.06] border border-white/[0.08] hover:border-emerald-500/30 transition-all duration-200 backdrop-blur-sm"
+                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/[0.035] hover:bg-white/[0.06] border border-white/[0.08] hover:border-primary/40 transition-all duration-200 backdrop-blur-sm"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center shrink-0 text-emerald-400">
+                  <div className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 text-[#D2E2D8]">
                     {getBenefitIcon(index, isDriver)}
                   </div>
                   <span className="text-xs sm:text-[13px] text-slate-200 font-medium leading-snug">
@@ -202,9 +202,9 @@ export const AuthPromoPanel = ({ role = 'passenger', customSecurityNote, classNa
           </div>
 
           {/* Portal Operations & Security Footer */}
-          <div className="pt-4 sm:pt-5 border-t border-[#25382F] text-[11px] text-slate-400 flex items-center justify-between shrink-0">
+          <div className="pt-4 sm:pt-5 border-t border-[#24382D] text-[11px] text-slate-400 flex items-center justify-between shrink-0">
             <span className="flex items-center gap-2">
-              <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
+              <ShieldCheck size={14} className="text-[#D2E2D8] shrink-0" />
               {securityNote}
             </span>
             <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-white/[0.04] border border-white/5">

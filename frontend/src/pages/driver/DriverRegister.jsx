@@ -75,7 +75,7 @@ export const DriverRegister = () => {
           {error && (
             <div
               role="alert"
-              className="mb-4 text-xs font-medium text-danger bg-danger-subtle border border-red-200 dark:border-red-900/40 p-3 rounded-md"
+              className="mb-4 text-xs font-medium text-danger bg-danger-subtle border border-error/20 p-3 rounded-md"
             >
               {error}
             </div>
@@ -175,13 +175,13 @@ export const DriverRegister = () => {
       </div>
 
       {/* ── Right Branded Panel (mirrors Driver Portal) ────── */}
-      <div className="hidden lg:flex w-[44%] bg-[#18241F] text-white p-14 flex-col justify-between relative overflow-hidden border-l border-[#25382F] select-none">
+      <div className="hidden lg:flex w-[44%] bg-[#192A20] text-white p-14 flex-col justify-between relative overflow-hidden border-l border-[#24382D] select-none">
         <div className="relative z-10">
           <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center text-white mb-8 shadow-sm">
             <Car size={20} />
           </div>
 
-          <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-2 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#D2E2D8] mb-2 block">
             Partner Program
           </span>
 
@@ -209,7 +209,7 @@ export const DriverRegister = () => {
           </div>
         </div>
 
-        <div className="relative z-10 pt-6 border-t border-[#25382F] text-[11px] text-slate-400">
+        <div className="relative z-10 pt-6 border-t border-[#24382D] text-[11px] text-slate-400">
           CarPool Mobility Platform · Driver Partner Registration
         </div>
       </div>
