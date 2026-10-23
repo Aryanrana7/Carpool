@@ -13,11 +13,11 @@ import FareLabel from './ui/FareLabel';
 import RouteConnector from './ui/RouteConnector';
 
 // Clean SVG Pin and Car DivIcons
-const buildPinIcon = (color = '#087F5B', label = 'PICKUP') =>
+const buildPinIcon = (color = '#315B45', label = 'PICKUP') =>
   L.divIcon({
     html: `
       <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">
-        <div style="background:${color};color:#ffffff;font-size:9px;font-weight:700;letter-spacing:0.04em;padding:3px 7px;border-radius:6px;box-shadow:0 4px 12px rgba(24,36,31,0.3);border:1.5px solid #ffffff;white-space:nowrap;">
+        <div style="background:${color};color:#ffffff;font-size:9px;font-weight:700;letter-spacing:0.04em;padding:3px 7px;border-radius:6px;box-shadow:0 4px 12px rgba(25,42,32,0.3);border:1.5px solid #ffffff;white-space:nowrap;">
           ${label}
         </div>
         <div style="width:2px;height:4px;background:${color};"></div>
@@ -36,14 +36,14 @@ const buildCarIcon = () =>
         style="
           width:36px;
           height:36px;
-          background:#087F5B;
+          background:#315B45;
           color:#ffffff;
           border-radius:50%;
           display:flex;
           align-items:center;
           justify-content:center;
           border:2.5px solid #ffffff;
-          box-shadow:0 4px 14px rgba(8,127,91,0.45);
+          box-shadow:0 4px 14px rgba(49,91,69,0.45);
         "
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -162,7 +162,7 @@ export const ActiveTripModal = ({ isOpen, booking, onClose, onChatOpen }) => {
                 <MapFitter bounds={bounds} />
 
                 {/* Pickup marker */}
-                <Marker position={pickupCoords} icon={buildPinIcon('#087F5B', 'PICKUP')}>
+                <Marker position={pickupCoords} icon={buildPinIcon('#315B45', 'PICKUP')}>
                   <Popup>
                     <div className="text-center p-1 font-sans">
                       <strong className="text-xs text-primary block">Pickup Location</strong>
@@ -172,7 +172,7 @@ export const ActiveTripModal = ({ isOpen, booking, onClose, onChatOpen }) => {
                 </Marker>
 
                 {/* Destination marker */}
-                <Marker position={dropoffCoords} icon={buildPinIcon('#18241F', 'DROPOFF')}>
+                <Marker position={dropoffCoords} icon={buildPinIcon('#192A20', 'DROPOFF')}>
                   <Popup>
                     <div className="text-center p-1 font-sans">
                       <strong className="text-xs text-text-primary block">Dropoff Point</strong>
@@ -184,13 +184,13 @@ export const ActiveTripModal = ({ isOpen, booking, onClose, onChatOpen }) => {
                 {/* Route polyline with casing */}
                 <Polyline
                   positions={routePositions}
-                  color={isDarkMode ? '#0E1713' : '#18241F'}
+                  color={isDarkMode ? '#0E1712' : '#192A20'}
                   weight={6}
                   opacity={0.85}
                 />
                 <Polyline
                   positions={routePositions}
-                  color="#087F5B"
+                  color="#315B45"
                   weight={3.5}
                   opacity={0.95}
                 />

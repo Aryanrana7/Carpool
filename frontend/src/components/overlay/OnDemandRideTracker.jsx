@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   Zap,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -51,27 +52,45 @@ export const OnDemandRideTracker = ({
   const [cancelling, setCancelling] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [localStatus, setLocalStatus] = useState(request?.status || 'searching');
 
   useEffect(() => {
-    if (!request || request.status !== 'searching') return;
+    if (request?.status) {
+      setLocalStatus(request.status);
+    }
+  }, [request?.status]);
+
+  useEffect(() => {
+    if (!request) return;
+    const isPast = request.expiresAt && new Date(request.expiresAt).getTime() <= Date.now();
+    if (isPast && localStatus === 'searching') {
+      setLocalStatus('expired');
+      setCountdown(0);
+      return;
+    }
+
+    if (localStatus !== 'searching') return;
     const expiresAt = new Date(request.expiresAt).getTime();
 
-    const interval = setInterval(() => {
+    const checkTime = () => {
       const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
       setCountdown(remaining);
       if (remaining <= 0) {
-        clearInterval(interval);
+        setLocalStatus('expired');
       }
-    }, 1000);
+    };
 
+    checkTime();
+    const interval = setInterval(checkTime, 1000);
     return () => clearInterval(interval);
-  }, [request]);
+  }, [request, localStatus]);
 
   if (!request) return null;
 
-  const isSearching = request.status === 'searching';
+  const statusToRender = localStatus || request.status;
+  const isSearching = statusToRender === 'searching';
   const hasDriver = Boolean(request.driver);
-  const currentStep = getStepIndex(request.status);
+  const currentStep = getStepIndex(statusToRender);
 
   const handleCancelRequest = async () => {
     setCancelling(true);
@@ -83,10 +102,24 @@ export const OnDemandRideTracker = ({
       setShowCancelConfirm(false);
       if (onCancel) onCancel();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to cancel request');
+      const status = err.response?.status;
+      const message = err.response?.data?.message;
+      if (status === 403 || status === 404 || status === 400) {
+        // If session was switched or request is already expired/closed, resolve smoothly
+        toast(message || 'Ride request was closed', { icon: 'ℹ️' });
+        setShowCancelConfirm(false);
+        if (onCancel) onCancel();
+      } else {
+        toast.error(message || 'Failed to cancel request');
+      }
     } finally {
       setCancelling(false);
     }
+  };
+
+  const handleDismiss = () => {
+    if (onClose) onClose();
+    else if (onCancel) onCancel();
   };
 
   return (
@@ -102,13 +135,13 @@ export const OnDemandRideTracker = ({
         className={
           embedded
             ? "w-full bg-surface border border-border rounded-xl p-4 sm:p-5 shadow-sm"
-            : "absolute bottom-4 left-1/2 -translate-x-1/2 z-[600] w-[calc(100vw-24px)] max-w-lg bg-surface border border-border rounded-xl p-5 shadow-modal"
+            : "fixed bottom-6 left-1/2 -translate-x-1/2 z-[1150] w-[calc(100vw-32px)] max-w-lg bg-surface/98 backdrop-blur-md border border-border rounded-2xl p-5 shadow-2xl"
         }
       >
         {/* Top Status Header */}
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-border">
           <div className="flex items-center gap-2">
-            <Badge status={request.status} />
+            <Badge status={statusToRender} />
             {isSearching && (
               <span className="text-xs font-semibold tabular-nums text-text-muted flex items-center gap-1">
                 <Clock size={12} className="text-primary" /> {countdown}s remaining
@@ -117,7 +150,7 @@ export const OnDemandRideTracker = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {request.status === 'completed' && onRateOpen && (
+            {statusToRender === 'completed' && onRateOpen && (
               <Button
                 variant="secondary"
                 size="sm"
@@ -128,20 +161,20 @@ export const OnDemandRideTracker = ({
               </Button>
             )}
 
-            {['completed', 'cancelled', 'expired'].includes(request.status) && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-xs font-medium text-text-muted hover:text-text-primary px-2 py-1 rounded"
-              >
-                Close
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleDismiss}
+              aria-label="Close ride tracker"
+              className="text-text-muted hover:text-text-primary p-1.5 rounded-lg hover:bg-surface-sunken transition-colors"
+              title="Close"
+            >
+              <X size={15} />
+            </button>
           </div>
         </div>
 
         {/* Visual Status Stepper */}
-        {!['cancelled', 'expired'].includes(request.status) && (
+        {!['cancelled', 'expired'].includes(statusToRender) && (
           <div className="my-3 py-2 px-1">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-border -translate-y-1/2 z-0" />
@@ -191,6 +224,21 @@ export const OnDemandRideTracker = ({
             </p>
             <p className="text-[11px] text-text-muted mt-0.5 max-w-xs">
               Matching with online drivers within radius. First driver to accept confirms your trip.
+            </p>
+          </div>
+        )}
+
+        {/* Expired State Notice */}
+        {statusToRender === 'expired' && (
+          <div className="my-3 p-4 rounded-lg bg-surface-sunken border border-border flex flex-col items-center justify-center text-center">
+            <div className="w-10 h-10 rounded-full bg-accent-muted text-text-muted flex items-center justify-center mb-2">
+              <Clock size={18} />
+            </div>
+            <p className="text-xs font-bold text-text-primary">
+              No Nearby Drivers Available
+            </p>
+            <p className="text-[11px] text-text-muted mt-0.5 max-w-xs">
+              Drivers in this pickup radius didn’t respond in time. You can try searching again or choose a scheduled ride.
             </p>
           </div>
         )}
@@ -247,7 +295,7 @@ export const OnDemandRideTracker = ({
 
         {/* Bottom Actions */}
         <div className="mt-3">
-          {['searching', 'accepted', 'driver_arriving'].includes(request.status) ? (
+          {['searching', 'accepted', 'driver_arriving'].includes(statusToRender) ? (
             <Button
               variant="destructive"
               size="sm"
@@ -256,20 +304,30 @@ export const OnDemandRideTracker = ({
             >
               Cancel Request
             </Button>
-          ) : request.status === 'in_progress' ? (
+          ) : statusToRender === 'in_progress' ? (
             <p className="text-xs font-medium text-primary text-center py-1">
               Ride in progress. Heading toward your destination.
             </p>
-          ) : request.status === 'expired' ? (
-            <Button
-              variant="primary"
-              size="sm"
-              fullWidth
-              leftIcon={RefreshCw}
-              onClick={onClose}
-            >
-              Try New Search
-            </Button>
+          ) : statusToRender === 'expired' ? (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                fullWidth
+                onClick={handleDismiss}
+              >
+                Dismiss
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                fullWidth
+                leftIcon={RefreshCw}
+                onClick={handleDismiss}
+              >
+                Try Again
+              </Button>
+            </div>
           ) : null}
         </div>
       </motion.div>
@@ -277,7 +335,7 @@ export const OnDemandRideTracker = ({
       {/* Cancel Confirmation Dialog */}
       <AnimatePresence>
         {showCancelConfirm && (
-          <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[1250] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm">
             <div
               role="alertdialog"
               aria-modal="true"

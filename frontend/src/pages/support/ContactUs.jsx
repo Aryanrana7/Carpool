@@ -131,7 +131,7 @@ export const ContactUs = () => {
         {/* 2. In-App Contact Form */}
         <section
           aria-labelledby="contact-form-title"
-          className="bg-surface dark:bg-[#18241F] border border-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs transition-colors"
+          className="bg-surface border border-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs transition-colors"
         >
           <div className="max-w-2xl mx-auto space-y-6">
             <div>
@@ -160,7 +160,7 @@ export const ContactUs = () => {
                     <p className="text-xs text-text-secondary leading-relaxed">
                       {successResult.message}
                     </p>
-                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-surface dark:bg-[#18241F] border border-border rounded-md text-xs font-mono font-bold text-primary">
+                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-surface border border-border rounded-md text-xs font-mono font-bold text-primary">
                       <span>Tracking ID:</span>
                       <span>{successResult.ticketId}</span>
                     </div>

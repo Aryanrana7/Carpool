@@ -79,7 +79,7 @@ export const HelpFaq = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by keyword, topic, or question (e.g. cancellation, seats, payment)..."
-              className="w-full min-h-[48px] pl-10 pr-10 text-sm bg-surface dark:bg-[#18241F] border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary shadow-xs transition-colors"
+              className="w-full min-h-[48px] pl-10 pr-10 text-sm bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary shadow-xs transition-colors"
               aria-label="Search FAQ questions"
             />
             {searchQuery && (
@@ -123,11 +123,11 @@ export const HelpFaq = () => {
                 }
                 className={`
                   px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-[13px] font-semibold transition-all duration-150 cursor-pointer select-none
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0F1714]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
                   ${
                     isSelected
                       ? '!bg-primary !text-white !border-primary shadow-xs font-bold'
-                      : 'bg-white dark:bg-[#18241F] text-text-primary dark:text-[#F6F4EC] border border-border dark:border-[#2B3D35] hover:bg-primary-subtle dark:hover:bg-primary/20 hover:text-primary dark:hover:text-emerald-300 hover:border-primary/50'
+                      : 'bg-surface text-text-primary border border-border hover:bg-primary-subtle hover:text-primary hover:border-primary/50'
                   }
                 `}
               >
@@ -150,7 +150,7 @@ export const HelpFaq = () => {
                 return (
                   <div
                     key={faq.id}
-                    className="bg-surface dark:bg-[#18241F] border border-border rounded-xl overflow-hidden transition-colors shadow-xs"
+                    className="bg-surface border border-border rounded-xl overflow-hidden transition-colors shadow-xs"
                   >
                     <button
                       type="button"
@@ -184,7 +184,7 @@ export const HelpFaq = () => {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 px-4 bg-surface dark:bg-[#18241F] border border-border rounded-2xl space-y-4">
+            <div className="text-center py-12 px-4 bg-surface border border-border rounded-2xl space-y-4">
               <div className="w-12 h-12 rounded-full bg-primary-subtle text-primary dark:bg-primary/20 flex items-center justify-center mx-auto">
                 <Search size={22} />
               </div>

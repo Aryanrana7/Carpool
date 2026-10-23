@@ -46,6 +46,7 @@ const Layout = () => {
   const location = useLocation();
   // Keep shared Navbar stable during authentication portal switching (/login and /driver/login)
   const isDriverRoute = location.pathname.startsWith('/driver') && location.pathname !== '/driver/login';
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/driver/login';
 
   useEffect(() => {
     document.title = 'CarPool';
@@ -59,7 +60,7 @@ const Layout = () => {
           <Outlet />
         </Suspense>
       </main>
-      <FooterSection />
+      {!isAuthRoute && <FooterSection />}
     </div>
   );
 };

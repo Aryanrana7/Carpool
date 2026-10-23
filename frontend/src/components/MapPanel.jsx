@@ -16,7 +16,7 @@ import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils/formatters';
 
 // Clean SVG Car Marker (No emojis)
-const buildCarIcon = (color = '#087F5B', isSelected = false) => {
+const buildCarIcon = (color = '#315B45', isSelected = false) => {
   const size = isSelected ? 42 : 36;
   return L.divIcon({
     html: `
@@ -31,10 +31,10 @@ const buildCarIcon = (color = '#087F5B', isSelected = false) => {
           color:#ffffff;
           border:2.5px solid #ffffff;
           border-radius:50%;
-          box-shadow:0 6px 16px rgba(24,36,31,0.3);
+          box-shadow:0 6px 16px rgba(25,42,32,0.3);
           transition:transform 0.15s ease;
         "
-        class="${isSelected ? 'scale-110 ring-4 ring-emerald-500/30' : ''}"
+        class="${isSelected ? 'scale-110 ring-4 ring-primary/40' : ''}"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 10.9 2 11.2 2 11.5V16c0 .6.4 1 1 1h2"/>
@@ -52,7 +52,7 @@ const buildCarIcon = (color = '#087F5B', isSelected = false) => {
 };
 
 // Route Pin Icons (Pickup & Dropoff)
-const buildPinIcon = (color = '#087F5B', label = 'PICKUP') =>
+const buildPinIcon = (color = '#315B45', label = 'PICKUP') =>
   L.divIcon({
     html: `
       <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">
@@ -65,7 +65,7 @@ const buildPinIcon = (color = '#087F5B', label = 'PICKUP') =>
             letter-spacing:0.04em;
             padding:3px 7px;
             border-radius:6px;
-            box-shadow:0 4px 12px rgba(24,36,31,0.25);
+            box-shadow:0 4px 12px rgba(25,42,32,0.25);
             border:1.5px solid #ffffff;
             white-space:nowrap;
           "
@@ -86,8 +86,8 @@ const buildPassengerLocationIcon = () =>
   L.divIcon({
     html: `
       <div style="position:relative;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
-        <span style="position:absolute;width:28px;height:28px;border-radius:50%;background:#087F5B;opacity:0.25;" class="animate-ping"></span>
-        <div style="width:12px;height:12px;border-radius:50%;background:#087F5B;border:2.5px solid #ffffff;box-shadow:0 2px 8px rgba(8,127,91,0.6);z-index:2;"></div>
+        <span style="position:absolute;width:28px;height:28px;border-radius:50%;background:#315B45;opacity:0.25;" class="animate-ping"></span>
+        <div style="width:12px;height:12px;border-radius:50%;background:#315B45;border:2.5px solid #ffffff;box-shadow:0 2px 8px rgba(49,91,69,0.6);z-index:2;"></div>
       </div>
     `,
     className: 'custom-passenger-marker',
@@ -265,7 +265,7 @@ export const MapPanel = ({
         {source && source.lat && (
           <Marker
             position={[source.lat, source.lng]}
-            icon={buildPinIcon('#087F5B', 'PICKUP')}
+            icon={buildPinIcon('#315B45', 'PICKUP')}
           />
         )}
 
@@ -273,24 +273,24 @@ export const MapPanel = ({
         {destination && destination.lat && (
           <Marker
             position={[destination.lat, destination.lng]}
-            icon={buildPinIcon('#18241F', 'DROPOFF')}
+            icon={buildPinIcon('#192A20', 'DROPOFF')}
           />
         )}
 
-        {/* Route Polyline with Forest Charcoal Casing & Vibrant Emerald Core */}
+        {/* Route Polyline with Forest Charcoal Casing & Pine Green Core */}
         {routePoints?.length > 0 && (
           <>
             {/* Casing line */}
             <Polyline
               positions={routePoints}
-              color={isDarkMode ? '#0F1714' : '#18241F'}
+              color={isDarkMode ? '#0E1712' : '#192A20'}
               weight={7}
               opacity={0.8}
             />
             {/* Core route line */}
             <Polyline
               positions={routePoints}
-              color="#087F5B"
+              color="#315B45"
               weight={4}
               opacity={0.95}
             />
@@ -316,7 +316,7 @@ export const MapPanel = ({
               <Marker
                 key={ride._id}
                 position={coords}
-                icon={buildCarIcon(isSelected || isHovered ? '#05513A' : '#087F5B', isSelected)}
+                icon={buildCarIcon(isSelected || isHovered ? '#264936' : '#315B45', isSelected)}
                 eventHandlers={{
                   click: () => onSelectRide && onSelectRide(ride),
                 }}
@@ -344,7 +344,7 @@ export const MapPanel = ({
         {driverLocation && (
           <Marker
             position={[driverLocation.lat, driverLocation.lng]}
-            icon={buildCarIcon('#16A34A', true)}
+            icon={buildCarIcon('#23815E', true)}
           >
             <Popup>
               <div className="text-center py-1">

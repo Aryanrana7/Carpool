@@ -78,7 +78,7 @@ export const Payment = () => {
     return (
       <div className="min-h-[calc(100vh-68px)] flex items-center justify-center bg-background p-6">
         <div className="text-center max-w-sm bg-surface border border-border p-8 rounded-xl shadow-modal">
-          <div className="w-14 h-14 bg-success-subtle text-success rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-200 dark:border-emerald-800/40">
+          <div className="w-14 h-14 bg-success-subtle text-success rounded-full flex items-center justify-center mx-auto mb-4 border border-success/30">
             <CheckCircle2 size={32} />
           </div>
           <h2 className="text-xl font-bold text-text-primary mb-1">

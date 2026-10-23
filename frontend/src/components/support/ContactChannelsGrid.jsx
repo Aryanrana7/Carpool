@@ -9,7 +9,7 @@ export const ContactChannelsGrid = ({ compact = false }) => {
       {/* 1. Phone Support */}
       <a
         href={CONTACT_CONFIG.phone.link}
-        className="group flex flex-col justify-between p-5 bg-surface dark:bg-[#18241F] border border-border rounded-xl shadow-xs hover:border-primary hover:shadow-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="group flex flex-col justify-between p-5 bg-surface border border-border rounded-xl shadow-xs hover:border-primary hover:shadow-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         aria-label={`Call CarPool Support at ${CONTACT_CONFIG.phone.display}`}
       >
         <div className="space-y-3">
@@ -37,11 +37,11 @@ export const ContactChannelsGrid = ({ compact = false }) => {
         href={CONTACT_CONFIG.whatsapp.getLink()}
         target="_blank"
         rel="noopener noreferrer"
-        className="group flex flex-col justify-between p-5 bg-surface dark:bg-[#18241F] border border-border rounded-xl shadow-xs hover:border-primary hover:shadow-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="group flex flex-col justify-between p-5 bg-surface border border-border rounded-xl shadow-xs hover:border-primary hover:shadow-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         aria-label="Chat with CarPool Support on WhatsApp"
       >
         <div className="space-y-3">
-          <div className="w-10 h-10 rounded-lg bg-[#E8F8F0] text-[#087F5B] dark:bg-emerald-950/40 flex items-center justify-center transition-transform group-hover:scale-105">
+          <div className="w-10 h-10 rounded-lg bg-success-subtle text-success flex items-center justify-center transition-transform group-hover:scale-105">
             <MessageCircle size={18} />
           </div>
           <div>
@@ -64,7 +64,7 @@ export const ContactChannelsGrid = ({ compact = false }) => {
       {/* 3. Email Support */}
       <a
         href={CONTACT_CONFIG.email.link}
-        className="group flex flex-col justify-between p-5 bg-surface dark:bg-[#18241F] border border-border rounded-xl shadow-xs hover:border-primary hover:shadow-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="group flex flex-col justify-between p-5 bg-surface border border-border rounded-xl shadow-xs hover:border-primary hover:shadow-subtle transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         aria-label={`Send an email to CarPool Support at ${CONTACT_CONFIG.email.address}`}
       >
         <div className="space-y-3">
@@ -90,7 +90,7 @@ export const ContactChannelsGrid = ({ compact = false }) => {
       {/* 4. Social Media: Instagram (Coming Soon) */}
       {!compact && (
         <div
-          className="flex flex-col justify-between p-5 bg-surface/60 dark:bg-[#18241F]/60 border border-border/80 rounded-xl shadow-xs"
+          className="flex flex-col justify-between p-5 bg-surface/60 border border-border/80 rounded-xl shadow-xs"
           aria-label="Instagram page status"
         >
           <div className="space-y-3">

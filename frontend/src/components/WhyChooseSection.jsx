@@ -26,13 +26,13 @@ const BENEFITS = [
 
 export const WhyChooseSection = () => {
   return (
-    <section className="w-full py-14 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF9F5] dark:bg-[#0F1714] border-b border-border transition-colors">
+    <section className="w-full py-14 sm:py-20 px-4 sm:px-6 lg:px-8 bg-background border-b border-border transition-colors">
       <div className="max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-3 max-w-xl mx-auto">
           <span className="text-xs font-bold text-primary uppercase tracking-wider block">
             Why Commuters Trust CarPool
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-text-primary font-heading">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-text-primary font-heading">
             Engineered for Everyday Reliability
           </h2>
           <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">

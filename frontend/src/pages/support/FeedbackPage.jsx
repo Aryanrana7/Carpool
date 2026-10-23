@@ -109,7 +109,7 @@ export const FeedbackPage = () => {
         {/* Feedback Card */}
         <section
           aria-labelledby="feedback-form-title"
-          className="bg-surface dark:bg-[#18241F] border border-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs transition-colors"
+          className="bg-surface border border-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs transition-colors"
         >
           {success ? (
             <div

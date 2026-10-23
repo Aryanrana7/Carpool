@@ -198,7 +198,7 @@ export const ReportProblem = () => {
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'new'
                     ? 'bg-primary text-white shadow-xs'
-                    : 'bg-surface dark:bg-[#18241F] text-text-secondary border border-border hover:text-text-primary'
+                    : 'bg-surface text-text-secondary border border-border hover:text-text-primary'
                 }`}
               >
                 File New Report
@@ -209,7 +209,7 @@ export const ReportProblem = () => {
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                   activeTab === 'history'
                     ? 'bg-primary text-white shadow-xs'
-                    : 'bg-surface dark:bg-[#18241F] text-text-secondary border border-border hover:text-text-primary'
+                    : 'bg-surface text-text-secondary border border-border hover:text-text-primary'
                 }`}
               >
                 <History size={13} />
@@ -221,7 +221,7 @@ export const ReportProblem = () => {
 
         {activeTab === 'history' ? (
           /* Report History View */
-          <div className="bg-surface dark:bg-[#18241F] border border-border rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold font-heading text-text-primary">
@@ -280,7 +280,7 @@ export const ReportProblem = () => {
           /* New Report Form */
           <section
             aria-labelledby="report-form-title"
-            className="bg-surface dark:bg-[#18241F] border border-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs transition-colors"
+            className="bg-surface border border-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs transition-colors"
           >
             {successResult ? (
               <div
@@ -299,7 +299,7 @@ export const ReportProblem = () => {
                     <p className="text-xs text-text-secondary leading-relaxed">
                       {successResult.message}
                     </p>
-                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-surface dark:bg-[#18241F] border border-border rounded-md text-xs font-mono font-bold text-primary">
+                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-surface border border-border rounded-md text-xs font-mono font-bold text-primary">
                       <span>Tracking Reference:</span>
                       <span>{successResult.ticketId}</span>
                     </div>

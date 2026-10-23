@@ -23,6 +23,7 @@ export const DemoLoginSection = ({
   type = 'passenger', // 'passenger' | 'driver'
   onSelectFill,
   onDirectLogin,
+  compact = false,
 }) => {
   const [loadingEmail, setLoadingEmail] = useState(null);
   const isDemoEnabled = import.meta.env.VITE_ENABLE_DEMO_MODE !== 'false';
@@ -64,39 +65,45 @@ export const DemoLoginSection = ({
   };
 
   return (
-    <div className="mt-6 pt-5 border-t border-border">
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">
-          <Zap size={13} className="text-primary" />
+    <div className={compact ? 'mt-3 pt-2.5 border-t border-border/70' : 'mt-5 pt-4 border-t border-border'}>
+      <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+          <Zap size={12} className="text-[#134E35] dark:text-primary" />
           <span>Quick Demo Access</span>
         </div>
-        <span className="text-[11px] text-text-muted">
-          Pass: <code className="bg-border-subtle px-1.5 py-0.5 rounded text-[10px] font-mono text-text-secondary">{DEMO_PASSWORD}</code>
+        <span className="text-[10px] text-text-muted flex items-center gap-1">
+          Pass: <code className="bg-[#EBE7DF] dark:bg-surface-sunken px-1.5 py-0.5 rounded text-[10px] font-mono text-text-primary font-semibold border border-border/50">{DEMO_PASSWORD}</code>
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className={`grid grid-cols-2 ${compact ? 'gap-1.5' : 'gap-2.5'}`}>
         {list.map((account) => (
           <button
             key={account.email}
             type="button"
             disabled={loadingEmail !== null}
             onClick={() => handleQuickLogin(account)}
-            className="p-2.5 rounded-md border border-border bg-surface hover:border-primary hover:bg-background text-left transition-colors group disabled:opacity-50 cursor-pointer shadow-subtle"
+            className={`border border-border/70 bg-white/90 dark:bg-surface/90 hover:border-[#134E35]/60 hover:bg-[#F6FAF7] dark:hover:bg-surface-elevated text-left transition-all duration-150 group disabled:opacity-50 cursor-pointer shadow-2xs flex items-center justify-between ${
+              compact ? 'px-2.5 py-1.5 rounded-lg' : 'p-3 rounded-xl'
+            }`}
           >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-primary truncate group-hover:text-primary">
+            <div className="min-w-0 pr-1.5">
+              <span className={`font-bold text-text-primary truncate block group-hover:text-[#134E35] dark:group-hover:text-primary ${
+                compact ? 'text-[11px] leading-tight' : 'text-xs'
+              }`}>
                 {account.name.split(' ')[0]}
               </span>
-              {type === 'passenger' ? (
-                <User size={12} className="text-text-muted group-hover:text-primary shrink-0" />
-              ) : (
-                <Car size={12} className="text-text-muted group-hover:text-primary shrink-0" />
-              )}
+              <p className={`text-text-muted truncate ${
+                compact ? 'text-[10px] leading-tight mt-0.5' : 'text-[11px] mt-0.5'
+              }`}>
+                {type === 'passenger' ? account.tag : account.route}
+              </p>
             </div>
-            <p className="text-[10px] text-text-muted truncate mt-0.5">
-              {type === 'passenger' ? account.tag : account.route}
-            </p>
+            {type === 'passenger' ? (
+              <User size={compact ? 12 : 14} className="text-text-muted group-hover:text-[#134E35] dark:group-hover:text-primary shrink-0 transition-colors" />
+            ) : (
+              <Car size={compact ? 12 : 14} className="text-text-muted group-hover:text-[#134E35] dark:group-hover:text-primary shrink-0 transition-colors" />
+            )}
           </button>
         ))}
       </div>

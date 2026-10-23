@@ -63,7 +63,7 @@ export const HowItWorksSection = () => {
           <span className="text-xs font-bold text-primary uppercase tracking-wider block">
             Simple Mobility Workflows
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-text-primary font-heading">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-text-primary font-heading">
             How CarPool Works
           </h2>
           <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">

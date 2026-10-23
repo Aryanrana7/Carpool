@@ -163,8 +163,8 @@ const VerticalRideCard = React.memo(({
           className={`
             inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer shadow-sm shrink-0
             ${selected
-              ? 'bg-[#066649] text-white ring-2 ring-[#087F5B] ring-offset-1'
-              : 'bg-[#087F5B] hover:bg-[#066649] text-white'
+              ? 'bg-primary-hover text-white ring-2 ring-primary ring-offset-1'
+              : 'bg-primary hover:bg-primary-hover text-white'
             }
           `}
         >

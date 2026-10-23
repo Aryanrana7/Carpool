@@ -31,7 +31,7 @@ export const SafetyHelp = () => {
               <ShieldAlert size={28} />
             </div>
             <div className="space-y-1.5">
-              <h1 id="emergency-alert-title" className="text-2xl sm:text-3xl font-black font-heading tracking-tight">
+              <h1 id="emergency-alert-title" className="text-2xl sm:text-3xl font-extrabold font-heading tracking-tight">
                 In Immediate Danger? Call Emergency Services (112)
               </h1>
               <p className="text-xs sm:text-sm text-red-100 leading-relaxed max-w-2xl">
@@ -55,7 +55,7 @@ export const SafetyHelp = () => {
         </section>
 
         {/* Clear Distinction Note */}
-        <div className="p-4 bg-surface dark:bg-[#18241F] border border-border rounded-xl flex items-start gap-3 text-xs text-text-secondary leading-relaxed">
+        <div className="p-4 bg-surface border border-border rounded-xl flex items-start gap-3 text-xs text-text-secondary leading-relaxed">
           <ShieldCheck size={18} className="text-primary shrink-0 mt-0.5" />
           <p>
             <strong className="text-text-primary">Important Clarification:</strong> CarPool is a shared mobility platform and does not replace official emergency law enforcement, fire, or ambulance dispatch. The CarPool support channels below provide 24/7 assistance for platform operations, booking mediation, and trip safety incident logging.
@@ -75,7 +75,7 @@ export const SafetyHelp = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Step 1: Move to Safe Location */}
-            <div className="p-6 bg-surface dark:bg-[#18241F] border border-border rounded-2xl space-y-3 shadow-xs">
+            <div className="p-6 bg-surface border border-border rounded-2xl space-y-3 shadow-xs">
               <div className="w-10 h-10 rounded-xl bg-primary-subtle text-primary dark:bg-primary/20 flex items-center justify-center font-bold font-heading">
                 1
               </div>
@@ -88,7 +88,7 @@ export const SafetyHelp = () => {
             </div>
 
             {/* Step 2: Share Trip Details */}
-            <div className="p-6 bg-surface dark:bg-[#18241F] border border-border rounded-2xl space-y-3 shadow-xs">
+            <div className="p-6 bg-surface border border-border rounded-2xl space-y-3 shadow-xs">
               <div className="w-10 h-10 rounded-xl bg-primary-subtle text-primary dark:bg-primary/20 flex items-center justify-center font-bold font-heading">
                 2
               </div>
@@ -101,7 +101,7 @@ export const SafetyHelp = () => {
             </div>
 
             {/* Step 3: Log Report with CarPool */}
-            <div className="p-6 bg-surface dark:bg-[#18241F] border border-border rounded-2xl space-y-3 shadow-xs">
+            <div className="p-6 bg-surface border border-border rounded-2xl space-y-3 shadow-xs">
               <div className="w-10 h-10 rounded-xl bg-primary-subtle text-primary dark:bg-primary/20 flex items-center justify-center font-bold font-heading">
                 3
               </div>
@@ -118,7 +118,7 @@ export const SafetyHelp = () => {
         {/* Direct CarPool Contact Channels */}
         <section
           aria-labelledby="carpool-safety-contact-title"
-          className="bg-surface dark:bg-[#18241F] border border-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs"
+          className="bg-surface border border-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs"
         >
           <div className="space-y-1">
             <h2 id="carpool-safety-contact-title" className="text-xl font-bold font-heading text-text-primary">
@@ -149,7 +149,7 @@ export const SafetyHelp = () => {
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-border-subtle/50 transition-all text-xs font-semibold text-text-primary group"
             >
-              <div className="w-9 h-9 rounded-lg bg-[#E8F8F0] text-[#087F5B] dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-success-subtle text-success flex items-center justify-center shrink-0">
                 <MessageCircle size={16} />
               </div>
               <div>

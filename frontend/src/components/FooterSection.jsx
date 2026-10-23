@@ -15,7 +15,7 @@ import { CONTACT_CONFIG } from '../config/contactConfig';
 
 export const FooterSection = () => {
   return (
-    <footer className="w-full bg-[#18241F] text-slate-300 text-xs border-t border-[#25382F] transition-colors select-none">
+    <footer className="w-full bg-[#192A20] text-slate-300 text-xs border-t border-[#24382D] transition-colors select-none">
       <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* 1. Brand Column */}
@@ -31,7 +31,7 @@ export const FooterSection = () => {
               CarPool is a community-first mobility platform connecting daily commuters with verified drivers along shared everyday corridors.
             </p>
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 text-emerald-300 text-[11px] font-bold border border-emerald-500/30">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#16231C] text-[#D2E2D8] text-[11px] font-bold border border-primary/30">
               <Clock size={12} className="text-primary animate-pulse" />
               <span>{CONTACT_CONFIG.availability.label}</span>
             </div>
@@ -146,7 +146,7 @@ export const FooterSection = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-[#25382F] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
+        <div className="pt-8 border-t border-[#24382D] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <p>© {new Date().getFullYear()} CarPool Mobility Platform. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <span className="text-slate-500">•</span>

@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 export const SupportNav = () => {
   return (
-    <div className="w-full bg-surface dark:bg-[#18241F] border-b border-border transition-colors">
+    <div className="w-full bg-surface border-b border-border transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           {/* Section Navigation Tabs */}
@@ -39,7 +39,7 @@ export const SupportNav = () => {
           </nav>
 
           {/* 24/7 Availability Indicator */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-subtle text-primary dark:bg-primary/20 dark:text-emerald-300 text-xs font-bold border border-primary/20 shrink-0 self-start sm:self-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-subtle text-primary text-xs font-bold border border-primary/20 shrink-0 self-start sm:self-auto">
             <Clock size={13} className="text-primary animate-pulse" />
             <span>{CONTACT_CONFIG.availability.label}</span>
           </div>
