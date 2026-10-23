@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 247 185" fill="none">
-  <!-- Teal Person (Left) -->
-  <circle cx="71" cy="33.5" r="33.5" fill="var(--carpool-teal, #087F5B)" />
-  <path d="M 14.5 169.5 L 14.5 155 C 14.5 125 40 115.5 71 115.5 C 102 115.5 127.5 125 127.5 155" stroke="var(--carpool-teal, #087F5B)" stroke-width="29" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <!-- Left Person (Pine Green #315B45) -->
+  <circle cx="71" cy="33.5" r="33.5" fill="#315B45" />
+  <path d="M 14.5 169.5 L 14.5 155 C 14.5 125 40 115.5 71 115.5 C 102 115.5 127.5 125 127.5 155" stroke="#315B45" stroke-width="29" stroke-linecap="round" stroke-linejoin="round" fill="none" />
   
-  <!-- Amber Person (Right) -->
-  <circle cx="175" cy="33.5" r="33.5" fill="var(--carpool-amber, #E8A45B)" />
-  <path d="M 122.5 140.5 C 127.5 125 144 115.5 175 115.5 C 206 115.5 231.5 125 231.5 155 L 231.5 169.5" stroke="var(--carpool-amber, #E8A45B)" stroke-width="29" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <!-- Right Person (Sage Green #7EAA93) overlapping left shoulder -->
+  <circle cx="175" cy="33.5" r="33.5" fill="#7EAA93" />
+  <path d="M 122.5 140.5 C 127.5 125 144 115.5 175 115.5 C 206 115.5 231.5 125 231.5 155 L 231.5 169.5" stroke="#7EAA93" stroke-width="29" stroke-linecap="round" stroke-linejoin="round" fill="none" />
 </svg>

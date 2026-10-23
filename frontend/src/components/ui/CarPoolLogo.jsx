@@ -2,14 +2,14 @@ import React from 'react';
 
 /**
  * Authentic CarPool brand logo: two-person mobility emblem.
- * - Left figure: Primary Teal (#087F5B)
- * - Right figure: Accent Amber (#E8A45B) overlapping the left shoulder
+ * - Left figure: Primary Blue (#477DA8)
+ * - Right figure: Slate Blue (#7BA3C7) overlapping the left shoulder
  * Scalable SVG with high-DPI crisp rendering.
  */
 export const CarPoolLogo = ({
   className = 'h-7 sm:h-8 w-auto',
-  tealColor = '#087F5B',
-  amberColor = '#E8A45B',
+  tealColor = '#315B45',
+  amberColor = '#7EAA93',
   title = 'CarPool logo',
   ...props
 }) => {
@@ -25,7 +25,7 @@ export const CarPoolLogo = ({
     >
       <title>{title}</title>
       
-      {/* Left Person — Primary Teal (#087F5B) */}
+      {/* Left Person — Primary Blue (#477DA8) */}
       <circle
         cx="71"
         cy="33.5"
